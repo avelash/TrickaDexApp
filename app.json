@@ -4,7 +4,7 @@
     "slug": "TrickaDexApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app_icon_new.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
