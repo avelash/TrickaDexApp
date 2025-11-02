@@ -601,8 +601,54 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["transition"],
     prerequisites: ["cartwheel"],
     difficulty: 1,
-    description: "A kind of cartwheel where the legs and hands are placed in an opposite order, creating a 360 flat spin movement.",
+    description:
+      "A kind of cartwheel where the legs and hands are placed in an opposite order, creating a 360 flat spin movement.",
     tutorialUrl: "https://www.youtube.com/watch?v=NzSMOA6-868",
+  },
+  {
+    id: "lazyboi",
+    name: "Lazyboi",
+    icon: require("../../assets/lazyboi_icon.png"),
+    types: ["transition"],
+    prerequisites: ["tornado", "compasso"],
+    difficulty: 1,
+    description:
+      "A layed back, no-kick, tornado.\noften performed with the hands behind the head or on the hips.",
+    tutorialUrl: "https://www.youtube.com/watch?v=Bb8tUbg09ME",
+  },
+  {
+    id: "touchdown_raiz",
+    name: "Touchdown Raiz",
+    icon: require("../../assets/touchDown_Raiz_icon.png"),
+    types: ["transition", "flip"],
+    prerequisites: ["raiz"],
+    difficulty: 2,
+    description:
+      "A raiz where the leading hand touches the ground before the feet.",
+    tutorialUrl: "https://www.youtube.com/watch?v=hFVmKVHsGho",
+  },
+  {
+    id: "cork",
+    name: "Cork",
+    icon: require("../../assets/cork_icon.png"),
+    types: ["twist", "flip"],
+    prerequisites: ["gainer"],
+    difficulty: 3,
+    description:
+      "A gainer with a full twist.\neven though it does not say so in the prerequisites, it's recommended you know at least one twisting move before trying this one.",
+    tutorialUrl: "https://www.youtube.com/watch?v=r_VnnEcCtp8",
+  },
+  {
+    id: "rodeo_flash",
+    name: "Rodeo Flash",
+    icon: require("../../assets/RodeoFlash_icon.png"),
+    types: ["flip"],
+    prerequisites: ["flash_kick"],
+    difficulty: 3,
+    description:
+      "A flash kick, with an added one/two arm grab of the other leg, pulling it behind the back into an arched position.\n" +
+      "this below is not a tutorial but just the only video i found.",
+    tutorialUrl: "https://www.youtube.com/watch?app=desktop&v=lxKKRWuLhZ8",
   },
 ];
 
