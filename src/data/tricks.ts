@@ -650,6 +650,42 @@ const TRICKS_DATA_RAW: Trick[] = [
       "this below is not a tutorial but just the only video i found.",
     tutorialUrl: "https://www.youtube.com/watch?app=desktop&v=lxKKRWuLhZ8",
   },
+  {
+    id: "backside_720",
+    name: "Backside 720",
+    icon: require("../../assets/bs720_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["pop_360"],
+    difficulty: 1,
+    description:
+      "Starting with the back to the direction of movement(DOM), the practitioner jumps and spins 450 degrees and then" +
+      " performs a hook kick towards the target.",
+    tutorialUrl: "https://www.youtube.com/watch?v=yArws74DOXk",
+  },
+  {
+    id: "backside_900",
+    name: "Backside 900",
+    icon: require("../../assets/bs900_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["backside_720", "pop_tornado"],
+    difficulty: 2,
+    description:
+      "Starting in a backside position, the practitioner  jumps and spins 540 degrees and then" +
+      " performs a round kick towards the target.",
+    tutorialUrl: "https://www.youtube.com/watch?v=jm8lRz8ed4M",
+  },
+  {
+    id: "pop_720",
+    name: "Pop 720",
+    icon: require("../../assets/pop720_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["pop_360", "backside_720"],
+    difficulty: 2,
+    description:
+      "From a setup, the practitioner jumps and spins 540 degrees and then" +
+      " performs a hook kick towards the target.",
+    tutorialUrl: "https://www.youtube.com/watch?v=0A5R0VejgJQ",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
