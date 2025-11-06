@@ -216,6 +216,16 @@ export const TrickListScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <Text style={styles.headerTitle}>Trickadex</Text>
+                    <TouchableOpacity
+                        style={styles.menuButton}
+                        accessibilityLabel="Feedback"
+                        onPress={() => navigation.navigate('FeedbackScreen')}
+                    >
+                        <Image
+                            source={require('../../assets/feedback.png')}
+                            style={styles.userIcon}
+                        />
+                    </TouchableOpacity>
                     <View style={styles.menuButton} />
                 </View>
             </View>
