@@ -222,7 +222,7 @@ export const TrickListScreen: React.FC = () => {
                         onPress={() => navigation.navigate('FeedbackScreen')}
                     >
                         <Image
-                            source={require('../../assets/feedback.png')}
+                            source={require('../../assets/edit.png')}
                             style={styles.userIcon}
                         />
                     </TouchableOpacity>
@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     userIcon: {
-        width: 28,
-        height: 28,
+        width: 22,
+        height: 22,
         resizeMode: 'contain',
         tintColor: 'white',
     },
