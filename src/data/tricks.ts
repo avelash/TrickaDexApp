@@ -686,6 +686,62 @@ const TRICKS_DATA_RAW: Trick[] = [
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=0A5R0VejgJQ",
   },
+  {
+    id: "illusion_twist",
+    name: "Illusion Twist",
+    icon: require("../../assets/illusionTwist_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["pop_360", "backside_720", "butterfly_kick"],
+    difficulty: 2,
+    description:
+      "A pop 360 turbo from a Butterfly-Kick setup.\n A lot of people see this as a Butterfly" +
+      " Twist variation, but there is actually no twist happening, hence the name “illusion”.",
+    tutorialUrl: "https://www.youtube.com/watch?v=4Vp4oX0qVTI",
+  },
+  {
+    id: "webster",
+    name: "Webster",
+    icon: require("../../assets/webster_icon.png"),
+    types: ["flip"],
+    prerequisites: ["forward_roll"],
+    difficulty: 2,
+    description:
+      "A front flip taking off of one leg while swinging the other leg backwards.",
+    tutorialUrl: "https://www.youtube.com/watch?v=_VM9PJ1wZF4",
+  },
+  {
+    id: "parafuso",
+    name: "Parafuso",
+    icon: require("../../assets/parafuso_icon.png"),
+    types: ["flip", "kick"],
+    prerequisites: ["tornado_kick"],
+    difficulty: 2,
+    description:
+      "A Double Leg from a cheat setup.\nThe legs start apart and come together mid air, landing together.",
+    tutorialUrl: "https://www.youtube.com/watch?v=mMRmjm85ZcE",
+  },
+  {
+    id: "cartwheel_helicoptero",
+    name: "Cartwheel Helicoptero",
+    icon: require("../../assets/helicoptero_icon.png"),
+    types: ["transition"],
+    prerequisites: ["cartwheel_switch"],
+    difficulty: 2,
+    description:
+      "A Cartwheel where the practitioner swings one leg down and the other one up, both in a circular motion, landing on the starting leg.",
+    tutorialUrl: "https://www.youtube.com/watch?v=d9SRfzi8fWw&t=123s",
+  },
+  {
+    id: "master_scoot",
+    name: "Master Scoot",
+    icon: require("../../assets/masterScoot_icon.png"),
+    types: ["transition", "flip"],
+    prerequisites: ["scoot", "dive_cartwheel"],
+    difficulty: 1,
+    description:
+      "A two handed scoot from an inward swing of the leading leg(master swing).",
+    tutorialUrl: "https://www.youtube.com/watch?v=heNft_5ukkU&t=230s",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
