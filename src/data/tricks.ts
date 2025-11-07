@@ -762,6 +762,16 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A backflip in a piked position.",
     tutorialUrl: "https://www.youtube.com/watch?v=ZY2qjQEeeCU",
   },
+  {
+    id: "crowd_awakener",
+    name: "Crowd Awakener",
+    icon: require("../../assets/crowdAwakener_icon.png"),
+    types: ["kick"],
+    prerequisites: ["pop_360", "tornado_kick"],
+    difficulty: 1,
+    description: "A split kick from a pop or cheat setup.",
+    tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
