@@ -85,7 +85,7 @@ export const FILTER_CONFIG: FilterConfig[] = [
     icon: require("../../assets/stars/six.png"),
   },
   {
-    name: SKILL_LEVELS[6].color,
+    name: SKILL_LEVELS[6].name,
     category: "Level",
     color: SKILL_LEVELS[6].color,
     icon: require("../../assets/stars/seven.png"),

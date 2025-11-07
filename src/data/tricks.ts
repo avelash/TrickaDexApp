@@ -742,6 +742,26 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A two handed scoot from an inward swing of the leading leg(master swing).",
     tutorialUrl: "https://www.youtube.com/watch?v=heNft_5ukkU&t=230s",
   },
+  {
+    id: "moon_kick",
+    name: "Moon Kick",
+    icon: require("../../assets/moonKick_icon.png"),
+    types: ["kick", "flip"],
+    prerequisites: ["aerial_hook", "slant_gainer"],
+    difficulty: 2,
+    description: "A slant gainer with a hook kick.",
+    tutorialUrl: "https://www.youtube.com/watch?v=zedUQyqHdrM",
+  },
+  {
+    id: "piked_backflip",
+    name: "Piked Backflip",
+    icon: require("../../assets/pikedBackflip_icon.png"),
+    types: ["flip"],
+    prerequisites: ["backflip"],
+    difficulty: 2,
+    description: "A backflip in a piked position.",
+    tutorialUrl: "https://www.youtube.com/watch?v=ZY2qjQEeeCU",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
