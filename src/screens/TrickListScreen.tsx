@@ -219,7 +219,7 @@ export const TrickListScreen: React.FC = () => {
                     <TouchableOpacity
                         style={styles.menuButton}
                         accessibilityLabel="Feedback"
-                        onPress={() => navigation.navigate('FeedbackScreen')}
+                        onPress={() => navigation.navigate('ComboBuilderScreen')}
                     >
                         <Image
                             source={require('../../assets/edit.png')}

@@ -1,0 +1,181 @@
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Trick } from '../types';
+
+interface ComboDropZoneProps {
+    tricks: Trick[];
+    onRemoveTrick: (index: number) => void;
+    onReorderTrick: (fromIndex: number, toIndex: number) => void;
+}
+
+export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
+    tricks,
+    onRemoveTrick,
+    onReorderTrick,
+}) => {
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    if (tricks.length === 0) {
+        return (
+            <View style={[styles.emptyDropZone, isDragOver && styles.dropZoneActive]}>
+                <Text style={styles.emptyDropZoneIcon}>⬇️</Text>
+                <Text style={styles.emptyDropZoneText}>Drag tricks here</Text>
+                <Text style={styles.emptyDropZoneSubtext}>Build your combo by dragging tricks from above</Text>
+            </View>
+        );
+    }
+
+    return (
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dropZoneContent}
+            style={styles.dropZone}
+        >
+            {tricks.map((trick, index) => (
+                <View key={`${trick.id}-${index}`} style={styles.comboCardWrapper}>
+                    <View style={styles.comboCard}>
+                        <TouchableOpacity
+                            style={styles.removeButton}
+                            onPress={() => onRemoveTrick(index)}
+                        >
+                            <Text style={styles.removeButtonText}>✕</Text>
+                        </TouchableOpacity>
+                        <View style={styles.comboIconContainer}>
+                            <Image
+                                source={trick.icon}
+                                style={styles.comboIconImage}
+                                resizeMode="contain"
+                            />
+                        </View>
+                        <Text
+                            style={styles.comboTrickName}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                        >
+                            {trick.name}
+                        </Text>
+                    </View>
+                    {index < tricks.length - 1 && (
+                        <View style={styles.arrowContainer}>
+                            <Text style={styles.arrow}>→</Text>
+                        </View>
+                    )}
+                </View>
+            ))}
+        </ScrollView>
+    );
+};
+
+const styles = StyleSheet.create({
+    emptyDropZone: {
+        height: 180,
+        borderRadius: 20,
+        borderWidth: 3,
+        borderStyle: 'dashed',
+        borderColor: '#BDC3C7',
+        backgroundColor: '#F9F9F9',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    dropZoneActive: {
+        borderColor: '#4ECDC4',
+        backgroundColor: '#E9F7F6',
+    },
+    emptyDropZoneIcon: {
+        fontSize: 40,
+        marginBottom: 10,
+    },
+    emptyDropZoneText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#7F8C8D',
+        marginBottom: 5,
+    },
+    emptyDropZoneSubtext: {
+        fontSize: 14,
+        color: '#BDC3C7',
+        textAlign: 'center',
+        paddingHorizontal: 20,
+    },
+    dropZone: {
+        minHeight: 180,
+        maxHeight: 180,
+        borderRadius: 20,
+        borderWidth: 3,
+        borderColor: '#4ECDC4',
+        backgroundColor: '#E9F7F6',
+        marginBottom: 10,
+    },
+    dropZoneContent: {
+        padding: 15,
+        alignItems: 'center',
+    },
+    comboCardWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    comboCard: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 8,
+        marginHorizontal: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        width: 120,
+        height: 140,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    removeButton: {
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        backgroundColor: '#FF5252',
+        borderRadius: 12,
+        width: 24,
+        height: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+    },
+    removeButtonText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    comboIconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 12,
+        backgroundColor: '#E9F7F6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    comboIconImage: {
+        width: 60,
+        height: 60,
+        resizeMode: 'contain',
+    },
+    comboTrickName: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#2C3E50',
+        textAlign: 'center',
+        paddingHorizontal: 4,
+    },
+    arrowContainer: {
+        marginHorizontal: 5,
+    },
+    arrow: {
+        fontSize: 28,
+        color: '#4ECDC4',
+        fontWeight: 'bold',
+    },
+});
