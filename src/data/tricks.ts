@@ -772,6 +772,16 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A split kick from a pop or cheat setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
   },
+  {
+    id: "valdez",
+    name: "Valdez",
+    icon: require("../../assets/valdez_icon.png"),
+    types: ["flip", "transition"],
+    prerequisites: ["back_handspring"],
+    difficulty: 2,
+    description: "A one handed Back Handspring.",
+    tutorialUrl: "https://www.youtube.com/watch?v=A7lzmG8e84c",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
