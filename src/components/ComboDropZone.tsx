@@ -116,11 +116,6 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                                     {trick.name}
                                 </Text>
                             </View>
-                            {index < tricks.length - 1 && (
-                                <View style={styles.arrowContainer}>
-                                    <Text style={styles.arrow}>→</Text>
-                                </View>
-                            )}
                         </View>
                     </React.Fragment>
                 ))}
