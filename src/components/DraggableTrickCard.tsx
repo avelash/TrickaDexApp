@@ -10,16 +10,24 @@ import { Trick } from '../types';
 interface DraggableTrickCardProps {
     trick: Trick;
     onDrop: (trick: Trick, position: number) => void;
+    dropZoneLayout?: { x: number; y: number; width: number; height: number } | null;
+    comboTricks?: Trick[];
 }
 
 export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
     trick,
     onDrop,
+    dropZoneLayout,
+    comboTricks = [],
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
+
+    // Store the card's absolute position
+    const cardLayout = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+    const viewRef = useRef<View>(null);
 
     const onGestureEvent = Animated.event(
         [
@@ -33,17 +41,86 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         { useNativeDriver: true }
     );
 
+    const handleLayout = () => {
+        if (viewRef.current) {
+            viewRef.current.measureInWindow((x, y, width, height) => {
+                cardLayout.current = { x, y, width, height };
+            });
+        }
+    };
+
+    const calculateDropPosition = (absoluteX: number, absoluteY: number): number => {
+        if (!dropZoneLayout || comboTricks.length === 0) {
+            return 0; // Drop at beginning if empty
+        }
+
+        // Check if dropped over the drop zone
+        const isOverDropZone =
+            absoluteX >= dropZoneLayout.x &&
+            absoluteX <= dropZoneLayout.x + dropZoneLayout.width &&
+            absoluteY >= dropZoneLayout.y &&
+            absoluteY <= dropZoneLayout.y + dropZoneLayout.height;
+
+        if (!isOverDropZone) {
+            return -1; // Not over drop zone
+        }
+
+        // Calculate position based on X coordinate within drop zone
+        // Each card is ~120px wide + 10px margin + ~33px for arrow = ~163px per card
+        const CARD_WIDTH = 163;
+        const relativeX = absoluteX - dropZoneLayout.x;
+        const position = Math.floor(relativeX / CARD_WIDTH);
+
+        return Math.max(0, Math.min(position, comboTricks.length));
+    };
+
     const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
         if (event.nativeEvent.state === State.BEGAN) {
             setIsDragging(true);
+            handleLayout(); // Update card position when drag starts
+
             Animated.spring(scale, {
                 toValue: 1.1,
                 useNativeDriver: true,
             }).start();
         }
 
-        if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
+        if (event.nativeEvent.state === State.END) {
             setIsDragging(false);
+
+            // Calculate absolute position of the dragged card
+            if (cardLayout.current && dropZoneLayout) {
+                const draggedX = cardLayout.current.x + event.nativeEvent.translationX;
+                const draggedY = cardLayout.current.y + event.nativeEvent.translationY;
+
+                const dropPosition = calculateDropPosition(draggedX, draggedY);
+
+                if (dropPosition >= 0) {
+                    // Valid drop - call onDrop
+                    onDrop(trick, dropPosition);
+                }
+            }
+
+            // Reset animation
+            Animated.parallel([
+                Animated.spring(translateX, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(translateY, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(scale, {
+                    toValue: 1,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+
+        if (event.nativeEvent.state === State.CANCELLED) {
+            setIsDragging(false);
+
             Animated.parallel([
                 Animated.spring(translateX, {
                     toValue: 0,
@@ -67,6 +144,8 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
             onHandlerStateChange={onHandlerStateChange}
         >
             <Animated.View
+                ref={viewRef}
+                onLayout={handleLayout}
                 style={[
                     styles.cardContainer,
                     {

@@ -37,6 +37,7 @@ export const ComboBuilderScreen: React.FC = () => {
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
+    const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
     // Get only landed tricks
     const landedTricks = useMemo(
@@ -180,6 +181,8 @@ export const ComboBuilderScreen: React.FC = () => {
                                     key={trick.id}
                                     trick={trick}
                                     onDrop={handleTrickDrop}
+                                    dropZoneLayout={dropZoneLayout} 
+                                    comboTricks={comboTricks} 
                                 />
                             ))
                         ) : (
@@ -211,6 +214,7 @@ export const ComboBuilderScreen: React.FC = () => {
                         tricks={comboTricks}
                         onRemoveTrick={handleRemoveTrick}
                         onReorderTrick={handleReorderTrick}
+                        onLayout={setDropZoneLayout} 
                     />
                 </View>
 

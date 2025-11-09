@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Trick } from '../types';
 
@@ -6,18 +6,33 @@ interface ComboDropZoneProps {
     tricks: Trick[];
     onRemoveTrick: (index: number) => void;
     onReorderTrick: (fromIndex: number, toIndex: number) => void;
+    onLayout?: (layout: { x: number; y: number; width: number; height: number }) => void;
 }
 
 export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     tricks,
     onRemoveTrick,
     onReorderTrick,
+    onLayout,
 }) => {
     const [isDragOver, setIsDragOver] = useState(false);
+    const viewRef = useRef<View>(null);
+
+    const handleLayout = () => {
+        if (viewRef.current && onLayout) {
+            viewRef.current.measureInWindow((x, y, width, height) => {
+                onLayout({ x, y, width, height });
+            });
+        }
+    };
 
     if (tricks.length === 0) {
         return (
-            <View style={[styles.emptyDropZone, isDragOver && styles.dropZoneActive]}>
+            <View
+                ref={viewRef}
+                onLayout={handleLayout}
+                style={[styles.emptyDropZone, isDragOver && styles.dropZoneActive]}
+            >
                 <Text style={styles.emptyDropZoneIcon}>⬇️</Text>
                 <Text style={styles.emptyDropZoneText}>Drag tricks here</Text>
                 <Text style={styles.emptyDropZoneSubtext}>Build your combo by dragging tricks from above</Text>
@@ -26,48 +41,57 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     }
 
     return (
-        <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.dropZoneContent}
-            style={styles.dropZone}
+        <View
+            ref={viewRef}
+            onLayout={handleLayout}
+            style={styles.dropZoneWrapper}
         >
-            {tricks.map((trick, index) => (
-                <View key={`${trick.id}-${index}`} style={styles.comboCardWrapper}>
-                    <View style={styles.comboCard}>
-                        <TouchableOpacity
-                            style={styles.removeButton}
-                            onPress={() => onRemoveTrick(index)}
-                        >
-                            <Text style={styles.removeButtonText}>✕</Text>
-                        </TouchableOpacity>
-                        <View style={styles.comboIconContainer}>
-                            <Image
-                                source={trick.icon}
-                                style={styles.comboIconImage}
-                                resizeMode="contain"
-                            />
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.dropZoneContent}
+                style={styles.dropZone}
+            >
+                {tricks.map((trick, index) => (
+                    <View key={`${trick.id}-${index}`} style={styles.comboCardWrapper}>
+                        <View style={styles.comboCard}>
+                            <TouchableOpacity
+                                style={styles.removeButton}
+                                onPress={() => onRemoveTrick(index)}
+                            >
+                                <Text style={styles.removeButtonText}>✕</Text>
+                            </TouchableOpacity>
+                            <View style={styles.comboIconContainer}>
+                                <Image
+                                    source={trick.icon}
+                                    style={styles.comboIconImage}
+                                    resizeMode="contain"
+                                />
+                            </View>
+                            <Text
+                                style={styles.comboTrickName}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {trick.name}
+                            </Text>
                         </View>
-                        <Text
-                            style={styles.comboTrickName}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                        >
-                            {trick.name}
-                        </Text>
+                        {index < tricks.length - 1 && (
+                            <View style={styles.arrowContainer}>
+                                <Text style={styles.arrow}>→</Text>
+                            </View>
+                        )}
                     </View>
-                    {index < tricks.length - 1 && (
-                        <View style={styles.arrowContainer}>
-                            <Text style={styles.arrow}>→</Text>
-                        </View>
-                    )}
-                </View>
-            ))}
-        </ScrollView>
+                ))}
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    dropZoneWrapper: {
+        // This wrapper helps with measurement
+    },
     emptyDropZone: {
         height: 180,
         borderRadius: 20,
