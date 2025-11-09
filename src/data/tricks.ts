@@ -782,6 +782,28 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A one handed Back Handspring.",
     tutorialUrl: "https://www.youtube.com/watch?v=A7lzmG8e84c",
   },
+  {
+    id: "flyspring",
+    name: "Flyspring",
+    icon: require("../../assets/flyspring_icon.png"),
+    types: ["flip", "transition"],
+    prerequisites: ["front_handspring", "dive_roll"],
+    difficulty: 2,
+    description: "A Front Handspring performed off of two feet.",
+    tutorialUrl: "https://www.youtube.com/watch?v=_gK5vijqgv8",
+  },
+  {
+    id: "coin_drop",
+    name: "Coin Drop",
+    icon: require("../../assets/coinDrop_icon.png"),
+    types: ["flip", "transition"],
+    prerequisites: ["machine", "star_kipup"],
+    difficulty: 2,
+    description:
+      "Starting the same way as a machine,\n the practitioner slides onto his back, then through" +
+      " a circular motion, similar to a star kipup, he bounces back up.",
+    tutorialUrl: "https://www.youtube.com/watch?v=CnCc3yJBNEs",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
