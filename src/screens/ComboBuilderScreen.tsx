@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import {
     StyleSheet,
     View,
@@ -8,12 +8,14 @@ import {
     TouchableOpacity,
     Image,
     Dimensions,
+    Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SearchBar } from '../components/SearchBar';
 import { DraggableTrickCard } from '../components/DraggableTrickCard';
 import { ComboDropZone } from '../components/ComboDropZone';
+import { DragOverlay } from '../components/DragOverlay';
 import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
@@ -37,7 +39,14 @@ export const ComboBuilderScreen: React.FC = () => {
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
+
+    // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+    const [draggedTrick, setDraggedTrick] = useState<Trick | null>(null);
+    const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
+    const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null); // NEW: Track hover position
+    const dragTranslateX = useRef(new Animated.Value(0)).current;
+    const dragTranslateY = useRef(new Animated.Value(0)).current;
 
     // Get only landed tricks
     const landedTricks = useMemo(
@@ -90,6 +99,24 @@ export const ComboBuilderScreen: React.FC = () => {
         return tricks;
     }, [activeFilters, search, landedTricks, predefinedFilters]);
 
+    // Drag handlers
+    const handleDragStart = useCallback((trick: Trick, layout: { x: number; y: number; width: number; height: number }) => {
+        setDraggedTrick(trick);
+        setDragStartPosition({ x: layout.x, y: layout.y });
+        dragTranslateX.setValue(0);
+        dragTranslateY.setValue(0);
+    }, []);
+
+    const handleDragMove = useCallback((translateX: number, translateY: number) => {
+        dragTranslateX.setValue(translateX);
+        dragTranslateY.setValue(translateY);
+    }, []);
+
+    const handleDragEnd = useCallback(() => {
+        setDraggedTrick(null);
+        setDragStartPosition(null);
+    }, []);
+
     // Handle trick drop
     const handleTrickDrop = useCallback((trick: Trick, position: number) => {
         setComboTricks(prev => {
@@ -127,114 +154,127 @@ export const ComboBuilderScreen: React.FC = () => {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-                <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
+            <View style={{ flex: 1 }}>
+                <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+                    <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.headerRow}>
-                        <TouchableOpacity
-                            style={styles.backButton}
-                            onPress={() => navigation.goBack()}
-                        >
-                            <Image
-                                source={require('../../assets/return.png')}
-                                style={styles.backIcon}
-                            />
-                        </TouchableOpacity>
-
-                        <Text style={styles.headerTitle}>Combo Builder</Text>
-
-                        <View style={styles.backButton} />
-                    </View>
-                </View>
-
-                {/* Search Bar */}
-                <SearchBar
-                    filters={predefinedFilters}
-                    activeFilters={activeFilters}
-                    onToggleFilter={handleToggleFilter}
-                    onSearch={setSearch}
-                />
-
-                {/* Filter Summary */}
-                {activeFilters.length > 0 && (
-                    <View style={styles.filterSummary}>
-                        <Text style={styles.filterSummaryText}>
-                            {filteredTricks.length} trick{filteredTricks.length !== 1 ? 's' : ''} available
-                        </Text>
-                    </View>
-                )}
-
-                {/* Horizontal Scrollable Trick List */}
-                <View style={styles.trickListContainer}>
-                    <Text style={styles.sectionTitle}>Your Landed Tricks</Text>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={[styles.horizontalScrollContent, { overflow: 'visible' }]}
-                        style={{ overflow: 'visible' }}
-                    >
-                        {filteredTricks.length > 0 ? (
-                            filteredTricks.map(trick => (
-                                <DraggableTrickCard
-                                    key={trick.id}
-                                    trick={trick}
-                                    onDrop={handleTrickDrop}
-                                    dropZoneLayout={dropZoneLayout} 
-                                    comboTricks={comboTricks} 
-                                />
-                            ))
-                        ) : (
-                            <View style={styles.emptyState}>
-                                <Text style={styles.emptyStateText}>
-                                    {activeFilters.length > 0
-                                        ? 'No tricks match the selected filters'
-                                        : 'No landed tricks yet'}
-                                </Text>
-                            </View>
-                        )}
-                    </ScrollView>
-                </View>
-
-                {/* Drop Zone */}
-                <View style={styles.dropZoneContainer}>
-                    <View style={styles.dropZoneHeader}>
-                        <Text style={styles.sectionTitle}>Build Your Combo</Text>
-                        {comboTricks.length > 0 && (
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <View style={styles.headerRow}>
                             <TouchableOpacity
-                                style={styles.clearButton}
-                                onPress={handleClearCombo}
+                                style={styles.backButton}
+                                onPress={() => navigation.goBack()}
                             >
-                                <Text style={styles.clearButtonText}>Clear</Text>
+                                <Image
+                                    source={require('../../assets/return.png')}
+                                    style={styles.backIcon}
+                                />
                             </TouchableOpacity>
-                        )}
-                    </View>
-                    <ComboDropZone
-                        tricks={comboTricks}
-                        onRemoveTrick={handleRemoveTrick}
-                        onReorderTrick={handleReorderTrick}
-                        onLayout={setDropZoneLayout} 
-                    />
-                </View>
 
-                {/* Combo Text Display */}
-                <View style={styles.comboTextContainer}>
-                    <Text style={styles.comboTextLabel}>Combo:</Text>
-                    <ScrollView
-                        style={styles.comboTextScroll}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {comboText ? (
-                            <Text style={styles.comboText}>{comboText}</Text>
-                        ) : (
-                            <Text style={styles.comboTextEmpty}>
-                                Drag tricks to build your combo
+                            <Text style={styles.headerTitle}>Combo Builder</Text>
+
+                            <View style={styles.backButton} />
+                        </View>
+                    </View>
+
+                    {/* Search Bar */}
+                    <SearchBar
+                        filters={predefinedFilters}
+                        activeFilters={activeFilters}
+                        onToggleFilter={handleToggleFilter}
+                        onSearch={setSearch}
+                    />
+
+                    {/* Filter Summary */}
+                    {activeFilters.length > 0 && (
+                        <View style={styles.filterSummary}>
+                            <Text style={styles.filterSummaryText}>
+                                {filteredTricks.length} trick{filteredTricks.length !== 1 ? 's' : ''} available
                             </Text>
-                        )}
-                    </ScrollView>
-                </View>
-            </SafeAreaView>
+                        </View>
+                    )}
+
+                    {/* Horizontal Scrollable Trick List */}
+                    <View style={styles.trickListContainer}>
+                        <Text style={styles.sectionTitle}>Your Landed Tricks</Text>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={[styles.horizontalScrollContent, { overflow: 'visible' }]}
+                            style={{ overflow: 'visible' }}
+                        >
+                            {filteredTricks.length > 0 ? (
+                                filteredTricks.map(trick => (
+                                    <DraggableTrickCard
+                                        key={trick.id}
+                                        trick={trick}
+                                        onDrop={handleTrickDrop}
+                                        dropZoneLayout={dropZoneLayout}
+                                        comboTricks={comboTricks}
+                                        onDragStart={(layout) => handleDragStart(trick, layout)}
+                                        onDragMove={handleDragMove}
+                                        onDragEnd={handleDragEnd}
+                                    />
+                                ))
+                            ) : (
+                                <View style={styles.emptyState}>
+                                    <Text style={styles.emptyStateText}>
+                                        {activeFilters.length > 0
+                                            ? 'No tricks match the selected filters'
+                                            : 'No landed tricks yet'}
+                                    </Text>
+                                </View>
+                            )}
+                        </ScrollView>
+                    </View>
+
+                    {/* Drop Zone */}
+                    <View style={styles.dropZoneContainer}>
+                        <View style={styles.dropZoneHeader}>
+                            <Text style={styles.sectionTitle}>Build Your Combo</Text>
+                            {comboTricks.length > 0 && (
+                                <TouchableOpacity
+                                    style={styles.clearButton}
+                                    onPress={handleClearCombo}
+                                >
+                                    <Text style={styles.clearButtonText}>Clear</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                        <ComboDropZone
+                            tricks={comboTricks}
+                            onRemoveTrick={handleRemoveTrick}
+                            onReorderTrick={handleReorderTrick}
+                            onLayout={setDropZoneLayout}
+                        />
+                    </View>
+
+                    {/* Combo Text Display */}
+                    <View style={styles.comboTextContainer}>
+                        <Text style={styles.comboTextLabel}>Combo:</Text>
+                        <ScrollView
+                            style={styles.comboTextScroll}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {comboText ? (
+                                <Text style={styles.comboText}>{comboText}</Text>
+                            ) : (
+                                <Text style={styles.comboTextEmpty}>
+                                    Drag tricks to build your combo
+                                </Text>
+                            )}
+                        </ScrollView>
+                    </View>
+                </SafeAreaView>
+
+                {/* Drag Overlay - OUTSIDE SafeAreaView to render above everything */}
+                <DragOverlay
+                    trick={draggedTrick}
+                    startPosition={dragStartPosition}
+                    translateX={dragTranslateX}
+                    translateY={dragTranslateY}
+                />
+            </View>
         </GestureHandlerRootView>
     );
 };

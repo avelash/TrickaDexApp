@@ -12,6 +12,10 @@ interface DraggableTrickCardProps {
     onDrop: (trick: Trick, position: number) => void;
     dropZoneLayout?: { x: number; y: number; width: number; height: number } | null;
     comboTricks?: Trick[];
+    onDragStart?: (layout: { x: number; y: number; width: number; height: number }) => void;
+    onDragMove?: (translateX: number, translateY: number) => void;
+    onDragEnd?: () => void;
+    onDragPositionChange?: (position: number | null) => void; // NEW: Report hover position
 }
 
 export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
@@ -19,11 +23,15 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
     onDrop,
     dropZoneLayout,
     comboTricks = [],
+    onDragStart,
+    onDragMove,
+    onDragEnd,
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
+    const opacity = useRef(new Animated.Value(1)).current; // Add opacity for ghost effect
 
     // Store the card's absolute position
     const cardLayout = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -38,7 +46,15 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                 },
             },
         ],
-        { useNativeDriver: true }
+        {
+            useNativeDriver: true,
+            listener: (event: any) => {
+                // Pass translation to parent for overlay
+                if (onDragMove) {
+                    onDragMove(event.nativeEvent.translationX, event.nativeEvent.translationY);
+                }
+            }
+        }
     );
 
     const handleLayout = () => {
@@ -79,10 +95,22 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
             setIsDragging(true);
             handleLayout(); // Update card position when drag starts
 
-            Animated.spring(scale, {
-                toValue: 1.1,
-                useNativeDriver: true,
-            }).start();
+            // Notify parent about drag start with card layout
+            if (cardLayout.current && onDragStart) {
+                onDragStart(cardLayout.current);
+            }
+
+            Animated.parallel([
+                Animated.spring(scale, {
+                    toValue: 1.1,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 0.3, // Make original card semi-transparent
+                    duration: 150,
+                    useNativeDriver: true,
+                }),
+            ]).start();
         }
 
         if (event.nativeEvent.state === State.END) {
@@ -101,6 +129,11 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                 }
             }
 
+            // Notify parent about drag end
+            if (onDragEnd) {
+                onDragEnd();
+            }
+
             // Reset animation
             Animated.parallel([
                 Animated.spring(translateX, {
@@ -115,11 +148,21 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                     toValue: 1,
                     useNativeDriver: true,
                 }),
+                Animated.timing(opacity, {
+                    toValue: 1,
+                    duration: 150,
+                    useNativeDriver: true,
+                }),
             ]).start();
         }
 
         if (event.nativeEvent.state === State.CANCELLED) {
             setIsDragging(false);
+
+            // Notify parent about drag end
+            if (onDragEnd) {
+                onDragEnd();
+            }
 
             Animated.parallel([
                 Animated.spring(translateX, {
@@ -132,6 +175,11 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                 }),
                 Animated.spring(scale, {
                     toValue: 1,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 1,
+                    duration: 150,
                     useNativeDriver: true,
                 }),
             ]).start();
@@ -154,8 +202,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                             { translateY },
                             { scale },
                         ],
-                        zIndex: isDragging ? 9999 : 0,
-                        elevation: isDragging ? 20 : 3,
+                        opacity, // Add opacity animation
                     },
                 ]}
             >
@@ -198,6 +245,9 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         justifyContent: 'flex-end',
         alignItems: 'center',
+        borderColor: '#D0D7DE',
+        borderWidth: 1,
+        elevation: 5,
     },
     front: {
         flex: 1,

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Animated } from 'react-native';
 import { Trick } from '../types';
 
 interface ComboDropZoneProps {
@@ -7,6 +7,7 @@ interface ComboDropZoneProps {
     onRemoveTrick: (index: number) => void;
     onReorderTrick: (fromIndex: number, toIndex: number) => void;
     onLayout?: (layout: { x: number; y: number; width: number; height: number }) => void;
+    dragOverPosition?: number | null; // The position where item will be inserted
 }
 
 export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
