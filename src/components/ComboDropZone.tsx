@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Animated } from 'react-native';
+import React, { useRef, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Animated, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { Trick } from '../types';
 
 interface ComboDropZoneProps {
@@ -7,7 +7,12 @@ interface ComboDropZoneProps {
     onRemoveTrick: (index: number) => void;
     onReorderTrick: (fromIndex: number, toIndex: number) => void;
     onLayout?: (layout: { x: number; y: number; width: number; height: number }) => void;
-    dragOverPosition?: number | null; // The position where item will be inserted
+    isOver?: boolean;
+    hoverIndex: number | null;
+    draggedTrick: Trick | null;
+    scrollViewRef?: React.RefObject<ScrollView | null>;
+    onStartScroll?: (direction: 'left' | 'right') => void;
+    onStopScroll?: () => void;
 }
 
 export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
@@ -15,9 +20,36 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     onRemoveTrick,
     onReorderTrick,
     onLayout,
+    isOver = false,
+    hoverIndex,
+    draggedTrick,
+    scrollViewRef,
+    onStartScroll,
+    onStopScroll
 }) => {
-    const [isDragOver, setIsDragOver] = useState(false);
     const viewRef = useRef<View>(null);
+
+    const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        // We'll handle auto-scroll in the drag move handler instead
+        if (onStopScroll) {
+            onStopScroll();
+        }
+    }, [onStopScroll]);
+
+    // Clean up auto-scroll when unmounting
+    useEffect(() => {
+        if (!isOver && onStopScroll) {
+            onStopScroll();
+        }
+    }, [isOver, onStopScroll]);
+
+    const measureDropZone = () => {
+        if (viewRef.current && onLayout) {
+            viewRef.current.measureInWindow((x, y, width, height) => {
+                onLayout({ x, y, width, height });
+            });
+        }
+    };
 
     const handleLayout = () => {
         if (viewRef.current && onLayout) {
@@ -31,8 +63,8 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
         return (
             <View
                 ref={viewRef}
-                onLayout={handleLayout}
-                style={[styles.emptyDropZone, isDragOver && styles.dropZoneActive]}
+                onLayout={measureDropZone}
+                style={[styles.emptyDropZone, isOver && styles.dropZoneActive]}
             >
                 <Text style={styles.emptyDropZoneIcon}>⬇️</Text>
                 <Text style={styles.emptyDropZoneText}>Drag tricks here</Text>
@@ -48,42 +80,53 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
             style={styles.dropZoneWrapper}
         >
             <ScrollView
+                ref={scrollViewRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.dropZoneContent}
                 style={styles.dropZone}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
             >
                 {tricks.map((trick, index) => (
-                    <View key={`${trick.id}-${index}`} style={styles.comboCardWrapper}>
-                        <View style={styles.comboCard}>
-                            <TouchableOpacity
-                                style={styles.removeButton}
-                                onPress={() => onRemoveTrick(index)}
-                            >
-                                <Text style={styles.removeButtonText}>✕</Text>
-                            </TouchableOpacity>
-                            <View style={styles.comboIconContainer}>
-                                <Image
-                                    source={trick.icon}
-                                    style={styles.comboIconImage}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <Text
-                                style={styles.comboTrickName}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                {trick.name}
-                            </Text>
-                        </View>
-                        {index < tricks.length - 1 && (
-                            <View style={styles.arrowContainer}>
-                                <Text style={styles.arrow}>→</Text>
-                            </View>
+                    <React.Fragment key={`${trick.id}-${index}`}>
+                        {isOver && draggedTrick && hoverIndex === index && (
+                            <View style={styles.dropIndicator} />
                         )}
-                    </View>
+                        <View style={styles.comboCardWrapper}>
+                            <View style={styles.comboCard}>
+                                <TouchableOpacity
+                                    style={styles.removeButton}
+                                    onPress={() => onRemoveTrick(index)}
+                                >
+                                    <Text style={styles.removeButtonText}>✕</Text>
+                                </TouchableOpacity>
+                                <View style={styles.comboIconContainer}>
+                                    <Image
+                                        source={trick.icon}
+                                        style={styles.comboIconImage}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                                <Text
+                                    style={styles.comboTrickName}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
+                                    {trick.name}
+                                </Text>
+                            </View>
+                            {index < tricks.length - 1 && (
+                                <View style={styles.arrowContainer}>
+                                    <Text style={styles.arrow}>→</Text>
+                                </View>
+                            )}
+                        </View>
+                    </React.Fragment>
                 ))}
+                {isOver && draggedTrick && hoverIndex === tricks.length && (
+                    <View style={styles.dropIndicator} />
+                )}
             </ScrollView>
         </View>
     );
@@ -199,8 +242,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     arrow: {
-        fontSize: 28,
+        fontSize: 24,
         color: '#4ECDC4',
         fontWeight: 'bold',
+    },
+    dropIndicator: {
+        width: 120,
+        height: 140,
+        backgroundColor: '#4ECDC4',
+        opacity: 0.2,
+        borderRadius: 16,
+        marginHorizontal: 5,
     },
 });

@@ -44,9 +44,38 @@ export const ComboBuilderScreen: React.FC = () => {
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     const [draggedTrick, setDraggedTrick] = useState<Trick | null>(null);
     const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
-    const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null); // NEW: Track hover position
+    const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null);
+    const [isOverDropZone, setIsOverDropZone] = useState(false);
+    const [hoverIndex, setHoverIndex] = useState<number | null>(null);
     const dragTranslateX = useRef(new Animated.Value(0)).current;
     const dragTranslateY = useRef(new Animated.Value(0)).current;
+    const scrollViewRef = useRef<ScrollView | null>(null);
+    const autoScrollTimer = useRef<NodeJS.Timeout | null>(null);
+
+    const startAutoScroll = useCallback((direction: 'left' | 'right') => {
+        if (!autoScrollTimer.current && scrollViewRef.current) {
+            const scrollAmount = direction === 'right' ? 20 : -20;
+            let currentOffset = 0;
+
+            autoScrollTimer.current = setInterval(() => {
+                const scrollView = scrollViewRef.current;
+                if (scrollView) {
+                    currentOffset += scrollAmount;
+                    scrollView.scrollTo({
+                        x: currentOffset,
+                        animated: true
+                    });
+                }
+            }, 50);
+        }
+    }, []);
+
+    const stopAutoScroll = useCallback(() => {
+        if (autoScrollTimer.current) {
+            clearInterval(autoScrollTimer.current);
+            autoScrollTimer.current = null;
+        }
+    }, []);
 
     // Get only landed tricks
     const landedTricks = useMemo(
@@ -110,21 +139,65 @@ export const ComboBuilderScreen: React.FC = () => {
     const handleDragMove = useCallback((translateX: number, translateY: number) => {
         dragTranslateX.setValue(translateX);
         dragTranslateY.setValue(translateY);
-    }, []);
+
+        if (dragStartPosition && dropZoneLayout) {
+            const currentX = dragStartPosition.x + translateX;
+            const currentY = dragStartPosition.y + translateY;
+
+            // Check if over drop zone
+            const isOver = currentX >= dropZoneLayout.x &&
+                currentX <= dropZoneLayout.x + dropZoneLayout.width &&
+                currentY >= dropZoneLayout.y &&
+                currentY <= dropZoneLayout.y + dropZoneLayout.height;
+
+            setIsOverDropZone(isOver);
+
+            if (isOver) {
+                // Calculate relative X position within drop zone
+                const relativeX = currentX - dropZoneLayout.x;
+
+                // Check if we're near the edges for auto-scroll
+                const scrollZoneSize = 60; // pixels from edge that triggers scroll
+
+                if (relativeX < scrollZoneSize && relativeX >= 0) {
+                    // Near left edge, scroll left
+                    startAutoScroll('left');
+                } else if (relativeX > dropZoneLayout.width - scrollZoneSize && relativeX <= dropZoneLayout.width) {
+                    // Near right edge, scroll right
+                    startAutoScroll('right');
+                } else {
+                    stopAutoScroll();
+                }                // Calculate hover index based on X position within drop zone
+                const itemWidth = 140; // width of a trick card + spacing
+                const newHoverIndex = Math.min(
+                    Math.floor(relativeX / itemWidth),
+                    comboTricks.length
+                );
+                setHoverIndex(newHoverIndex);
+            } else {
+                setHoverIndex(null);
+                stopAutoScroll();
+            }
+        }
+    }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll]);
 
     const handleDragEnd = useCallback(() => {
         setDraggedTrick(null);
         setDragStartPosition(null);
+        setIsOverDropZone(false);
+        setHoverIndex(null);
     }, []);
 
     // Handle trick drop
     const handleTrickDrop = useCallback((trick: Trick, position: number) => {
-        setComboTricks(prev => {
-            const newCombo = [...prev];
-            newCombo.splice(position, 0, trick);
-            return newCombo;
-        });
-    }, []);
+        if (isOverDropZone && hoverIndex !== null) {
+            setComboTricks(prev => {
+                const newCombo = [...prev];
+                newCombo.splice(hoverIndex, 0, trick);
+                return newCombo;
+            });
+        }
+    }, [isOverDropZone, hoverIndex]);
 
     // Handle trick removal from combo
     const handleRemoveTrick = useCallback((index: number) => {
@@ -246,6 +319,12 @@ export const ComboBuilderScreen: React.FC = () => {
                             onRemoveTrick={handleRemoveTrick}
                             onReorderTrick={handleReorderTrick}
                             onLayout={setDropZoneLayout}
+                            isOver={isOverDropZone}
+                            hoverIndex={hoverIndex}
+                            draggedTrick={draggedTrick}
+                            scrollViewRef={scrollViewRef}
+                            onStartScroll={startAutoScroll}
+                            onStopScroll={stopAutoScroll}
                         />
                     </View>
 
