@@ -1,5 +1,4 @@
 import { Trick } from "../types";
-import kick from "../../assets/kick.png";
 import k540 from "../../assets/540_icon.png";
 import tornado from "../../assets/tornado_icon.png";
 import round from "../../assets/round_icon.png";
@@ -73,7 +72,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["flip"],
     prerequisites: ["back_roll"],
     difficulty: 2,
-    description: "A backwards 360 somersault in the air",
+    description: "A backwards 360° somersault in the air",
     tutorialUrl: "https://youtu.be/X9rHyckeTtg?si=eCkbCOcwsW6xNv5u",
   },
   {
@@ -84,7 +83,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["handstand"],
     difficulty: 2,
     description:
-      "a 360 backwards somersault where the practitioner touches the ground with" +
+      "a 360° backwards somersault where the practitioner touches the ground with" +
       " their hands after half the rotation",
     tutorialUrl: "https://www.youtube.com/watch?v=mJgjlYwvLkw",
   },
@@ -106,7 +105,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["transition"],
     prerequisites: [],
     difficulty: 0,
-    description: "a 180 turn on one hand, from a kneeling position to standing",
+    description: "a 180° turn on one hand, from a kneeling position to standing",
     tutorialUrl: "https://www.youtube.com/watch?v=BaSU6o-FcOs",
   },
   {
@@ -153,7 +152,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description:
       "starting with his back to the target, the practitioner jumps and " +
-      "after a 180-degree spin, performs an outside crescent or hook kick.",
+      "after a 180° spin, performs an outside crescent or hook kick.",
     tutorialUrl: "https://youtube.com/shorts/oG13xxzFGB0?si=rDU5iWhvVf2qVf8W",
   },
   {
@@ -197,7 +196,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["flip"],
     prerequisites: ["dive_roll"],
     difficulty: 2,
-    description: "a forward 360 somersault in the air.",
+    description: "a forward 360° somersault in the air.",
     tutorialUrl: "https://www.youtube.com/watch?v=l-JK_sO5ZnE",
   },
   {
@@ -537,13 +536,13 @@ const TRICKS_DATA_RAW: Trick[] = [
   },
   {
     id: "btwist_shuriken",
-    name: "BTwist Shuriken",
+    name: "Btwist Shuriken",
     icon: require("../../assets/btwistShuriken_icon.png"),
     types: ["twist", "kick"],
     prerequisites: ["btwist", "pop_360_shuriken"],
     difficulty: 3,
     description:
-      "A btwist in which the rotation comes from an outside cresent (A shuriken).",
+      "A Btwist in which the rotation comes from an outside cresent (A shuriken).",
     tutorialUrl: "https://www.youtube.com/watch?v=37JicKEixLs",
   },
   {
@@ -579,7 +578,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description:
       'From a "cheat" setup, the practitioner spins vertically once, then executes a hook kick before landing.' +
-      "\n 720 degrees of rotation are completed when including the cheat step and take off.",
+      "\n 720° degrees of rotation are completed when including the cheat step and take off.",
     tutorialUrl: "https://www.youtube.com/watch?v=H0X8Vtob2m0",
   },
   {
@@ -670,7 +669,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["backside_720", "pop_tornado"],
     difficulty: 2,
     description:
-      "Starting in a backside position, the practitioner  jumps and spins 540 degrees and then" +
+      "Starting in a backside position, the practitioner  jumps and spins 540° degrees and then" +
       " performs a round kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=jm8lRz8ed4M",
   },
@@ -682,7 +681,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["pop_360", "backside_720"],
     difficulty: 2,
     description:
-      "From a setup, the practitioner jumps and spins 540 degrees and then" +
+      "From a setup, the practitioner jumps and spins 540° degrees and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=0A5R0VejgJQ",
   },
@@ -803,6 +802,16 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting the same way as a machine,\n the practitioner slides onto his back, then through" +
       " a circular motion, similar to a star kipup, he bounces back up.",
     tutorialUrl: "https://www.youtube.com/watch?v=CnCc3yJBNEs",
+  },
+  {
+    id: "btwist",
+    name: "Btwist",
+    icon: require("../../assets/btwist_icon.png"),
+    types: ["twist"],
+    prerequisites: ["butterfly_kick"],
+    difficulty: 2,
+    description: "A butterfly kick with a 360° spin.",
+    tutorialUrl: "https://www.youtube.com/watch?v=F88oPiATPq8",
   },
 ];
 
