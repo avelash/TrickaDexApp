@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, View, Text, Image, Animated } from 'react-native';
 import {
-    PanGestureHandler,
-    PanGestureHandlerGestureEvent,
-    State,
+    Gesture,
+    GestureDetector,
 } from 'react-native-gesture-handler';
 import { Trick } from '../types';
 
@@ -33,8 +32,8 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
 
     const onGestureEvent = (event: any) => {
         const movementDistance = Math.sqrt(
-            event.nativeEvent.translationX ** 2 +
-            event.nativeEvent.translationY ** 2
+            event.translationX ** 2 +
+            event.translationY ** 2
         );
 
         // Trigger drag start on first significant movement
@@ -44,7 +43,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         }
 
         if (onDragMove) {
-            onDragMove(event.nativeEvent.translationX, event.nativeEvent.translationY);
+            onDragMove(event.translationX, event.translationY);
         }
     };
 
@@ -73,16 +72,18 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         return Math.max(0, Math.min(position, comboTricks.length));
     };
 
-    const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
-        if (event.nativeEvent.state === State.BEGAN) {
+    const panGesture = Gesture.Pan()
+        .onStart(() => {
             handleLayout();
             dragStartedRef.current = false;
-        }
-
-        if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
+        })
+        .onUpdate((event) => {
+            onGestureEvent(event);
+        })
+        .onEnd((event) => {
             if (cardLayout.current && dropZoneLayout) {
-                const draggedX = cardLayout.current.x + event.nativeEvent.translationX;
-                const draggedY = cardLayout.current.y + event.nativeEvent.translationY;
+                const draggedX = cardLayout.current.x + event.translationX;
+                const draggedY = cardLayout.current.y + event.translationY;
 
                 const dropPosition = calculateDropPosition(draggedX, draggedY);
                 if (dropPosition >= 0) {
@@ -92,19 +93,15 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
 
             if (onDragEnd) onDragEnd();
             dragStartedRef.current = false;
-        }
-    };
+        });
 
     return (
         <View ref={viewRef} onLayout={handleLayout} style={styles.cardContainer}>
-            <PanGestureHandler
-                onGestureEvent={onGestureEvent}
-                onHandlerStateChange={onHandlerStateChange}
-            >
+            <GestureDetector gesture={panGesture}>
                 <Animated.View style={styles.iconContainer}>
                     <Image source={trick.icon} style={styles.iconImage} resizeMode="contain" />
                 </Animated.View>
-            </PanGestureHandler>
+            </GestureDetector>
 
             <View style={styles.bottomBar}>
                 <Text style={styles.trickName} numberOfLines={1} ellipsizeMode="tail">
