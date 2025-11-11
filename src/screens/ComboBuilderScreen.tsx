@@ -47,6 +47,7 @@ export const ComboBuilderScreen: React.FC = () => {
     const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null);
     const [isOverDropZone, setIsOverDropZone] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const [scrollOffset, setScrollOffset] = useState(0);
     const dragTranslateX = useRef(new Animated.Value(0)).current;
     const dragTranslateY = useRef(new Animated.Value(0)).current;
     const scrollViewRef = useRef<ScrollView | null>(null);
@@ -55,15 +56,17 @@ export const ComboBuilderScreen: React.FC = () => {
     const startAutoScroll = useCallback((direction: 'left' | 'right') => {
         if (!autoScrollTimer.current && scrollViewRef.current) {
             const scrollAmount = direction === 'right' ? 20 : -20;
-            let currentOffset = 0;
 
             autoScrollTimer.current = setInterval(() => {
                 const scrollView = scrollViewRef.current;
                 if (scrollView) {
-                    currentOffset += scrollAmount;
-                    scrollView.scrollTo({
-                        x: currentOffset,
-                        animated: true
+                    setScrollOffset(prev => {
+                        const newOffset = Math.max(0, prev + scrollAmount);
+                        scrollView.scrollTo({
+                            x: newOffset,
+                            animated: false
+                        });
+                        return newOffset;
                     });
                 }
             }, 50);
@@ -167,19 +170,27 @@ export const ComboBuilderScreen: React.FC = () => {
                     startAutoScroll('right');
                 } else {
                     stopAutoScroll();
-                }                // Calculate hover index based on X position within drop zone
-                const itemWidth = 140; // width of a trick card + spacing
-                const newHoverIndex = Math.min(
-                    Math.floor(relativeX / itemWidth),
-                    comboTricks.length
-                );
-                setHoverIndex(newHoverIndex);
+                }
+
+                // Calculate hover index based on X position within drop zone
+                // Account for scroll offset and use midpoint logic
+                const CARD_WIDTH = 130; // card width + spacing (120 + 10 spacing)
+                const CARD_HALF_WIDTH = CARD_WIDTH / 2;
+
+                // Add scroll offset to relative position
+                const adjustedX = relativeX + scrollOffset;
+
+                // Calculate index using midpoint logic
+                // If we're past the midpoint of a card, we should insert at the next index
+                const newHoverIndex = Math.round(adjustedX / CARD_WIDTH);
+
+                setHoverIndex(Math.min(newHoverIndex, comboTricks.length));
             } else {
                 setHoverIndex(null);
                 stopAutoScroll();
             }
         }
-    }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll]);
+    }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll, scrollOffset]);
 
     const handleDragEnd = useCallback(() => {
         setDraggedTrick(null);
