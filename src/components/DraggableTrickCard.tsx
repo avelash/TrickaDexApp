@@ -29,8 +29,20 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
 }) => {
     const cardLayout = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
     const viewRef = useRef<View>(null);
+    const dragStartedRef = useRef(false);
 
     const onGestureEvent = (event: any) => {
+        const movementDistance = Math.sqrt(
+            event.nativeEvent.translationX ** 2 +
+            event.nativeEvent.translationY ** 2
+        );
+
+        // Trigger drag start on first significant movement
+        if (movementDistance > 2 && !dragStartedRef.current && cardLayout.current && onDragStart) {
+            dragStartedRef.current = true;
+            onDragStart(cardLayout.current);
+        }
+
         if (onDragMove) {
             onDragMove(event.nativeEvent.translationX, event.nativeEvent.translationY);
         }
@@ -64,10 +76,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
     const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
         if (event.nativeEvent.state === State.BEGAN) {
             handleLayout();
-
-            if (cardLayout.current && onDragStart) {
-                onDragStart(cardLayout.current);
-            }
+            dragStartedRef.current = false;
         }
 
         if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
@@ -82,6 +91,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
             }
 
             if (onDragEnd) onDragEnd();
+            dragStartedRef.current = false;
         }
     };
 
