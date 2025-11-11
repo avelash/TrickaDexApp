@@ -1,14 +1,5 @@
-import React, { useState } from "react";
-import { Linking } from "react-native";
-import { TrickCardInfo } from "./TrickCardInfo";
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableOpacity,
-    Pressable,
-    Image
-} from "react-native";
+import React from "react";
+import { Linking, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { Trick } from "../types";
 
 interface TrickCardProps {
@@ -24,79 +15,51 @@ export const TrickCard: React.FC<TrickCardProps> = ({
     onToggle,
     onInfo,
 }) => {
-    const [isFlipped, setIsFlipped] = useState(false);
-
-    const flipToFront = () => setIsFlipped(false);
-    const flipToBack = () => setIsFlipped(true);
-
     return (
-        <>
-            {isFlipped && (
-                <Pressable style={styles.overlay} onPress={flipToFront} />
-            )}
+        <View style={styles.cardContainer}>
+            <TouchableOpacity
+                style={styles.iconContainerWrapper}
+                activeOpacity={0.7}
+                onPress={onToggle}
+            >
+                <View
+                    style={[
+                        styles.iconContainer,
+                        isLanded && styles.iconContainerLanded,
+                    ]}
+                >
+                    <Image
+                        source={trick.icon}
+                        style={[styles.iconImage, !isLanded && styles.iconGreyed]}
+                        resizeMode="contain"
+                    />
+                </View>
+            </TouchableOpacity>
 
-            <View style={styles.cardContainer}>
-                {!isFlipped ? (
-                    <TouchableOpacity
-                        style={styles.front}
-                        activeOpacity={0.7}
-                        onPress={onToggle}
-                    >
-                        <View style={[styles.iconContainer, isLanded && styles.iconContainerLanded]}>
-                            <Image
-                                source={trick.icon}
-                                style={[styles.iconImage, !isLanded && styles.iconGreyed]}
-                                resizeMode="contain"
-                            />
-                        </View>
-                        <View style={styles.bottomBar}>
-                            <Text style={[styles.trickName, !isLanded && styles.textGreyed]}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                {trick.name}
-                            </Text>
-                            <TouchableOpacity onPress={() => onInfo(trick)}>
-                                <Image
-                                    source={require('../../assets/info.png')}
-                                    style={styles.infoIcon}
-                                    resizeMode="contain"
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </TouchableOpacity>
-                ) : (
-                    <View style={styles.back}>
-                        <TouchableOpacity style={styles.closeButton} onPress={flipToFront}>
-                            <Text style={styles.closeText}>✕</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.trickTypes}>
-                            {trick.types.map((t) => `#${t}`).join(" ")}
-                        </Text>
-                        <Text style={styles.trickDescription}>{trick.description}</Text>
-                        {trick.tutorialUrl && (
-                            <TouchableOpacity
-                                style={styles.tutorialButton}
-                                onPress={() => Linking.openURL(trick.tutorialUrl!)}
-                            >
-                                <Text style={styles.tutorialButtonText}>Tutorial</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                )}
+            <View style={styles.bottomBar}>
+                <Text
+                    style={[
+                        styles.trickName,
+                        !isLanded && styles.textGreyed,
+                    ]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                >
+                    {trick.name}
+                </Text>
+                <TouchableOpacity onPress={() => onInfo(trick)}>
+                    <Image
+                        source={require("../../assets/info.png")}
+                        style={styles.infoIcon}
+                        resizeMode="contain"
+                    />
+                </TouchableOpacity>
             </View>
-        </>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
     cardContainer: {
         backgroundColor: "white",
         borderRadius: 20,
@@ -113,13 +76,11 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         alignItems: "center",
     },
-    front: {
+    iconContainerWrapper: {
         flex: 1,
         width: "100%",
-        height: "100%",
-        justifyContent: "flex-end",
+        justifyContent: "center",
         alignItems: "center",
-        overflow: "hidden",
     },
     iconContainer: {
         width: 140,
@@ -128,7 +89,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F0F0F0",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 5,
+        marginTop: 10,
         overflow: "hidden",
     },
     iconContainerLanded: {
@@ -153,14 +114,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        marginBottom:2
+        marginBottom: 2,
     },
     trickName: {
         fontSize: 14,
         fontWeight: "bold",
         color: "#2C3E50",
         flex: 1,
-        
     },
     textGreyed: {
         color: "#BDC3C7",
@@ -170,48 +130,5 @@ const styles = StyleSheet.create({
         height: 18,
         marginLeft: 8,
         tintColor: "#BDC3C7",
-    },
-    back: {
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        padding: 16,
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-    },
-    closeButton: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        padding: 5,
-    },
-    closeText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#E74C3C",
-    },
-    trickTypes: {
-        fontSize: 12,
-        color: "#4ECDC4",
-        fontWeight: "600",
-        marginBottom: 4,
-        marginTop: 25,
-    },
-    trickDescription: {
-        fontSize: 13,
-        color: "#7F8C8D",
-    },
-    tutorialButton: {
-        marginTop: 12,
-        backgroundColor: '#FF5252',
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 16,
-    },
-    tutorialButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 15,
     },
 });

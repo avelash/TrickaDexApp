@@ -658,7 +658,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["pop_360"],
     difficulty: 1,
     description:
-      "Starting with the back to the direction of movement(DOM), the practitioner jumps and spins 450 degrees and then" +
+      "Starting with the back to the direction of movement(DOM), the practitioner jumps and spins 450° and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=yArws74DOXk",
   },
@@ -769,7 +769,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["kick"],
     prerequisites: ["pop_360", "tornado_kick"],
     difficulty: 1,
-    description: "A split kick from a pop or cheat setup.",
+    description: "A 180° turn into a split kick from a pop or cheat setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
   },
   {

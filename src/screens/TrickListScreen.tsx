@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     trickCol: {
         flex: 1,
         maxWidth: '50%',
-        paddingHorizontal: 5,
+        paddingHorizontal: 0,
     },
     emptyState: {
         flex: 1,
