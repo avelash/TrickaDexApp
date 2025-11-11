@@ -105,7 +105,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["transition"],
     prerequisites: [],
     difficulty: 0,
-    description: "a 180° turn on one hand, from a kneeling position to standing",
+    description:
+      "a 180° turn on one hand, from a kneeling position to standing",
     tutorialUrl: "https://www.youtube.com/watch?v=BaSU6o-FcOs",
   },
   {
@@ -812,6 +813,16 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A butterfly kick with a 360° spin.",
     tutorialUrl: "https://www.youtube.com/watch?v=F88oPiATPq8",
+  },
+  {
+    id: "butterfly_hook",
+    name: "Butterfly Hook",
+    icon: require("../../assets/butterflyHook_icon.png"),
+    types: ["kick"],
+    prerequisites: ["butterfly_kick", "skip_hook"],
+    difficulty: 1,
+    description: "A butterfly kick with a hook kick at the end.",
+    tutorialUrl: "https://www.youtube.com/watch?v=_GFD5TjWfbA",
   },
 ];
 
