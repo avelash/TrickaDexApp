@@ -9,9 +9,11 @@ import {
     Image,
     Dimensions,
     Animated,
+    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Clipboard from 'expo-clipboard';
 import { SearchBar } from '../components/SearchBar';
 import { DraggableTrickCard } from '../components/DraggableTrickCard';
 import { ComboDropZone } from '../components/ComboDropZone';
@@ -347,7 +349,17 @@ export const ComboBuilderScreen: React.FC = () => {
                             showsVerticalScrollIndicator={false}
                         >
                             {comboText ? (
-                                <Text style={styles.comboText}>{comboText}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <Text style={[styles.comboText, { flex: 1 }]} >{comboText}</Text>
+                                    <TouchableOpacity onPress={() => {
+                                        Clipboard.setStringAsync(comboText);
+                                        Alert.alert("Your combo has been copied to the clipboard.");
+                                    }}
+                                        style={{ flexShrink: 0 }}
+                                    >
+                                        <Image style={styles.copyIcon} source={require("../../assets/copy.png")}></Image>
+                                    </TouchableOpacity>
+                                </View>
                             ) : (
                                 <Text style={styles.comboTextEmpty}>
                                     Drag tricks to build your combo
@@ -355,6 +367,7 @@ export const ComboBuilderScreen: React.FC = () => {
                             )}
                         </ScrollView>
                     </View>
+
                 </SafeAreaView>
 
                 {/* Drag Overlay - OUTSIDE SafeAreaView to render above everything */}
@@ -482,6 +495,7 @@ const styles = StyleSheet.create({
     },
     comboText: {
         fontSize: 15,
+        marginRight: 10,
         color: '#4ECDC4',
         fontWeight: '600',
         lineHeight: 22,
@@ -490,5 +504,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#BDC3C7',
         fontStyle: 'italic',
+    },
+    copyIcon: {
+        width: 24,
+        height: 24,
+        resizeMode: 'contain',
     },
 });

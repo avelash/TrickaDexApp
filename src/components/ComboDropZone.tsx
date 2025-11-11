@@ -197,9 +197,8 @@ const styles = StyleSheet.create({
     },
     removeButton: {
         position: 'absolute',
-        top: 4,
-        right: 4,
-        backgroundColor: '#FF5252',
+        top: 2,
+        right: 2,
         borderRadius: 12,
         width: 24,
         height: 24,
@@ -208,8 +207,8 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     removeButtonText: {
-        color: 'white',
-        fontSize: 14,
+        color: 'grey',
+        fontSize: 12,
         fontWeight: 'bold',
     },
     comboIconContainer: {
