@@ -18,6 +18,7 @@ import { SearchBar } from '../components/SearchBar';
 import { DraggableTrickCard } from '../components/DraggableTrickCard';
 import { ComboDropZone } from '../components/ComboDropZone';
 import { DragOverlay } from '../components/DragOverlay';
+import { PreferencesModal, PreferencesState } from '../components/PreferencesModal';
 import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
@@ -41,6 +42,12 @@ export const ComboBuilderScreen: React.FC = () => {
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
+    const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
+    const [preferences, setPreferences] = useState<PreferencesState>({
+        onlyLandedTricks: true,
+        minLevel: 0,
+        maxLevel: SKILL_LEVELS.length - 1,
+    });
 
     // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -84,8 +91,10 @@ export const ComboBuilderScreen: React.FC = () => {
 
     // Get only landed tricks
     const landedTricks = useMemo(
-        () => TRICKS_DATA.filter(trick => isTrickLanded(trick.id)),
-        [isTrickLanded]
+        () => preferences.onlyLandedTricks
+            ? TRICKS_DATA.filter(trick => isTrickLanded(trick.id))
+            : TRICKS_DATA,
+        [isTrickLanded, preferences.onlyLandedTricks]
     );
 
     const predefinedFilters = useMemo(
@@ -109,6 +118,12 @@ export const ComboBuilderScreen: React.FC = () => {
     const filteredTricks = useMemo(() => {
         let tricks = landedTricks;
 
+        // Apply level filtering
+        tricks = tricks.filter(trick => {
+            const trickLevel = trick.difficulty ?? 0;
+            return trickLevel >= preferences.minLevel && trickLevel <= preferences.maxLevel;
+        });
+
         if (activeFilters.length > 0) {
             tricks = tricks.filter(trick => {
                 return activeFilters.every(filter => {
@@ -131,7 +146,7 @@ export const ComboBuilderScreen: React.FC = () => {
         }
 
         return tricks;
-    }, [activeFilters, search, landedTricks, predefinedFilters]);
+    }, [activeFilters, search, landedTricks, predefinedFilters, preferences]);
 
     // Drag handlers
     const handleDragStart = useCallback((trick: Trick, layout: { x: number; y: number; width: number; height: number }) => {
@@ -259,7 +274,15 @@ export const ComboBuilderScreen: React.FC = () => {
 
                             <Text style={styles.headerTitle}>Combo Builder</Text>
 
-                            <View style={styles.backButton} />
+                            <TouchableOpacity
+                                style={styles.preferencesButton}
+                                onPress={() => setPreferencesModalVisible(true)}
+                            >
+                                <Image
+                                    source={require('../../assets/preferences.png')}
+                                    style={styles.preferencesIcon}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
@@ -377,6 +400,14 @@ export const ComboBuilderScreen: React.FC = () => {
                     translateX={dragTranslateX}
                     translateY={dragTranslateY}
                 />
+
+                {/* Preferences Modal */}
+                <PreferencesModal
+                    visible={preferencesModalVisible}
+                    preferences={preferences}
+                    onClose={() => setPreferencesModalVisible(false)}
+                    onSave={(newPreferences) => setPreferences(newPreferences)}
+                />
             </View>
         </GestureHandlerRootView>
     );
@@ -402,6 +433,16 @@ const styles = StyleSheet.create({
         width: 30,
     },
     backIcon: {
+        width: 24,
+        height: 24,
+        resizeMode: 'contain',
+        tintColor: 'white',
+    },
+    preferencesButton: {
+        padding: 4,
+        width: 30,
+    },
+    preferencesIcon: {
         width: 24,
         height: 24,
         resizeMode: 'contain',
