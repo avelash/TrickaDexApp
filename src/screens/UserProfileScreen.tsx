@@ -21,6 +21,7 @@ import { RootStackParamList } from '../../App';
 import { TrickCard } from "../components/TrickCard";
 import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserName } from '../hooks/useUserDetails';
 
 interface ProfileStats {
     focus: string;
@@ -104,24 +105,12 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
     const [displayedNumber, setDisplayedNumber] = useState(0);
     const [selectedTrick, setSelectedTrick] = useState<Trick | null>(null);
 
-    const [userName, setUserName] = useState<string | null>('');
+    const { userName, setUserName } = useUserName();
     const [isEditingName, setIsEditingName] = useState(false);
     const [editedName, setEditedName] = useState('');
 
     // For double-tap detection
     const lastPressRef = useRef<number>(0);
-
-    useEffect(() => {
-        const fetchUserName = async () => {
-            try {
-                const storedName = await AsyncStorage.getItem('userName');
-                setUserName(storedName || 'Alex Thompson');
-            } catch {
-                setUserName('Alex Thompson');
-            }
-        };
-        fetchUserName();
-    }, []);
 
     useEffect(() => {
         Animated.timing(progressAnim, {
@@ -166,11 +155,11 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
         lastPressRef.current = now;
     };
 
-    const handleNameSave = async () => {
+    const handleNameSave = () => {
         const trimmed = editedName.trim();
         if (trimmed) {
             setUserName(trimmed);
-            await AsyncStorage.setItem('userName', trimmed);
+            AsyncStorage.setItem('userName', trimmed);
         }
         setIsEditingName(false);
     };

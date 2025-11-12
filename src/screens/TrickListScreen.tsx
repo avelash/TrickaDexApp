@@ -12,6 +12,7 @@ import { FILTER_CONFIG } from '../data/filterConfigs';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { useUserName } from '../hooks/useUserDetails';
 
 type TrickListScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
@@ -35,6 +36,7 @@ export const TrickListScreen: React.FC = () => {
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
     const [modalTrick, setModalTrick] = useState<Trick | null>(null);
+    const userName = useUserName().userName;
 
     // Apply initial filter from navigation params
     useEffect(() => {
@@ -219,7 +221,13 @@ export const TrickListScreen: React.FC = () => {
                     <TouchableOpacity
                         style={styles.menuButton}
                         accessibilityLabel="Feedback"
-                        onPress={() => navigation.navigate('ComboBuilderScreen')}
+                        onPress={() => {
+                            if (userName === "comboBuilder") {
+                                navigation.navigate('ComboBuilderScreen');
+                            } else {
+                                navigation.navigate('FeedbackScreen');
+                            }
+                        }}
                     >
                         <Image
                             source={require('../../assets/edit.png')}
