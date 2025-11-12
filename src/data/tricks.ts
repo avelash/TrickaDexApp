@@ -824,6 +824,17 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A butterfly kick with a hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=_GFD5TjWfbA",
   },
+  {
+    id: "headspring",
+    name: "Headspring",
+    icon: require("../../assets/headspring_icon.png"),
+    types: ["flip"],
+    prerequisites: ["handstand", "forward_roll"],
+    difficulty: 1,
+    description:
+      "A forward flip that starts by going into a headstand then kicking over to land on the feet.",
+    tutorialUrl: "https://www.youtube.com/watch?v=ifqi_v1Nf0o",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
