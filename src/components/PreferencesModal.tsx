@@ -14,6 +14,7 @@ export interface PreferencesState {
     onlyLandedTricks: boolean;
     minLevel: number;
     maxLevel: number;
+    numberOfTricks: number;
 }
 
 interface PreferencesModalProps {
@@ -58,6 +59,14 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
             maxLevel: levelNumber,
             // Ensure minLevel is not more than maxLevel
             minLevel: prev.minLevel > levelNumber ? levelNumber : prev.minLevel,
+        }));
+    };
+
+    const handleNumberOfTricksChange = (newCount: number) => {
+        const clamped = Math.max(1, Math.min(10, Math.round(newCount)));
+        setLocalPreferences(prev => ({
+            ...prev,
+            numberOfTricks: clamped,
         }));
     };
 
@@ -146,6 +155,30 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                                     </TouchableOpacity>
                                 ))}
                             </View>
+                        </View>
+                        {/* Number of Tricks for Random */}
+                        <View style={styles.settingSection}>
+                            <Text style={styles.settingLabel}>Random combo size</Text>
+                            <View style={styles.stepperContainer}>
+                                <TouchableOpacity
+                                    style={styles.stepperButton}
+                                    onPress={() => handleNumberOfTricksChange(localPreferences.numberOfTricks - 1)}
+                                >
+                                    <Text style={styles.stepperButtonText}>−</Text>
+                                </TouchableOpacity>
+
+                                <View style={styles.numberDisplay}>
+                                    <Text style={styles.numberDisplayText}>{localPreferences.numberOfTricks}</Text>
+                                </View>
+
+                                <TouchableOpacity
+                                    style={styles.stepperButton}
+                                    onPress={() => handleNumberOfTricksChange(localPreferences.numberOfTricks + 1)}
+                                >
+                                    <Text style={styles.stepperButtonText}>+</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.hintText}>Choose how many tricks the Random button should pick (1–10).</Text>
                         </View>
                     </ScrollView>
 
@@ -240,6 +273,45 @@ const styles = StyleSheet.create({
     levelButtonTextActive: {
         color: 'white',
         fontWeight: '600',
+    },
+    stepperContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 6,
+        marginBottom: 6,
+    },
+    stepperButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+        borderWidth: 1.2,
+        borderColor: '#DDD',
+        backgroundColor: '#F5F5F5',
+    },
+    stepperButtonText: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#666',
+    },
+    numberDisplay: {
+        minWidth: 48,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        backgroundColor: '#F0F0F0',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    numberDisplayText: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#2C3E50',
+    },
+    hintText: {
+        fontSize: 12,
+        color: '#888',
+        marginTop: 6,
     },
     buttonContainer: {
         flexDirection: 'row',

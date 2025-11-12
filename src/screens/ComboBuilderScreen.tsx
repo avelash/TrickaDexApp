@@ -47,6 +47,7 @@ export const ComboBuilderScreen: React.FC = () => {
         onlyLandedTricks: true,
         minLevel: 0,
         maxLevel: SKILL_LEVELS.length - 1,
+        numberOfTricks: 3,
     });
 
     // Drag and drop states
@@ -247,6 +248,30 @@ export const ComboBuilderScreen: React.FC = () => {
         setComboTricks([]);
     }, []);
 
+    // Generate random combo with N tricks based on preferences.numberOfTricks
+    const handleRandomCombo = useCallback(() => {
+        const count = Math.max(1, Math.round(preferences.numberOfTricks ?? 3));
+
+        if (filteredTricks.length < count) {
+            Alert.alert('Not Enough Tricks', `You need at least ${count} trick${count !== 1 ? 's' : ''} available to generate a random combo.`);
+            return;
+        }
+
+        const randomTricks: Trick[] = [];
+        const selectedIndices = new Set<number>();
+
+        // Select `count` unique random tricks
+        while (randomTricks.length < count) {
+            const randomIndex = Math.floor(Math.random() * filteredTricks.length);
+            if (!selectedIndices.has(randomIndex)) {
+                selectedIndices.add(randomIndex);
+                randomTricks.push(filteredTricks[randomIndex]);
+            }
+        }
+
+        setComboTricks(randomTricks);
+    }, [filteredTricks, preferences.numberOfTricks]);
+
     // Generate combo text
     const comboText = useMemo(() => {
         if (comboTricks.length === 0) return '';
@@ -279,7 +304,7 @@ export const ComboBuilderScreen: React.FC = () => {
                                 onPress={() => setPreferencesModalVisible(true)}
                             >
                                 <Image
-                                    source={require('../../assets/preferences.png')}
+                                    source={require('../../assets/preferences .png')}
                                     style={styles.preferencesIcon}
                                 />
                             </TouchableOpacity>
@@ -341,14 +366,22 @@ export const ComboBuilderScreen: React.FC = () => {
                     <View style={styles.dropZoneContainer}>
                         <View style={styles.dropZoneHeader}>
                             <Text style={styles.sectionTitle}>Build Your Combo</Text>
-                            {comboTricks.length > 0 && (
+                            <View style={styles.buttonGroup}>
                                 <TouchableOpacity
-                                    style={styles.clearButton}
-                                    onPress={handleClearCombo}
+                                    style={styles.randomButton}
+                                    onPress={handleRandomCombo}
                                 >
-                                    <Text style={styles.clearButtonText}>Clear</Text>
+                                    <Text style={styles.randomButtonText}>Random</Text>
                                 </TouchableOpacity>
-                            )}
+                                {comboTricks.length > 0 && (
+                                    <TouchableOpacity
+                                        style={styles.clearButton}
+                                        onPress={handleClearCombo}
+                                    >
+                                        <Text style={styles.clearButtonText}>Clear</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
                         <ComboDropZone
                             tricks={comboTricks}
@@ -506,6 +539,21 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 10,
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    randomButton: {
+        backgroundColor: '#4ECDC4',
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 15,
+    },
+    randomButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
     },
     clearButton: {
         backgroundColor: '#FF5252',
