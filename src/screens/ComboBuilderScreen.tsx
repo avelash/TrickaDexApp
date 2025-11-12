@@ -139,7 +139,7 @@ export const ComboBuilderScreen: React.FC = () => {
         }
 
         // Apply search filter
-        if (search && !predefinedFilters.includes(search)) {
+        if (search) {
             tricks = tricks.filter(trick =>
                 trick.name.toLowerCase().includes(search.toLowerCase())
             );
