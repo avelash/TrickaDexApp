@@ -205,7 +205,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
                         )}
                     </View>
 
-                    <Text style={styles.focusSubtitle}>{stats.focus}</Text>
+                    <Text style={styles.focusSubtitle}>{userName?.toLowerCase() === "michael guthrie" ? "G.O.A.T" : stats.focus}</Text>
                     <View style={styles.divider} />
 
                     <View style={styles.levelSection}>
