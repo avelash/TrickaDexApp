@@ -7,6 +7,7 @@ import { TrickListScreen } from './src/screens/TrickListScreen';
 import { UserProfileScreen } from './src/screens/UserProfileScreen';
 import { AllLevelsProgressScreen } from './src/screens/AllLevelsProgressScreen';
 import  FeedbackScreen from './src/screens/FeedbackScreen';
+import { ComboBuilderScreen } from './src/screens/ComboBuilderScreen';
 
 // Define type-safe stack param list
 export type RootStackParamList = {
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   UserProfileScreen: undefined;
   AllLevelsProgressScreen: undefined;
   FeedbackScreen: undefined;
+  ComboBuilderScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,6 +35,7 @@ export default function App() {
         <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
         <Stack.Screen name="AllLevelsProgressScreen" component={AllLevelsProgressScreen} />
         <Stack.Screen name="FeedbackScreen" component={FeedbackScreen} />
+        <Stack.Screen name="ComboBuilderScreen" component={ComboBuilderScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
