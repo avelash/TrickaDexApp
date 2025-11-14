@@ -835,6 +835,38 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A forward flip that starts by going into a headstand then kicking over to land on the feet.",
     tutorialUrl: "https://www.youtube.com/watch?v=ifqi_v1Nf0o",
   },
+  {
+    id: "spyder",
+    name: "Spyder",
+    icon: require("../../assets/spyder_icon.png"),
+    types: ["transition"],
+    prerequisites: ["machine"],
+    difficulty: 1,
+    description: "A no-handed Machine.",
+    tutorialUrl: "https://www.youtube.com/watch?v=iOl0tIdLAk8&t=15s",
+  },
+  {
+    id: "arabian",
+    name: "Arabian",
+    icon: require("../../assets/arabian_icon.png"),
+    types: ["flip"],
+    prerequisites: ["frontflip", "backflip"],
+    difficulty: 2,
+    description:
+      "A backflip during which the practioner does a 180° twist tand then tucks into a frontflip.",
+    tutorialUrl: "https://www.youtube.com/watch?v=YiYf_vzz3ng",
+  },
+  {
+    id: "cheat_720_double",
+    name: "Cheat 720 Double",
+    icon: require("../../assets/cheat720Double_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["cheat_720"],
+    difficulty: 2,
+    description:
+      "A Cheat 720 with two kicks, kick an outside cresent / hook kick during the takeoff and the regular hook kick at the end.",
+    tutorialUrl: "https://www.youtube.com/watch?v=9ms_CQ6nrsY&t=2s",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
