@@ -115,40 +115,55 @@ export const ComboBuilderScreen: React.FC = () => {
         });
     }, []);
 
-    // Filter tricks based on search and active filters
-    const filteredTricks = useMemo(() => {
-        let tricks = landedTricks;
-
-        // Apply level filtering
-        tricks = tricks.filter(trick => {
-            const trickLevel = trick.difficulty ?? 0;
-            return trickLevel >= preferences.minLevel && trickLevel <= preferences.maxLevel;
-        });
-
-        if (activeFilters.length > 0) {
-            tricks = tricks.filter(trick => {
-                return activeFilters.every(filter => {
-                    if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
-                        const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
-                        return (trick.difficulty ?? 0) === levelIdx;
-                    } else {
-                        // Type filter
-                        return trick.types.includes(filter.toLowerCase());
-                    }
+      // Filter tricks based on search and active filters
+        const filteredTricks = useMemo(() => {
+            let tricks = TRICKS_DATA;
+            let filtersToApply = [...activeFilters];
+    
+            // Check if search matches a valid filter name from FILTER_CONFIG
+            if (search && !activeFilters.includes(search)) {
+                const matchedFilter = FILTER_CONFIG.find(
+                    filter => filter.name.toLowerCase() === search.toLowerCase()
+                );
+    
+                if (matchedFilter) {
+                    filtersToApply.push(matchedFilter.name);
+                }
+            }
+    
+            // If no filters active and no search, show all
+            if (filtersToApply.length === 0 && !search) {
+                return TRICKS_DATA;
+            }
+    
+            // Apply multiple filters
+            if (filtersToApply.length > 0) {
+                tricks = tricks.filter(trick => {
+                    return filtersToApply.every(filter => {
+                        if (filter === 'Landed') {
+                            return isTrickLanded(trick.id);
+                        } else if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
+                            const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
+                            return (trick.difficulty ?? 0) === levelIdx;
+                        } else {
+                            // Type filter (compare case-insensitively)
+                            return trick.types.some(type =>
+                                type.toLowerCase() === filter.toLowerCase()
+                            );
+                        }
+                    });
                 });
-            });
-        }
-
-        // Apply search filter
-        if (search) {
-            tricks = tricks.filter(trick =>
-                trick.name.toLowerCase().includes(search.toLowerCase())
-            );
-        }
-
-        return tricks;
-    }, [activeFilters, search, landedTricks, predefinedFilters, preferences]);
-
+            }
+    
+            // Apply text search filter for tricks that don't match filter names
+            if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
+                tricks = tricks.filter(trick =>
+                    trick.name.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+    
+            return tricks;
+        }, [activeFilters, search, isTrickLanded, TRICKS_DATA, SKILL_LEVELS]);
     // Drag handlers
     const handleDragStart = useCallback((trick: Trick, layout: { x: number; y: number; width: number; height: number }) => {
         setDraggedTrick(trick);

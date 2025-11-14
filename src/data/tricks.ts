@@ -849,7 +849,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     id: "arabian",
     name: "Arabian",
     icon: require("../../assets/arabian_icon.png"),
-    types: ["flip"],
+    types: ["flip", "twist"],
     prerequisites: ["frontflip", "backflip"],
     difficulty: 2,
     description:
@@ -866,6 +866,30 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Cheat 720 with two kicks, kick an outside cresent / hook kick during the takeoff and the regular hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=9ms_CQ6nrsY&t=2s",
+  },
+  {
+    id: "tricker_aerial",
+    name: "Tricker Aerial",
+    icon: require("../../assets/trickerAerial_icon.png"),
+    types: ["transition", "flip"],
+    prerequisites: ["dive_cartwheel", "touchdown_round"],
+    difficulty: 1,
+    description:
+      "A no-handed cartwheel going over the side.\n" +
+      "Note that in a regular Aerial the practitioner takes off forwards.",
+    tutorialUrl: "https://www.youtube.com/watch?v=dSntnWrIdz4&t=86s",
+  },
+  {
+    id: "aerial_twist",
+    name: "Aerial Twist",
+    icon: require("../../assets/aerialTwist_icon.png"),
+    types: ["twist", "flip"],
+    prerequisites: ["webster", "tricker_aerial"],
+    difficulty: 2,
+    description:
+      "A Webster with a 180° twist.\n" +
+      "Also can be done as a tricker aerial with a  270° twist.",
+    tutorialUrl: "https://www.youtube.com/watch?v=kwE_CPll3H0&t=159s",
   },
 ];
 

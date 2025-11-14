@@ -72,20 +72,29 @@ export const TrickListScreen: React.FC = () => {
     // Filter tricks based on search and active filters
     const filteredTricks = useMemo(() => {
         let tricks = TRICKS_DATA;
+        let filtersToApply = [...activeFilters];
+
+        // Check if search matches a valid filter name from FILTER_CONFIG
+        if (search && !activeFilters.includes(search)) {
+            const matchedFilter = FILTER_CONFIG.find(
+                filter => filter.name.toLowerCase() === search.toLowerCase()
+            );
+
+            if (matchedFilter) {
+                filtersToApply.push(matchedFilter.name);
+            }
+        }
 
         // If no filters active and no search, show all
-        if (activeFilters.length === 0 && !search) {
+        if (filtersToApply.length === 0 && !search) {
             return TRICKS_DATA;
         }
 
         // Apply multiple filters
-        if (activeFilters.length > 0) {
+        if (filtersToApply.length > 0) {
             tricks = tricks.filter(trick => {
-                // Check each active filter
-                return activeFilters.every(filter => {
-                    if (filter === 'All') {
-                        return true;
-                    } else if (filter === 'Landed') {
+                return filtersToApply.every(filter => {
+                    if (filter === 'Landed') {
                         return isTrickLanded(trick.id);
                     } else if (filter === 'Next Learns') {
                         return suggestedTricks.some(st => st.id === trick.id);
@@ -93,22 +102,24 @@ export const TrickListScreen: React.FC = () => {
                         const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
                         return (trick.difficulty ?? 0) === levelIdx;
                     } else {
-                        // Type filter
-                        return trick.types.includes(filter.toLowerCase());
+                        // Type filter (compare case-insensitively)
+                        return trick.types.some(type =>
+                            type.toLowerCase() === filter.toLowerCase()
+                        );
                     }
                 });
             });
         }
 
-        // Apply search filter if present
-        if (search && !predefinedFilters.includes(search)) {
+        // Apply text search filter for tricks that don't match filter names
+        if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
             tricks = tricks.filter(trick =>
                 trick.name.toLowerCase().includes(search.toLowerCase())
             );
         }
 
         return tricks;
-    }, [activeFilters, search, isTrickLanded, suggestedTricks, predefinedFilters]);
+    }, [activeFilters, search, isTrickLanded, suggestedTricks, TRICKS_DATA, SKILL_LEVELS]);
 
     // Group tricks by difficulty and create flat list data
     const flatListData: TrickRow[] = useMemo(() => {

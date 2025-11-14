@@ -11,6 +11,7 @@ import {
     StatusBar,
     Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -90,7 +91,7 @@ const FeedbackScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
             <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
@@ -134,7 +135,7 @@ const FeedbackScreen: React.FC = () => {
                         listItemLabelStyle={{ color: "#333" }}
                         selectedItemLabelStyle={{ color: "#4ECDC4", fontWeight: "600" }}
                         arrowIconStyle={{ tintColor: "#4ECDC4" } as any
-                    }
+                        }
                     />
                 </View>
 
@@ -160,7 +161,7 @@ const FeedbackScreen: React.FC = () => {
                     )}
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
