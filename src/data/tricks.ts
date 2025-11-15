@@ -157,6 +157,16 @@ const TRICKS_DATA_RAW: Trick[] = [
     tutorialUrl: "https://youtube.com/shorts/oG13xxzFGB0?si=rDU5iWhvVf2qVf8W",
   },
   {
+    id: "pop_360_turbo",
+    name: "Pop 360 Turbo",
+    icon: require("../../assets/pop360Turbo_icon.png"),
+    types: ["kick"],
+    prerequisites: ["pop_360"],
+    difficulty: 1,
+    description: "A pop 360 that lands on both feet with an extra 90° turn.",
+    tutorialUrl: "https://www.youtube.com/watch?v=7Iaq33DHnm4",
+  },
+  {
     id: "cork_rodeo",
     name: "Cork Rodeo",
     icon: corkRodeo,
@@ -342,7 +352,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     name: "Pop 360 Shuriken",
     icon: pop360shuriken,
     types: ["kick"],
-    prerequisites: ["pop_360"],
+    prerequisites: ["pop_360_turbo"],
     difficulty: 1,
     description: "A pop 360 landing on the kicking leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=HwWPw6Hgx_Q",
@@ -691,7 +701,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     name: "Illusion Twist",
     icon: require("../../assets/illusionTwist_icon.png"),
     types: ["kick", "twist"],
-    prerequisites: ["pop_360", "backside_720", "butterfly_kick"],
+    prerequisites: ["pop_360_turbo", "backside_720", "butterfly_kick"],
     difficulty: 2,
     description:
       "A pop 360 turbo from a Butterfly-Kick setup.\n A lot of people see this as a Butterfly" +
@@ -767,7 +777,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     name: "Crowd Awakener",
     icon: require("../../assets/crowdAwakener_icon.png"),
     types: ["kick"],
-    prerequisites: ["pop_360", "tornado_kick"],
+    prerequisites: ["pop_360_turbo", "tornado_kick"],
     difficulty: 1,
     description: "A 180° turn into a split kick from a pop or cheat setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
@@ -890,6 +900,19 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A Webster with a 180° twist.\n" +
       "Also can be done as a tricker aerial with a  270° twist.",
     tutorialUrl: "https://www.youtube.com/watch?v=kwE_CPll3H0&t=159s",
+  },
+  {
+    id: "wrap_720",
+    name: "Wrap 720",
+    icon: require("../../assets/wrap720_icon.png"),
+    types: ["twist", "kick"],
+    prerequisites: ["skip_hook"],
+    difficulty: 1,
+    description:
+      "Starting from standing on one leg, the practitioner wraps the other leg around before performing a 360° / 540° spin" +
+      "releasing a hook kick at the end." +
+      "\nCould not find a wrap 720 tutorial, if you find one please let me know through the contact form.",
+    tutorialUrl: "https://www.youtube.com/watch?v=rK7ID2SO_Iw",
   },
 ];
 
