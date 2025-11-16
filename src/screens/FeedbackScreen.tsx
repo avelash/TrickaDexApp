@@ -86,7 +86,7 @@ const FeedbackScreen: React.FC = () => {
             console.error(error);
         } finally {
             setLoading(false);
-            navigation.replace("TrickListScreen");
+            navigation.replace("MainTabs");
         }
     };
 

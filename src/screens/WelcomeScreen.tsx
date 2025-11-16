@@ -36,8 +36,9 @@ export const WelcomeScreen: React.FC = () => {
         // Only start timer if modal is hidden
         if (!showNameModal) {
             const timer = setTimeout(() => {
-                navigation.replace('TrickListScreen');
+                navigation.replace('MainTabs');
             }, 5000);
+
             return () => clearTimeout(timer);
         }
     }, [showNameModal, navigation]);

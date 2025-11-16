@@ -17,7 +17,7 @@ import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList, ProfileStackParamList } from '../../App';
 import { TrickCard } from "../components/TrickCard";
 import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -93,9 +93,11 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
     }, [landedTricks]);
 };
 
-export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate }) => {
-    type UserProfileNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UserProfileScreen'>;
-    const navigation = useNavigation<UserProfileNavigationProp>();
+export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
+    type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'UserProfileScreen'>;
+    const navigation = useNavigation<ProfileNav>();
+    type RootNav = NativeStackNavigationProp<RootStackParamList>;
+    const rootNavigation = useNavigation<RootNav>();
 
     const { landedTricks } = useTrickProgress();
     const stats = useProfileStats(landedTricks);
@@ -143,7 +145,17 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
     };
 
     const handleInfo = (trick: Trick) => setSelectedTrick(trick);
-    const handleProgressBarPress = () => navigation.navigate('TrickListScreen', { initialFilter: stats.currentLevel });
+    const handleProgressBarPress = () => {
+        rootNavigation.navigate('MainTabs', {
+            screen: 'TrickTab',
+            params: {
+                screen: 'TrickListScreen',
+                params: {
+                    initialFilter: stats.currentLevel,
+                },
+            },
+        } as any); // `as any` to keep TS calm unless you wire full nested types
+    };
 
     const handleNamePress = () => {
         const now = Date.now();
@@ -171,7 +183,14 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.headerBg}>
-                    <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() =>
+                            rootNavigation.navigate('MainTabs', {
+                                screen: 'TrickTab',
+                            } as any)
+                        }
+                    >
                         <Image source={require('../../assets/return.png')} style={styles.backIcon} />
                     </TouchableOpacity>
                 </View>
@@ -245,9 +264,21 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
                         </View>
                         <View>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('TrickListScreen', { initialFilter: "Next Learns" })}
+                                onPress={() =>
+                                    rootNavigation.navigate('MainTabs', {
+                                        screen: 'TrickTab',
+                                        params: {
+                                            screen: 'TrickListScreen',
+                                            params: {
+                                                initialFilter: 'Next Learns',
+                                            },
+                                        },
+                                    } as any)
+                                }
                                 style={styles.allLevelsButton}
-                                activeOpacity={0.6}>
+                                activeOpacity={0.6}
+                            >
+
                                 <Text style={styles.allLevelsText}>All next Learns</Text>
                                 <Text style={styles.allLevelsArrow}>›</Text>
                             </TouchableOpacity>

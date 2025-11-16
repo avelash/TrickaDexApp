@@ -10,16 +10,21 @@ import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList, TrickStackParamList } from '../../App';
 import { useUserName } from '../hooks/useUserDetails';
 
-type TrickListScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
+
+type TrickListScreenNavigationProp = NativeStackNavigationProp<
+    TrickStackParamList,
     'TrickListScreen'
 >;
 
-type TrickListScreenRouteProp = RouteProp<RootStackParamList, 'TrickListScreen'>;
+type TrickListScreenRouteProp = RouteProp<
+    TrickStackParamList,
+    'TrickListScreen'
+>;
+type RootNav = NativeStackNavigationProp<RootStackParamList>;
 
 interface TrickRow {
     id: string;
@@ -31,6 +36,7 @@ interface TrickRow {
 export const TrickListScreen: React.FC = () => {
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
     const navigation = useNavigation<TrickListScreenNavigationProp>();
+    const rootNavigation = useNavigation<RootNav>();
     const route = useRoute<TrickListScreenRouteProp>();
 
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -217,27 +223,13 @@ export const TrickListScreen: React.FC = () => {
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerRow}>
-                    <TouchableOpacity
-                        style={styles.menuButton}
-                        accessibilityLabel="Menu"
-                        onPress={() => navigation.navigate('UserProfileScreen')}
-                    >
-                        <Image
-                            source={require('../../assets/user.png')}
-                            style={styles.userIcon}
-                        />
-                    </TouchableOpacity>
-
                     <Text style={styles.headerTitle}>Trickadex</Text>
                     <TouchableOpacity
                         style={styles.menuButton}
                         accessibilityLabel="Feedback"
                         onPress={() => {
-                            if (userName === "comboBuilder") {
-                                navigation.navigate('ComboBuilderScreen');
-                            } else {
-                                navigation.navigate('FeedbackScreen');
-                            }
+
+                            rootNavigation.navigate('FeedbackScreen');
                         }}
                     >
                         <Image

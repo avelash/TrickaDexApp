@@ -25,11 +25,11 @@ import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
 import { Trick } from '../types';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { ComboStackParamList } from '../../App';
 
-type ComboBuilderScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
+type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
+    ComboStackParamList,
     'ComboBuilderScreen'
 >;
 
@@ -54,7 +54,6 @@ export const ComboBuilderScreen: React.FC = () => {
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     const [draggedTrick, setDraggedTrick] = useState<Trick | null>(null);
     const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
-    const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null);
     const [isOverDropZone, setIsOverDropZone] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
     const [scrollOffset, setScrollOffset] = useState(0);
@@ -117,7 +116,7 @@ export const ComboBuilderScreen: React.FC = () => {
 
       // Filter tricks based on search and active filters
         const filteredTricks = useMemo(() => {
-            let tricks = TRICKS_DATA;
+            let tricks = landedTricks;
             let filtersToApply = [...activeFilters];
     
             // Check if search matches a valid filter name from FILTER_CONFIG
@@ -133,7 +132,7 @@ export const ComboBuilderScreen: React.FC = () => {
     
             // If no filters active and no search, show all
             if (filtersToApply.length === 0 && !search) {
-                return TRICKS_DATA;
+                return tricks;
             }
     
             // Apply multiple filters
