@@ -217,7 +217,7 @@ export const TrickListScreen: React.FC = () => {
     const keyExtractor = useCallback((item: TrickRow) => item.id, []);
 
     return (
-        <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
             {/* Header */}

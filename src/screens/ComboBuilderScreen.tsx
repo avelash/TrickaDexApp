@@ -295,7 +295,7 @@ export const ComboBuilderScreen: React.FC = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
-                <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+                <SafeAreaView style={styles.container} edges={['left', 'right']}>
                     <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
                     {/* Header */}

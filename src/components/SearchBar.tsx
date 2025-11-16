@@ -333,6 +333,7 @@ const styles = StyleSheet.create({
     suggestionGrid: {
         width: '100%',
         paddingHorizontal: 10,
+        paddingBottom: 90,
     },
     categorySection: {
         marginBottom: 20,

@@ -1,4 +1,5 @@
 // App.tsx
+import { Image } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -101,21 +102,57 @@ function MainTabs() {
         headerShown: false,
         // you can add tabBarIcon etc. here
       }}
-    >
-      <Tab.Screen
+    ><Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
-        options={{ title: 'Profile' }}
+        options={{
+          tabBarLabel: () => null,
+          tabBarIcon: ({ focused, size }) => (
+            <Image
+              source={require('./assets/user.png')}
+              style={{
+                width: size,
+                height: size,
+                opacity: focused ? 1 : 0.6, // optional focus effect
+              }}
+              resizeMode="contain"
+            />
+          ),
+        }}
       />
       <Tab.Screen
         name="TrickTab"
         component={TrickStackNavigator}
-        options={{ title: 'Tricks' }}
+        options={{tabBarLabel: () => null,
+      tabBarIcon: ({focused, size}) => (
+      <Image
+        source={require('./assets/kick.png')}
+        style={{
+          width: 40,
+          height: 40,
+          opacity: focused ? 1 : 0.6, // optional focus effect
+        }}
+        resizeMode="contain"
+      />
+      ),
+        }}
       />
       <Tab.Screen
         name="ComboTab"
         component={ComboStackNavigator}
-        options={{ title: 'Builder' }}
+        options={{tabBarLabel: () => null,
+      tabBarIcon: ({focused, size}) => (
+      <Image
+        source={require('./assets/game.png')}
+        style={{
+          width: 40,
+          height: 40,
+          opacity: focused ? 1 : 0.6, // optional focus effect
+        }}
+        resizeMode="contain"
+      />
+      ),
+        }}
       />
     </Tab.Navigator>
   );
