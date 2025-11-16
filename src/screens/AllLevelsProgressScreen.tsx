@@ -178,7 +178,7 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
     ).length;
 
     return (
-        <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar
                 barStyle="light-content"
                 backgroundColor="#4ECDC4"
