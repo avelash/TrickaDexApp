@@ -1,4 +1,4 @@
-import React from "react";
+import React, {memo } from "react";
 import { Linking, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { Trick } from "../types";
 
@@ -9,7 +9,7 @@ interface TrickCardProps {
     onInfo: (trick: Trick) => void;
 }
 
-export const TrickCard: React.FC<TrickCardProps> = ({
+const TrickCardComponent: React.FC<TrickCardProps> = ({
     trick,
     isLanded,
     onToggle,
@@ -132,3 +132,4 @@ const styles = StyleSheet.create({
         tintColor: "#BDC3C7",
     },
 });
+export const TrickCard = memo(TrickCardComponent);
