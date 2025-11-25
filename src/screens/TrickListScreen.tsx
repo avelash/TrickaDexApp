@@ -11,7 +11,8 @@ import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList, TrickStackParamList } from '../../App';
+import type { RootStackParamList } from '../../App';
+import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
 import { useUserName } from '../hooks/useUserDetails';
 
 

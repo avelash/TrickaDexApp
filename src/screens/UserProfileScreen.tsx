@@ -17,7 +17,8 @@ import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, ProfileStackParamList } from '../../App';
+import { RootStackParamList } from '../../App';
+import type { ProfileStackParamList } from '../navigation/MainTabsNavigator'
 import { TrickCard } from "../components/TrickCard";
 import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -13,7 +13,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, ProfileStackParamList} from '../../App';
+import { RootStackParamList} from '../../App';
+import type { ProfileStackParamList } from '../navigation/MainTabsNavigator'
+
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { useTrickProgress } from '../hooks/useTrickProgress';

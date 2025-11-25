@@ -26,7 +26,7 @@ import { FILTER_CONFIG } from '../data/filterConfigs';
 import { Trick } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { ComboStackParamList } from '../../App';
+import type { ComboStackParamList } from '../navigation/MainTabsNavigator'
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
