@@ -914,6 +914,60 @@ const TRICKS_DATA_RAW: Trick[] = [
       "\nCould not find a wrap 720 tutorial, if you find one please let me know through the contact form.",
     tutorialUrl: "https://www.youtube.com/watch?v=rK7ID2SO_Iw",
   },
+  {
+    id: "btwist_round",
+    name: "Btwist Round",
+    icon: require("../../assets/btwistRound_icon.png"),
+    types: ["twist", "kick"],
+    prerequisites: ["btwist", "pop_tornado"],
+    difficulty: 3,
+    description: "A Btwist with a round kick at the end.",
+    tutorialUrl: "https://www.youtube.com/watch?v=hhEGnbrl86c",
+  },
+  {
+    id: "sideswipe",
+    name: "Sideswipe",
+    icon: require("../../assets/sideswipe_icon.png"),
+    types: ["flip", "kick"],
+    prerequisites: ["raiz", "540_kick"],
+    difficulty: 3,
+    description:
+      "A Raiz with a swipe kick half way through, landing one the kicking leg.\nLike a laying down 540 kick.",
+    tutorialUrl: "https://www.youtube.com/watch?v=pP-Ariidlus&t=153s",
+  },
+  {
+    id: "loser",
+    name: "Loser",
+    icon: require("../../assets/loser_icon.png"),
+    types: ["flip"],
+    prerequisites: ["webster"],
+    difficulty: 3,
+    description:
+      "A frontswing Webster from a step / a few steps backwards as the set up.",
+    tutorialUrl: "https://www.youtube.com/watch?v=nPnAhsjBwDg",
+  },
+  {
+    id: "gainer_switch",
+    name: "Gainer Switch",
+    icon: require("../../assets/gainerSwitch_icon.png"),
+    types: ["flip"],
+    prerequisites: ["gainer"],
+    difficulty: 3,
+    description:
+      "A gainer where the practitioner kicks the jumping leg ahead of the swinging leg, landing back on the jumping leg.",
+    tutorialUrl: "https://www.youtube.com/watch?v=lI_iCIai3aQ",
+  },
+  {
+    id: "pop_720_double",
+    name: "Pop 720 Double",
+    icon: require("../../assets/pop720Double_icon.png"),
+    types: ["kick", "twist"],
+    prerequisites: ["pop_720", "pop_360_shuriken"],
+    difficulty: 2,
+    description:
+      "A Pop 720 with two kicks, an outside crescent / hook kick where a Pop 360 would kick, and the regular hook kick at the end.",
+    tutorialUrl: "https://www.youtube.com/shorts/ELo11Q7LuW0",
+  },
 ];
 
 export const TRICKS_DATA = TRICKS_DATA_RAW.sort((a, b) =>
