@@ -87,7 +87,7 @@ export function MainTabs() {
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarStyle: {
-                    height: 80,
+                    height: 90,
                     backgroundColor: '#fff',
                     borderTopWidth: 0,
                     elevation: 8,
@@ -107,7 +107,7 @@ export function MainTabs() {
                     tabBarLabel: () => null,
                     tabBarIcon: ({ focused, size }) => (
                         <Image
-                            source={require('../assets/userProfile_icon.png')}
+                            source={require('../../assets/userProfile_icon.png')}
                             style={{
                                 width: focused ? FOCUSED_SIZE : SIZE,
                                 height: focused ? FOCUSED_SIZE : SIZE,
@@ -126,7 +126,7 @@ export function MainTabs() {
                     tabBarLabel: () => null,
                     tabBarIcon: ({ focused, size }) => (
                         <Image
-                            source={require('../assets/trickList_icon.png')}
+                            source={require('../../assets/trickList_icon.png')}
                             style={{
                                 width: focused ? FOCUSED_SIZE : SIZE,
                                 height: focused ? FOCUSED_SIZE : SIZE,
@@ -148,7 +148,7 @@ export function MainTabs() {
                     tabBarLabel: () => null,
                     tabBarIcon: ({ focused, size }) => (
                         <Image
-                            source={require('../assets/comboBuilder_icon_tmp.png')}
+                            source={require('../../assets/comboBuilder_icon_tmp.png')}
                             style={{
                                 width: focused ? FOCUSED_SIZE : SIZE,
                                 height: focused ? FOCUSED_SIZE : SIZE,
