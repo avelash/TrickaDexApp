@@ -96,24 +96,39 @@ function ComboStackNavigator() {
 // ---------- Bottom tabs ----------
 
 function MainTabs() {
+  const FOCUSED_SIZE = 60;
+  const SIZE = 40;
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-        // you can add tabBarIcon etc. here
-      }}
-    ><Tab.Screen
+        tabBarStyle: {
+          height: 80,
+          backgroundColor: '#fff',
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: -2 },
+          marginBottom:7,
+        },
+        tabBarHideOnKeyboard: true,
+      })}
+    >
+      <Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
         options={{
           tabBarLabel: () => null,
           tabBarIcon: ({ focused, size }) => (
             <Image
-              source={require('./assets/user.png')}
+              source={require('./assets/userProfile_icon.png')}
               style={{
-                width: size,
-                height: size,
-                opacity: focused ? 1 : 0.6, // optional focus effect
+                width: focused ? FOCUSED_SIZE : SIZE,
+                height: focused ? FOCUSED_SIZE : SIZE,
+                opacity: focused ? 1 : 0.8,
+                borderRadius: 10
               }}
               resizeMode="contain"
             />
@@ -123,35 +138,42 @@ function MainTabs() {
       <Tab.Screen
         name="TrickTab"
         component={TrickStackNavigator}
-        options={{tabBarLabel: () => null,
-      tabBarIcon: ({focused, size}) => (
-      <Image
-        source={require('./assets/kick.png')}
-        style={{
-          width: 40,
-          height: 40,
-          opacity: focused ? 1 : 0.6, // optional focus effect
-        }}
-        resizeMode="contain"
-      />
-      ),
+        options={{
+          tabBarLabel: () => null,
+          tabBarIcon: ({ focused, size }) => (
+            <Image
+              source={require('./assets/trickList_icon.png')}
+              style={{
+                width: focused ? FOCUSED_SIZE : SIZE,
+                height: focused ? FOCUSED_SIZE : SIZE,
+                opacity: focused ? 1 : 0.8,
+                borderRadius:10
+              }}
+              resizeMode="contain"
+            />
+          ),
+          tabBarItemStyle: {
+            marginBottom: 15, // Elevates the middle tab
+          },
         }}
       />
       <Tab.Screen
         name="ComboTab"
         component={ComboStackNavigator}
-        options={{tabBarLabel: () => null,
-      tabBarIcon: ({focused, size}) => (
-      <Image
-        source={require('./assets/game.png')}
-        style={{
-          width: 40,
-          height: 40,
-          opacity: focused ? 1 : 0.6, // optional focus effect
-        }}
-        resizeMode="contain"
-      />
-      ),
+        options={{
+          tabBarLabel: () => null,
+          tabBarIcon: ({ focused, size }) => (
+            <Image
+              source={require('./assets/comboBuilder_icon_tmp.png')}
+              style={{
+                width: focused ? FOCUSED_SIZE : SIZE,
+                height: focused ? FOCUSED_SIZE : SIZE,
+                opacity: focused ? 1 : 0.8,
+                borderRadius:10
+              }}
+              resizeMode="contain"
+            />
+          ),
         }}
       />
     </Tab.Navigator>

@@ -237,7 +237,6 @@ export const TrickListScreen: React.FC = () => {
                             style={styles.userIcon}
                         />
                     </TouchableOpacity>
-                    <View style={styles.menuButton} />
                 </View>
             </View>
 
@@ -285,6 +284,7 @@ const styles = StyleSheet.create({
     menuButton: {
         marginRight: 10,
         padding: 4,
+        position: 'absolute'
     },
     userIcon: {
         width: 22,
