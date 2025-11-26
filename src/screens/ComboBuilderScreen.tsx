@@ -302,18 +302,6 @@ export const ComboBuilderScreen: React.FC = () => {
                     <View style={styles.header}>
                         <View style={styles.headerRow}>
                             <TouchableOpacity
-                                style={styles.backButton}
-                                onPress={() => navigation.goBack()}
-                            >
-                                <Image
-                                    source={require('../../assets/return.png')}
-                                    style={styles.backIcon}
-                                />
-                            </TouchableOpacity>
-
-                            <Text style={styles.headerTitle}>Combo Builder</Text>
-
-                            <TouchableOpacity
                                 style={styles.preferencesButton}
                                 onPress={() => setPreferencesModalVisible(true)}
                             >
@@ -322,6 +310,8 @@ export const ComboBuilderScreen: React.FC = () => {
                                     style={styles.preferencesIcon}
                                 />
                             </TouchableOpacity>
+                            <Text style={styles.headerTitle}>Combo Builder</Text>
+
                         </View>
                     </View>
 
@@ -469,6 +459,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#4ECDC4',
         padding: 20,
         paddingTop: 36,
+        minHeight: 80,
+        alignContent: 'center'
     },
     headerRow: {
         flexDirection: 'row',
@@ -496,7 +488,7 @@ const styles = StyleSheet.create({
         tintColor: 'white',
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: 'bold',
         color: 'white',
         textAlign: 'center',

@@ -184,16 +184,6 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.headerBg}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() =>
-                            rootNavigation.navigate('MainTabs', {
-                                screen: 'TrickTab',
-                            } as any)
-                        }
-                    >
-                        <Image source={require('../../assets/return.png')} style={styles.backIcon} />
-                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.profileCard}>
@@ -296,7 +286,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F7F7F7' },
     scrollContent: { flexGrow: 1, paddingBottom: 40 },
-    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 ,paddingTop: 36 },
+    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 ,paddingTop: 78 , maxHeight: 80},
     backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     backIcon: { width: 24, height: 24, tintColor: 'white', resizeMode: 'contain' },
     profileCard: { marginHorizontal: 20, marginTop: -20, backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },
