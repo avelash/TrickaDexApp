@@ -145,6 +145,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                                 <Image
                                     source={filterConfig.icon}
                                     style={styles.filterBoxIcon}
+                                    resizeMethod='resize'
                                 />
                                 <Text style={styles.filterBoxText}>{filterConfig.name}</Text>
                                 <TouchableOpacity
@@ -209,6 +210,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                                                 <Image
                                                     source={filterItem.icon}
                                                     style={styles.suggestionIcon}
+                                                    resizeMethod='resize'
                                                 />
                                                 <Text style={[
                                                     styles.suggestionText,

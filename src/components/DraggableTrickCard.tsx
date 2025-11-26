@@ -99,7 +99,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         <View ref={viewRef} onLayout={handleLayout} style={styles.cardContainer}>
             <GestureDetector gesture={panGesture}>
                 <Animated.View style={styles.iconContainer}>
-                    <Image source={trick.icon} style={styles.iconImage} resizeMode="contain" />
+                    <Image source={trick.icon} style={styles.iconImage} resizeMode="contain" resizeMethod='resize' />
                 </Animated.View>
             </GestureDetector>
 

@@ -106,6 +106,7 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                                         source={trick.icon}
                                         style={styles.comboIconImage}
                                         resizeMode="contain"
+                                        resizeMethod='resize'
                                     />
                                 </View>
                                 <Text
