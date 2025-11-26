@@ -12,25 +12,25 @@ export const FILTER_CONFIG: FilterConfig[] = [
   {
     name: "Kick",
     category: "Type",
-    color: "#3DA1F2",
+    color: "#932ef9ff",
     icon: require("../../assets/kick.png"),
   },
   {
     name: "Flip",
     category: "Type",
-    color: "#E94F87",
+    color: "#2a6ce7ff",
     icon: require("../../assets/flip_icon.png"),
   },
   {
     name: "Twist",
     category: "Type",
-    color: "#F28C2E",
+    color: "#F97316",
     icon: require("../../assets/twist_icon.png"),
   },
   {
     name: "Transition",
     category: "Type",
-    color: "#40C28C",
+    color: "#1dbc7aff",
     icon: require("../../assets/gymnast.png"),
   },
 
@@ -38,13 +38,13 @@ export const FILTER_CONFIG: FilterConfig[] = [
   {
     name: "Landed",
     category: "Learn/Landed",
-    color: "#4CC24A",
+    color: "#84CC16",
     icon: require("../../assets/win-gesture.png"),
   },
   {
     name: "Next Learns",
     category: "Learn/Landed",
-    color: "#ecbd01ff",
+    color: "#FACC15",
     icon: require("../../assets/NextLearns.png"),
   },
   // Skill Levels
