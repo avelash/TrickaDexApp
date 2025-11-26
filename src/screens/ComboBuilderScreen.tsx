@@ -86,11 +86,31 @@ export const ComboBuilderScreen: React.FC = () => {
     }, []);
 
     // Get only landed tricks
-    const landedTricks = useMemo(
-        () => preferences.onlyLandedTricks
-            ? TRICKS_DATA.filter(trick => isTrickLanded(trick.id))
-            : TRICKS_DATA,
-        [isTrickLanded, preferences.onlyLandedTricks]
+    const preferredTricks = useMemo(
+        () => {
+            let tricks = TRICKS_DATA;
+
+            // Filter by landed status if preference is enabled
+            if (preferences.onlyLandedTricks) {
+                tricks = tricks.filter(trick => isTrickLanded(trick.id));
+            }
+
+            // Filter by difficulty level if preference is set
+            if (preferences.minLevel !== undefined && preferences.minLevel !== null) {
+                tricks = tricks.filter(trick =>
+                    (trick.difficulty ?? 0) >= preferences.minLevel
+                );
+            }
+
+            if (preferences.maxLevel !== undefined && preferences.maxLevel !== null) {
+                tricks = tricks.filter(trick =>
+                    (trick.difficulty ?? 0) <= preferences.maxLevel
+                );
+            }
+
+            return tricks;
+        },
+        [isTrickLanded, preferences.onlyLandedTricks, preferences.minLevel, preferences.maxLevel]
     );
 
     const predefinedFilters = useMemo(
@@ -112,7 +132,7 @@ export const ComboBuilderScreen: React.FC = () => {
 
       // Filter tricks based on search and active filters
         const filteredTricks = useMemo(() => {
-            let tricks = landedTricks;
+            let tricks = preferredTricks;
             let filtersToApply = [...activeFilters];
     
             // Check if search matches a valid filter name from FILTER_CONFIG
