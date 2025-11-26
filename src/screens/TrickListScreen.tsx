@@ -42,6 +42,7 @@ export const TrickListScreen: React.FC = () => {
 
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
+    const [searchOpen, setSearchOpen] = useState(false);
     const [modalTrick, setModalTrick] = useState<Trick | null>(null);
     const userName = useUserName().userName;
 
@@ -49,6 +50,8 @@ export const TrickListScreen: React.FC = () => {
     useEffect(() => {
         if (route.params?.initialFilter) {
             setActiveFilters([route.params.initialFilter]);
+            setSearch('');
+            setSearchOpen(false);
         }
     }, [route.params?.initialFilter]);
 
@@ -247,6 +250,8 @@ export const TrickListScreen: React.FC = () => {
                 activeFilters={activeFilters}
                 onToggleFilter={handleToggleFilter}
                 onSearch={setSearch}
+                searchOpen={searchOpen}
+                setSearchOpen={setSearchOpen}
             />
 
             {/* Active Filters Summary */}
