@@ -334,7 +334,7 @@ export const ComboBuilderScreen: React.FC = () => {
 
                     {/* Horizontal Scrollable Trick List */}
                     <View style={styles.trickListContainer}>
-                        <Text style={styles.sectionTitle}>Your Landed Tricks</Text>
+                        <Text style={styles.sectionTitle}>Your Tricks</Text>
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}

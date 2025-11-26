@@ -84,6 +84,7 @@ export function MainTabs() {
     const SIZE = 40;
     return (
         <Tab.Navigator
+        initialRouteName='TrickTab'
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarStyle: {
