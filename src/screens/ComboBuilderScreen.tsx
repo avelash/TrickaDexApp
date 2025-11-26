@@ -27,6 +27,7 @@ import { Trick } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ComboStackParamList } from '../navigation/MainTabsNavigator'
+import { usePreferences } from '../hooks/usePreferences';
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
@@ -43,12 +44,7 @@ export const ComboBuilderScreen: React.FC = () => {
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
-    const [preferences, setPreferences] = useState<PreferencesState>({
-        onlyLandedTricks: true,
-        minLevel: 0,
-        maxLevel: SKILL_LEVELS.length - 1,
-        numberOfTricks: 3,
-    });
+    const { preferences, updatePreferences } = usePreferences();
 
     // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -443,7 +439,7 @@ export const ComboBuilderScreen: React.FC = () => {
                     visible={preferencesModalVisible}
                     preferences={preferences}
                     onClose={() => setPreferencesModalVisible(false)}
-                    onSave={(newPreferences) => setPreferences(newPreferences)}
+                    onSave={(newPreferences) => updatePreferences(newPreferences)}
                 />
             </View>
         </GestureHandlerRootView>

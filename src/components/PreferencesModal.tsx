@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -31,6 +31,11 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
     onSave,
 }) => {
     const [localPreferences, setLocalPreferences] = useState<PreferencesState>(preferences);
+
+    // Sync local state when preferences prop changes
+    useEffect(() => {
+        setLocalPreferences(preferences);
+    }, [preferences]);
 
     const handleSave = () => {
         onSave(localPreferences);
