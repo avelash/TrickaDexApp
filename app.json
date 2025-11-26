@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "TrickaDexApp",
-    "slug": "TrickaDexApp",
+    "name": "TrickaDex",
+    "slug": "TrickaDex",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app_icon_new.png",
+    "icon": "./assets/app_icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/app_icon_new.png",
+      "image": "./assets/app_icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app_icon_new.png",
+        "foregroundImage": "./assets/app_icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -25,7 +25,7 @@
       "package": "com.avelashansky.TrickaDexApp"
     },
     "web": {
-      "favicon": "./assets/app_icon_new.png"
+      "favicon": "./assets/app_icon.png"
     },
     "extra": {
       "eas": {
