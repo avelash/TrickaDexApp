@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image,  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrickCard } from '../components/TrickCard';
 import { TrickCardInfo } from '../components/TrickCardInfo';
@@ -9,17 +9,23 @@ import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { useNavigation, useRoute, RouteProp , useFocusEffect} from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../App';
+import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
 import { useUserName } from '../hooks/useUserDetails';
 
-type TrickListScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
+
+type TrickListScreenNavigationProp = NativeStackNavigationProp<
+    TrickStackParamList,
     'TrickListScreen'
 >;
 
-type TrickListScreenRouteProp = RouteProp<RootStackParamList, 'TrickListScreen'>;
+type TrickListScreenRouteProp = RouteProp<
+    TrickStackParamList,
+    'TrickListScreen'
+>;
+type RootNav = NativeStackNavigationProp<RootStackParamList>;
 
 interface TrickRow {
     id: string;
@@ -31,10 +37,12 @@ interface TrickRow {
 export const TrickListScreen: React.FC = () => {
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
     const navigation = useNavigation<TrickListScreenNavigationProp>();
+    const rootNavigation = useNavigation<RootNav>();
     const route = useRoute<TrickListScreenRouteProp>();
 
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
+    const [searchOpen, setSearchOpen] = useState(false);
     const [modalTrick, setModalTrick] = useState<Trick | null>(null);
     const userName = useUserName().userName;
 
@@ -42,8 +50,10 @@ export const TrickListScreen: React.FC = () => {
     useEffect(() => {
         if (route.params?.initialFilter) {
             setActiveFilters([route.params.initialFilter]);
+            setSearch('');
+            setSearchOpen(false);
         }
-    }, [route.params?.initialFilter]);
+    }, [route.params?.initialFilter, route.params?.trigger]);
 
     // Memoize suggested tricks
     const suggestedTricks = useMemo(() =>
@@ -211,33 +221,19 @@ export const TrickListScreen: React.FC = () => {
     const keyExtractor = useCallback((item: TrickRow) => item.id, []);
 
     return (
-        <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerRow}>
-                    <TouchableOpacity
-                        style={styles.menuButton}
-                        accessibilityLabel="Menu"
-                        onPress={() => navigation.navigate('UserProfileScreen')}
-                    >
-                        <Image
-                            source={require('../../assets/user.png')}
-                            style={styles.userIcon}
-                        />
-                    </TouchableOpacity>
-
                     <Text style={styles.headerTitle}>Trickadex</Text>
                     <TouchableOpacity
                         style={styles.menuButton}
                         accessibilityLabel="Feedback"
                         onPress={() => {
-                            if (userName === "comboBuilder") {
-                                navigation.navigate('ComboBuilderScreen');
-                            } else {
-                                navigation.navigate('FeedbackScreen');
-                            }
+
+                            rootNavigation.navigate('FeedbackScreen');
                         }}
                     >
                         <Image
@@ -245,7 +241,6 @@ export const TrickListScreen: React.FC = () => {
                             style={styles.userIcon}
                         />
                     </TouchableOpacity>
-                    <View style={styles.menuButton} />
                 </View>
             </View>
 
@@ -255,6 +250,8 @@ export const TrickListScreen: React.FC = () => {
                 activeFilters={activeFilters}
                 onToggleFilter={handleToggleFilter}
                 onSearch={setSearch}
+                searchOpen={searchOpen}
+                setSearchOpen={setSearchOpen}
             />
 
             {/* Active Filters Summary */}
@@ -293,6 +290,7 @@ const styles = StyleSheet.create({
     menuButton: {
         marginRight: 10,
         padding: 4,
+        position: 'absolute'
     },
     userIcon: {
         width: 22,
@@ -313,6 +311,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#4ECDC4',
         padding: 20,
         paddingTop: 36,
+        minHeight: 80,
     },
     headerTitle: {
         fontSize: 32,

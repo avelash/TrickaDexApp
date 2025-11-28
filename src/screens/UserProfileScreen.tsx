@@ -18,10 +18,12 @@ import { SKILL_LEVELS } from '../data/skillLevels';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
+import type { ProfileStackParamList } from '../navigation/MainTabsNavigator'
 import { TrickCard } from "../components/TrickCard";
 import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserName } from '../hooks/useUserDetails';
+import { easterEggNames } from '../data/easterEggs';
 
 interface ProfileStats {
     focus: string;
@@ -93,9 +95,21 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
     }, [landedTricks]);
 };
 
-export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate }) => {
-    type UserProfileNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UserProfileScreen'>;
-    const navigation = useNavigation<UserProfileNavigationProp>();
+const getFocusSubtitle = (
+    userName: string | null,
+    statsFocus: string
+): string => {
+    if (!userName) return statsFocus;
+
+    const key = userName.toLowerCase();
+    return key in easterEggNames ? easterEggNames[key] : statsFocus;
+};
+
+export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
+    type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'UserProfileScreen'>;
+    const navigation = useNavigation<ProfileNav>();
+    type RootNav = NativeStackNavigationProp<RootStackParamList>;
+    const rootNavigation = useNavigation<RootNav>();
 
     const { landedTricks } = useTrickProgress();
     const stats = useProfileStats(landedTricks);
@@ -143,7 +157,18 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
     };
 
     const handleInfo = (trick: Trick) => setSelectedTrick(trick);
-    const handleProgressBarPress = () => navigation.navigate('TrickListScreen', { initialFilter: stats.currentLevel });
+    const handleProgressBarPress = () => {
+        rootNavigation.navigate('MainTabs', {
+            screen: 'TrickTab',
+            params: {
+                screen: 'TrickListScreen',
+                params: {
+                    initialFilter: stats.currentLevel,
+                    trigger: Date.now()
+                },
+            },
+        } as any); // `as any` to keep TS calm unless you wire full nested types
+    };
 
     const handleNamePress = () => {
         const now = Date.now();
@@ -171,9 +196,6 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.headerBg}>
-                    <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
-                        <Image source={require('../../assets/return.png')} style={styles.backIcon} />
-                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.profileCard}>
@@ -194,7 +216,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
                         )}
                     </View>
 
-                    <Text style={styles.focusSubtitle}>{userName?.toLowerCase() === "michael guthrie" ? "G.O.A.T" : stats.focus}</Text>
+                    <Text style={styles.focusSubtitle}>{getFocusSubtitle(userName, stats.focus)}</Text>
                     <View style={styles.divider} />
 
                     <View style={styles.levelSection}>
@@ -245,9 +267,22 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
                         </View>
                         <View>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('TrickListScreen', { initialFilter: "Next Learns" })}
+                                onPress={() =>
+                                    rootNavigation.navigate('MainTabs', {
+                                        screen: 'TrickTab',
+                                        params: {
+                                            screen: 'TrickListScreen',
+                                            params: {
+                                                initialFilter: 'Next Learns',
+                                                trigger: Date.now()
+                                            },
+                                        },
+                                    } as any)
+                                }
                                 style={styles.allLevelsButton}
-                                activeOpacity={0.6}>
+                                activeOpacity={0.6}
+                            >
+
                                 <Text style={styles.allLevelsText}>All next Learns</Text>
                                 <Text style={styles.allLevelsArrow}>›</Text>
                             </TouchableOpacity>
@@ -264,7 +299,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onNavigate
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F7F7F7' },
     scrollContent: { flexGrow: 1, paddingBottom: 40 },
-    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 ,paddingTop: 36 },
+    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 ,paddingTop: 78 , maxHeight: 80},
     backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     backIcon: { width: 24, height: 24, tintColor: 'white', resizeMode: 'contain' },
     profileCard: { marginHorizontal: 20, marginTop: -20, backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },

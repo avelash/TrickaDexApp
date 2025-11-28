@@ -7,6 +7,8 @@ interface SearchBarProps {
     activeFilters: string[];
     onToggleFilter: (filter: string) => void;
     onSearch: (search: string) => void;
+    searchOpen?: boolean;
+    setSearchOpen?: (open: boolean) => void;
 }
 
 // Move static computation outside component
@@ -29,11 +31,22 @@ const ICON_SIZE = 24;
 const FILTER_ICON_SIZE = 20;
 const SUGGESTION_ICON_SIZE = 40;
 
-export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, onToggleFilter, onSearch }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({
+    filters,
+    activeFilters,
+    onToggleFilter,
+    onSearch,
+    searchOpen: externalSearchOpen,
+    setSearchOpen: externalSetSearchOpen
+}) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
-    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchOpenLocal, setSearchOpenLocal] = useState(false);
     const [searchText, setSearchText] = useState('');
     const inputRef = useRef<TextInput>(null);
+
+    // Use external or local state
+    const isSearchOpen = externalSearchOpen !== undefined ? externalSearchOpen : searchOpenLocal;
+    const setIsSearchOpen = externalSetSearchOpen || setSearchOpenLocal;
 
     useEffect(() => {
         const showSub = Keyboard.addListener('keyboardDidShow', (e) => {
@@ -54,9 +67,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
     );
 
     const handleIconPress = useCallback(() => {
-        setSearchOpen(true);
+        setIsSearchOpen(true);
         setTimeout(() => inputRef.current?.focus(), 100);
-    }, []);
+    }, [setIsSearchOpen]);
 
     const handleChange = useCallback((text: string) => {
         setSearchText(text);
@@ -67,24 +80,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
         onToggleFilter(filter);
         setSearchText('');
         onSearch('');
-        setSearchOpen(false);
+        setIsSearchOpen(false);
         Keyboard.dismiss();
-    }, [onToggleFilter, onSearch]);
+    }, [onToggleFilter, onSearch, setIsSearchOpen]);
 
     const handleScroll = useCallback(() => {
         Keyboard.dismiss();
     }, []);
 
     const handleCloseOverlay = useCallback(() => {
-        setSearchOpen(false);
+        setIsSearchOpen(false);
         setSearchText('');
         onSearch('');
         Keyboard.dismiss();
-    }, [onSearch]);
+    }, [onSearch, setIsSearchOpen]);
 
     const handleFocus = useCallback(() => {
-        setSearchOpen(true);
-    }, []);
+        setIsSearchOpen(true);
+    }, [setIsSearchOpen]);
 
     const handleRemoveFilter = useCallback((filter: string) => {
         onToggleFilter(filter);
@@ -103,7 +116,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
     return (
         <View style={styles.container}>
             <View style={styles.searchRow}>
-                {searchOpen && searchText.length === 0 ? (
+                {isSearchOpen && searchText.length === 0 ? (
                     <TouchableOpacity
                         onPress={handleCloseOverlay}
                         style={styles.iconButton}
@@ -145,6 +158,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                                 <Image
                                     source={filterConfig.icon}
                                     style={styles.filterBoxIcon}
+                                    resizeMethod='resize'
                                 />
                                 <Text style={styles.filterBoxText}>{filterConfig.name}</Text>
                                 <TouchableOpacity
@@ -167,7 +181,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                         styles.input,
                         !showInput && styles.inputHidden
                     ]}
-                    placeholder={!searchOpen ? "Search tricks or filter..." : ""}
+                    placeholder={!isSearchOpen ? "Search tricks or filter..." : ""}
                     value={searchText}
                     onChangeText={handleChange}
                     onFocus={handleFocus}
@@ -179,7 +193,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                 />
             </View>
 
-            {searchOpen && searchText.length === 0 && (
+            {isSearchOpen && searchText.length === 0 && (
                 <View style={overlayStyle}>
                     <ScrollView
                         contentContainerStyle={styles.suggestionGrid}
@@ -209,6 +223,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ filters, activeFilters, on
                                                 <Image
                                                     source={filterItem.icon}
                                                     style={styles.suggestionIcon}
+                                                    resizeMethod='resize'
                                                 />
                                                 <Text style={[
                                                     styles.suggestionText,
@@ -245,7 +260,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 6,
         minHeight: 44,
-        flexWrap: 'wrap', // allow chips + input to wrap
+        flexWrap: 'wrap',
     },
     iconButton: {
         padding: 6,
@@ -261,14 +276,13 @@ const styles = StyleSheet.create({
         height: ICON_SIZE,
         tintColor: '#4ECDC4',
     },
-    // Chips container now wraps and can be limited in height to show N rows
     filterChipsContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',         // wrap the chips to multiple rows when needed
-        flexShrink: 1,            // allow it to shrink for the input
+        flexWrap: 'wrap',
+        flexShrink: 1,
         marginRight: 6,
-        maxHeight: 88,            // ~2 rows (adjust this value to allow 1/2/3 rows)
-        overflow: 'hidden',       // hide anything beyond max rows
+        maxHeight: 88,
+        overflow: 'hidden',
         alignItems: 'center',
     },
     filterBox: {
@@ -333,6 +347,7 @@ const styles = StyleSheet.create({
     suggestionGrid: {
         width: '100%',
         paddingHorizontal: 10,
+        paddingBottom: 90,
     },
     categorySection: {
         marginBottom: 20,
@@ -349,9 +364,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        // gap is not supported in RN styles, use margins on children
         marginLeft: 10,
-        marginRight:10,
+        marginRight: 10,
     },
     suggestionCard: {
         width: 100,

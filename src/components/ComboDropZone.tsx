@@ -66,7 +66,7 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                 onLayout={measureDropZone}
                 style={[styles.emptyDropZone, isOver && styles.dropZoneActive]}
             >
-                <Text style={styles.emptyDropZoneIcon}>⬇️</Text>
+                <Image style={styles.emptyDropZoneIcon} source={require('../../assets/down-arrow.png')} resizeMethod='resize'/>
                 <Text style={styles.emptyDropZoneText}>Drag tricks here</Text>
                 <Text style={styles.emptyDropZoneSubtext}>Build your combo by dragging tricks from above</Text>
             </View>
@@ -106,6 +106,7 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                                         source={trick.icon}
                                         style={styles.comboIconImage}
                                         resizeMode="contain"
+                                        resizeMethod='resize'
                                     />
                                 </View>
                                 <Text
@@ -147,8 +148,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#E9F7F6',
     },
     emptyDropZoneIcon: {
-        fontSize: 40,
+        height: 40,
+        width: 40,
+        resizeMode: 'contain',
         marginBottom: 10,
+        tintColor: '#7F8C8D'
     },
     emptyDropZoneText: {
         fontSize: 18,

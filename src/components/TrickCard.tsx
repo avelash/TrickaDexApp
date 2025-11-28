@@ -31,7 +31,8 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                     <Image
                         source={trick.icon}
                         style={[styles.iconImage, !isLanded && styles.iconGreyed]}
-                        resizeMode="contain"
+                        resizeMode='contain'
+                        resizeMethod='resize'
                     />
                 </View>
             </TouchableOpacity>
@@ -52,6 +53,7 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                         source={require("../../assets/info.png")}
                         style={styles.infoIcon}
                         resizeMode="contain"
+                        resizeMethod="resize"
                     />
                 </TouchableOpacity>
             </View>

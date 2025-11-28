@@ -57,6 +57,7 @@ export const DragOverlay: React.FC<DragOverlayProps> = ({
                             source={trick.icon}
                             style={styles.iconImage}
                             resizeMode="contain"
+                            resizeMethod='resize'
                         />
                     </View>
                     <View style={styles.bottomBar}>

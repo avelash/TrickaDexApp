@@ -13,14 +13,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList} from '../../App';
+import type { ProfileStackParamList } from '../navigation/MainTabsNavigator'
+
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { useTrickProgress } from '../hooks/useTrickProgress';
 
 type AllLevelsProgressNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
-    'AllLevelsProgressScreen'
+    'MainTabs'
 >;
 
 interface LevelStat {
@@ -136,7 +138,10 @@ const LevelProgressBar: React.FC<LevelProgressBarProps> = ({ level, onPress }) =
 };
 
 export const AllLevelsProgressScreen: React.FC = () => {
-    const navigation = useNavigation<AllLevelsProgressNavigationProp>();
+type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsProgressScreen'>;
+    const navigation = useNavigation<ProfileNav>();
+    type RootNav = NativeStackNavigationProp<RootStackParamList>;
+    const rootNavigation = useNavigation<RootNav>();
     const { landedTricks } = useTrickProgress();
 
     const levelStats: LevelStat[] = useMemo(() => {
@@ -161,7 +166,13 @@ export const AllLevelsProgressScreen: React.FC = () => {
     }, [landedTricks]);
 
     const handleLevelPress = (levelName: string) => {
-        navigation.navigate('TrickListScreen', { initialFilter: levelName });
+        rootNavigation.navigate('MainTabs', {
+            screen: 'TrickTab',
+            params: {
+                screen: 'TrickListScreen',
+                params: { initialFilter: levelName , trigger: Date.now() },
+            },
+        } as any);
     };
 
     const totalLanded = Object.keys(landedTricks).filter(
@@ -169,7 +180,7 @@ export const AllLevelsProgressScreen: React.FC = () => {
     ).length;
 
     return (
-        <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar
                 barStyle="light-content"
                 backgroundColor="#4ECDC4"

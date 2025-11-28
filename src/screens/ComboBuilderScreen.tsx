@@ -25,11 +25,12 @@ import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
 import { Trick } from '../types';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { ComboStackParamList } from '../navigation/MainTabsNavigator'
+import { usePreferences } from '../hooks/usePreferences';
 
-type ComboBuilderScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
+type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
+    ComboStackParamList,
     'ComboBuilderScreen'
 >;
 
@@ -43,18 +44,12 @@ export const ComboBuilderScreen: React.FC = () => {
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
-    const [preferences, setPreferences] = useState<PreferencesState>({
-        onlyLandedTricks: true,
-        minLevel: 0,
-        maxLevel: SKILL_LEVELS.length - 1,
-        numberOfTricks: 3,
-    });
+    const { preferences, updatePreferences } = usePreferences();
 
     // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     const [draggedTrick, setDraggedTrick] = useState<Trick | null>(null);
     const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
-    const [dragHoverPosition, setDragHoverPosition] = useState<number | null>(null);
     const [isOverDropZone, setIsOverDropZone] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
     const [scrollOffset, setScrollOffset] = useState(0);
@@ -91,11 +86,31 @@ export const ComboBuilderScreen: React.FC = () => {
     }, []);
 
     // Get only landed tricks
-    const landedTricks = useMemo(
-        () => preferences.onlyLandedTricks
-            ? TRICKS_DATA.filter(trick => isTrickLanded(trick.id))
-            : TRICKS_DATA,
-        [isTrickLanded, preferences.onlyLandedTricks]
+    const preferredTricks = useMemo(
+        () => {
+            let tricks = TRICKS_DATA;
+
+            // Filter by landed status if preference is enabled
+            if (preferences.onlyLandedTricks) {
+                tricks = tricks.filter(trick => isTrickLanded(trick.id));
+            }
+
+            // Filter by difficulty level if preference is set
+            if (preferences.minLevel !== undefined && preferences.minLevel !== null) {
+                tricks = tricks.filter(trick =>
+                    (trick.difficulty ?? 0) >= preferences.minLevel
+                );
+            }
+
+            if (preferences.maxLevel !== undefined && preferences.maxLevel !== null) {
+                tricks = tricks.filter(trick =>
+                    (trick.difficulty ?? 0) <= preferences.maxLevel
+                );
+            }
+
+            return tricks;
+        },
+        [isTrickLanded, preferences.onlyLandedTricks, preferences.minLevel, preferences.maxLevel]
     );
 
     const predefinedFilters = useMemo(
@@ -117,7 +132,7 @@ export const ComboBuilderScreen: React.FC = () => {
 
       // Filter tricks based on search and active filters
         const filteredTricks = useMemo(() => {
-            let tricks = TRICKS_DATA;
+            let tricks = preferredTricks;
             let filtersToApply = [...activeFilters];
     
             // Check if search matches a valid filter name from FILTER_CONFIG
@@ -133,7 +148,7 @@ export const ComboBuilderScreen: React.FC = () => {
     
             // If no filters active and no search, show all
             if (filtersToApply.length === 0 && !search) {
-                return TRICKS_DATA;
+                return tricks;
             }
     
             // Apply multiple filters
@@ -296,24 +311,12 @@ export const ComboBuilderScreen: React.FC = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
-                <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+                <SafeAreaView style={styles.container} edges={['left', 'right']}>
                     <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
                     {/* Header */}
                     <View style={styles.header}>
                         <View style={styles.headerRow}>
-                            <TouchableOpacity
-                                style={styles.backButton}
-                                onPress={() => navigation.goBack()}
-                            >
-                                <Image
-                                    source={require('../../assets/return.png')}
-                                    style={styles.backIcon}
-                                />
-                            </TouchableOpacity>
-
-                            <Text style={styles.headerTitle}>Combo Builder</Text>
-
                             <TouchableOpacity
                                 style={styles.preferencesButton}
                                 onPress={() => setPreferencesModalVisible(true)}
@@ -323,6 +326,8 @@ export const ComboBuilderScreen: React.FC = () => {
                                     style={styles.preferencesIcon}
                                 />
                             </TouchableOpacity>
+                            <Text style={styles.headerTitle}>Combo Builder</Text>
+
                         </View>
                     </View>
 
@@ -345,7 +350,7 @@ export const ComboBuilderScreen: React.FC = () => {
 
                     {/* Horizontal Scrollable Trick List */}
                     <View style={styles.trickListContainer}>
-                        <Text style={styles.sectionTitle}>Your Landed Tricks</Text>
+                        <Text style={styles.sectionTitle}>Your Tricks</Text>
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -454,7 +459,7 @@ export const ComboBuilderScreen: React.FC = () => {
                     visible={preferencesModalVisible}
                     preferences={preferences}
                     onClose={() => setPreferencesModalVisible(false)}
-                    onSave={(newPreferences) => setPreferences(newPreferences)}
+                    onSave={(newPreferences) => updatePreferences(newPreferences)}
                 />
             </View>
         </GestureHandlerRootView>
@@ -470,6 +475,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#4ECDC4',
         padding: 20,
         paddingTop: 36,
+        minHeight: 80,
+        alignContent: 'center'
     },
     headerRow: {
         flexDirection: 'row',
@@ -497,7 +504,7 @@ const styles = StyleSheet.create({
         tintColor: 'white',
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: 'bold',
         color: 'white',
         textAlign: 'center',
