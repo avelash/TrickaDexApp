@@ -96,7 +96,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description: "standing on hands, with legs extended vertically.",
     tutorialUrl:
-      "https://www.youtube.com/watch?https://www.youtube.com/watch?v=KNC5lkoE2Fs&t=6s=mJgjlYwvLkw",
+      "https://www.youtube.com/watch?v=KNC5lkoE2Fs&t=6s=mJgjlYwvLkw",
   },
   {
     id: "scoot",
