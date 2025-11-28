@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image,  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrickCard } from '../components/TrickCard';
 import { TrickCardInfo } from '../components/TrickCardInfo';
@@ -9,7 +9,7 @@ import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp , useFocusEffect} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
@@ -53,7 +53,7 @@ export const TrickListScreen: React.FC = () => {
             setSearch('');
             setSearchOpen(false);
         }
-    }, [route.params?.initialFilter]);
+    }, [route.params?.initialFilter, route.params?.trigger]);
 
     // Memoize suggested tricks
     const suggestedTricks = useMemo(() =>

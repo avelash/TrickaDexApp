@@ -170,7 +170,7 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
             screen: 'TrickTab',
             params: {
                 screen: 'TrickListScreen',
-                params: { initialFilter: levelName },
+                params: { initialFilter: levelName , trigger: Date.now() },
             },
         } as any);
     };

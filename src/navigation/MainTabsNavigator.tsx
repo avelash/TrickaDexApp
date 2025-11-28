@@ -13,6 +13,7 @@ import { ComboBuilderScreen } from '../screens/ComboBuilderScreen';
 export type TrickStackParamList = {
     TrickListScreen: {
         initialFilter?: string;
+        trigger?: number;
     } | undefined;
 };
 

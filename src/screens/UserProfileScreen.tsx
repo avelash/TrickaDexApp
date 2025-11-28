@@ -153,6 +153,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                 screen: 'TrickListScreen',
                 params: {
                     initialFilter: stats.currentLevel,
+                    trigger: Date.now()
                 },
             },
         } as any); // `as any` to keep TS calm unless you wire full nested types
@@ -262,6 +263,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                                             screen: 'TrickListScreen',
                                             params: {
                                                 initialFilter: 'Next Learns',
+                                                trigger: Date.now()
                                             },
                                         },
                                     } as any)
