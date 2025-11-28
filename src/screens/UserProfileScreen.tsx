@@ -23,6 +23,7 @@ import { TrickCard } from "../components/TrickCard";
 import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserName } from '../hooks/useUserDetails';
+import { easterEggNames } from '../data/easterEggs';
 
 interface ProfileStats {
     focus: string;
@@ -92,6 +93,16 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
             totalLanded: landedTrickIds.length,
         };
     }, [landedTricks]);
+};
+
+const getFocusSubtitle = (
+    userName: string | null,
+    statsFocus: string
+): string => {
+    if (!userName) return statsFocus;
+
+    const key = userName.toLowerCase();
+    return key in easterEggNames ? easterEggNames[key] : statsFocus;
 };
 
 export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
@@ -205,7 +216,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                         )}
                     </View>
 
-                    <Text style={styles.focusSubtitle}>{userName?.toLowerCase() === "michael guthrie" ? "G.O.A.T" : stats.focus}</Text>
+                    <Text style={styles.focusSubtitle}>{getFocusSubtitle(userName, stats.focus)}</Text>
                     <View style={styles.divider} />
 
                     <View style={styles.levelSection}>
