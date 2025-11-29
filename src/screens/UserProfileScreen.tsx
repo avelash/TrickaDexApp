@@ -158,6 +158,9 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
 
     const handleInfo = (trick: Trick) => setSelectedTrick(trick);
     const handleProgressBarPress = () => {
+        if (stats.currentLevel === "Unranked"){
+            return;
+        }
         rootNavigation.navigate('MainTabs', {
             screen: 'TrickTab',
             params: {
