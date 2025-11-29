@@ -250,7 +250,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     types: ["kick"],
     prerequisites: ["hook_kick"],
     difficulty: 0,
-    description: " a hook kick with the opposite leg touching the ground.",
+    description: " a hook kick with the opposite hand touching the ground.",
     tutorialUrl: "https://www.youtube.com/watch?v=2PTkgrZ3Q7A",
   },
   {
