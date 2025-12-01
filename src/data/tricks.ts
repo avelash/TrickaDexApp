@@ -95,8 +95,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: [],
     difficulty: 0,
     description: "standing on hands, with legs extended vertically.",
-    tutorialUrl:
-      "https://www.youtube.com/watch?v=KNC5lkoE2Fs&t=6s=mJgjlYwvLkw",
+    tutorialUrl: "https://www.youtube.com/watch?v=KNC5lkoE2Fs&t=6s=mJgjlYwvLkw",
   },
   {
     id: "scoot",
@@ -967,6 +966,16 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Pop 720 with two kicks, an outside crescent / hook kick where a Pop 360 would kick, and the regular hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/shorts/ELo11Q7LuW0",
+  },
+  {
+    id: "x_out",
+    name: "X Out",
+    icon: require("../../assets/xOut_icon.png"),
+    types: ["kick", "flip"],
+    prerequisites: ["backflip"],
+    difficulty: 2,
+    description: "A Backflip with a straddle / split-kick ",
+    tutorialUrl: "https://www.youtube.com/watch?v=_UAYYooXtiQ",
   },
 ];
 
