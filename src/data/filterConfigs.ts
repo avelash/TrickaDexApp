@@ -47,6 +47,12 @@ export const FILTER_CONFIG: FilterConfig[] = [
     color: "#FACC15",
     icon: require("../../assets/NextLearns.png"),
   },
+  {
+    name: "Favorites",
+    category: "Learn/Landed",
+    color: "#FF5252",
+    icon: require("../../assets/heart_filled.png"),
+  },
   // Skill Levels
   {
     name: SKILL_LEVELS[0].name,

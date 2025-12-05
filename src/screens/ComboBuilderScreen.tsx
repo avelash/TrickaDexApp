@@ -28,6 +28,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ComboStackParamList } from '../navigation/MainTabsNavigator'
 import { usePreferences } from '../hooks/usePreferences';
+import { useTrickFavorites } from '../hooks/useTrickFavorites';
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
@@ -45,6 +46,7 @@ export const ComboBuilderScreen: React.FC = () => {
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
     const { preferences, updatePreferences } = usePreferences();
+    const { favoriteTricks, isTrickFavorite } = useTrickFavorites();
 
     // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -130,55 +132,57 @@ export const ComboBuilderScreen: React.FC = () => {
         });
     }, []);
 
-      // Filter tricks based on search and active filters
-        const filteredTricks = useMemo(() => {
-            let tricks = preferredTricks;
-            let filtersToApply = [...activeFilters];
-    
-            // Check if search matches a valid filter name from FILTER_CONFIG
-            if (search && !activeFilters.includes(search)) {
-                const matchedFilter = FILTER_CONFIG.find(
-                    filter => filter.name.toLowerCase() === search.toLowerCase()
-                );
-    
-                if (matchedFilter) {
-                    filtersToApply.push(matchedFilter.name);
-                }
+    // Filter tricks based on search and active filters
+    const filteredTricks = useMemo(() => {
+        let tricks = preferredTricks;
+        let filtersToApply = [...activeFilters];
+
+        // Check if search matches a valid filter name from FILTER_CONFIG
+        if (search && !activeFilters.includes(search)) {
+            const matchedFilter = FILTER_CONFIG.find(
+                filter => filter.name.toLowerCase() === search.toLowerCase()
+            );
+
+            if (matchedFilter) {
+                filtersToApply.push(matchedFilter.name);
             }
-    
-            // If no filters active and no search, show all
-            if (filtersToApply.length === 0 && !search) {
-                return tricks;
-            }
-    
-            // Apply multiple filters
-            if (filtersToApply.length > 0) {
-                tricks = tricks.filter(trick => {
-                    return filtersToApply.every(filter => {
-                        if (filter === 'Landed') {
-                            return isTrickLanded(trick.id);
-                        } else if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
-                            const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
-                            return (trick.difficulty ?? 0) === levelIdx;
-                        } else {
-                            // Type filter (compare case-insensitively)
-                            return trick.types.some(type =>
-                                type.toLowerCase() === filter.toLowerCase()
-                            );
-                        }
-                    });
-                });
-            }
-    
-            // Apply text search filter for tricks that don't match filter names
-            if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
-                tricks = tricks.filter(trick =>
-                    trick.name.toLowerCase().includes(search.toLowerCase())
-                );
-            }
-    
+        }
+
+        // If no filters active and no search, show all
+        if (filtersToApply.length === 0 && !search) {
             return tricks;
-        }, [activeFilters, search, isTrickLanded, TRICKS_DATA, SKILL_LEVELS]);
+        }
+
+        // Apply multiple filters
+        if (filtersToApply.length > 0) {
+            tricks = tricks.filter(trick => {
+                return filtersToApply.every(filter => {
+                    if (filter === 'Landed') {
+                        return isTrickLanded(trick.id);
+                    } else if (filter === 'Favorites') {
+                        return isTrickFavorite(trick.id);
+                    } else if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
+                        const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
+                        return (trick.difficulty ?? 0) === levelIdx;
+                    } else {
+                        // Type filter (compare case-insensitively)
+                        return trick.types.some(type =>
+                            type.toLowerCase() === filter.toLowerCase()
+                        );
+                    }
+                });
+            });
+        }
+
+        // Apply text search filter for tricks that don't match filter names
+        if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
+            tricks = tricks.filter(trick =>
+                trick.name.toLowerCase().includes(search.toLowerCase())
+            );
+        }
+
+        return tricks;
+    }, [activeFilters, search, isTrickLanded, TRICKS_DATA, SKILL_LEVELS, isTrickFavorite]);
     // Drag handlers
     const handleDragStart = useCallback((trick: Trick, layout: { x: number; y: number; width: number; height: number }) => {
         setDraggedTrick(trick);

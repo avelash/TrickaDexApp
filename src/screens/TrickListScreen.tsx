@@ -1,15 +1,16 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image,  } from 'react-native';
+import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrickCard } from '../components/TrickCard';
 import { TrickCardInfo } from '../components/TrickCardInfo';
 import { Trick } from '../types';
 import { SearchBar } from '../components/SearchBar';
 import { useTrickProgress } from '../hooks/useTrickProgress';
+import { useTrickFavorites } from '../hooks/useTrickFavorites';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
-import { useNavigation, useRoute, RouteProp , useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
@@ -36,6 +37,7 @@ interface TrickRow {
 
 export const TrickListScreen: React.FC = () => {
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
+    const { isTrickFavorite } = useTrickFavorites();
     const navigation = useNavigation<TrickListScreenNavigationProp>();
     const rootNavigation = useNavigation<RootNav>();
     const route = useRoute<TrickListScreenRouteProp>();
@@ -108,6 +110,8 @@ export const TrickListScreen: React.FC = () => {
                         return isTrickLanded(trick.id);
                     } else if (filter === 'Next Learns') {
                         return suggestedTricks.some(st => st.id === trick.id);
+                    } else if (filter === 'Favorites') {
+                        return isTrickFavorite(trick.id);
                     } else if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
                         const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
                         return (trick.difficulty ?? 0) === levelIdx;
@@ -129,7 +133,7 @@ export const TrickListScreen: React.FC = () => {
         }
 
         return tricks;
-    }, [activeFilters, search, isTrickLanded, suggestedTricks, TRICKS_DATA, SKILL_LEVELS]);
+    }, [activeFilters, search, isTrickLanded, suggestedTricks, TRICKS_DATA, SKILL_LEVELS, isTrickFavorite]);
 
     // Group tricks by difficulty and create flat list data
     const flatListData: TrickRow[] = useMemo(() => {

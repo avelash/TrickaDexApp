@@ -13,6 +13,7 @@ import {
 import { Trick } from "../types";
 import { TRICKS_DATA } from "../data/tricks";
 import { SKILL_LEVELS } from "../data/skillLevels";
+import { useTrickFavorites } from "../hooks/useTrickFavorites";
 
 const { width, height } = Dimensions.get("window");
 const MARGIN_TOP = 60;
@@ -55,10 +56,10 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
     zIndex: 2,
-    backgroundColor: "#eee",
+    backgroundColor: "transparent",
     borderRadius: 20,
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -70,17 +71,18 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     marginBottom: 16,
+    paddingRight: 40,
   },
   name: {
-    flex: 1,
     fontSize: 26,
     fontWeight: "bold",
     color: "#2C3E50",
     marginRight: 10,
+    flexShrink: 1,
   },
-   icon: {
+  icon: {
     width: 200,
     height: 200,
     resizeMode: "contain",
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontWeight: "bold",
-      color: "#2C3E50",
+    color: "#2C3E50",
   },
   preReq: {
     fontWeight: "bold",
@@ -113,6 +115,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  favoriteButton: {
+    padding: 8,
+    marginLeft: "auto",
+  },
+  favoriteIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: "contain",
+    tintColor: "#f44337ff",
+  },
 });
 
 interface TrickCardInfoProps {
@@ -124,7 +136,10 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
   trick,
   onClose,
 }) => {
-    const skillLevelColor =
+  const { isTrickFavorite, toggleFavorite } = useTrickFavorites();
+  const isFavorite = isTrickFavorite(trick.id);
+
+  const skillLevelColor =
     typeof trick.difficulty === "number"
       ? SKILL_LEVELS[trick.difficulty].color
       : "#000";
@@ -136,11 +151,11 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
   const preReqNames =
     trick.prerequisites && trick.prerequisites.length > 0
       ? trick.prerequisites
-          .map((id: string) => {
-            const found = TRICKS_DATA.find((t) => t.id === id);
-            return found ? found.name : id;
-          })
-          .join(", ")
+        .map((id: string) => {
+          const found = TRICKS_DATA.find((t) => t.id === id);
+          return found ? found.name : id;
+        })
+        .join(", ")
       : "None";
 
   const anim = useRef(new Animated.Value(0)).current;
@@ -181,28 +196,41 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
           {/* Title */}
           <View style={styles.headerRow}>
             <Text style={styles.name}>{trick.name}</Text>
+            <TouchableOpacity
+              style={styles.favoriteButton}
+              onPress={() => toggleFavorite(trick.id)}
+            >
+              <Image
+                source={
+                  isFavorite
+                    ? require("../../assets/heart_filled.png")
+                    : require("../../assets/heart_outline.png")
+                }
+                style={styles.favoriteIcon}
+              />
+            </TouchableOpacity>
           </View>
-            {/* Icon */}
-            <View style={{ alignItems: "center", marginBottom: 10 }}>
+          {/* Icon */}
+          <View style={{ alignItems: "center", marginBottom: 10 }}>
             {trick.icon && <Image source={trick.icon} style={styles.icon} />}
-            </View>
+          </View>
 
           {/* Main text section */}
           <Text style={styles.paragraph}>
-                      {trick.description}{"\n\n"}
+            {trick.description}{"\n\n"}
             <Text style={styles.difficulty}>
               Skill Level:
             </Text>
             {"   "}
             <Text style={{ color: skillLevelColor }}>{skillLevelName}</Text>
-            
+
           </Text>
 
           <Text style={styles.paragraph}>
             <Text style={styles.preReq}>Prerequisites:</Text> {preReqNames}.
           </Text>
 
-          
+
 
           {trick.tutorialUrl && (
             <TouchableOpacity
