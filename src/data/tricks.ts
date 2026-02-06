@@ -507,7 +507,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A very low hook kick aimed for the target's lower calf or ankle.",
     tutorialUrl: "https://www.youtube.com/watch?v=RvhimhGiym8",
-    takeoff: "backside",
+    takeoff: "back-vanish",
     landingStance: "hyper",
   },
   {
