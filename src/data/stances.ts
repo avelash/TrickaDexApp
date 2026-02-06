@@ -50,6 +50,8 @@ export const transitions = (landingStance: LandingStance, takeoff: Takeoff): str
         return "swing";
     case "fake-mega-front-vanish":
         return "vanish";
+    case "fake-mega-back-vanish":
+        return "vanish";
 
         //landing dom = back
         case "backside-backside":

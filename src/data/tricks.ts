@@ -148,7 +148,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "a powerful turning kick where the fighter spins their body, extends the leg outward, and then hooks it back to " +
       "strike the target—usually with the heel—using the momentum from the spin for added speed and impact.",
     tutorialUrl: "https://youtu.be/SQl5Eu2LalA?si=gayUaoxsoGB1cBkZ",
-    takeoff: "backside",
+    takeoff: "back-vanish",
     landingStance: "hyper",
   },
   {
@@ -290,7 +290,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description: " a hook kick with the opposite hand touching the ground.",
     tutorialUrl: "https://www.youtube.com/watch?v=2PTkgrZ3Q7A",
-    takeoff: "backside",
+    takeoff: "back-vanish",
     landingStance: "hyper",
   },
   {
