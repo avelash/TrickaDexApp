@@ -46,7 +46,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "and extends their leg in a circular motion to strike with the shin or top of the foot",
     tutorialUrl: "https://youtu.be/O3jxtY8OTMc?si=sDN6dcydpTaAtuQV",
     takeoff: "swing",//INCOMPLETE
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "tornado_kick",
@@ -58,7 +58,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "a jumping roundhouse kick from a cheat-step setup",
     tutorialUrl: "https://youtu.be/b0kc_Xu7qQQ?si=hUFeyGDzmRP2Kma1",
     takeoff: "back-vanish",
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "540_kick",
@@ -391,7 +391,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A pop 360 shuriken with a round kick as well.",
     tutorialUrl: "https://www.youtube.com/watch?v=OtJ8Fk8pZEM",
     takeoff: "frontside",
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "scoot_hyper",
@@ -415,7 +415,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A pop 360 landing on the kicking leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=HwWPw6Hgx_Q",
     takeoff: "frontside",
-    landingStance: "mega",
+    landingStance: "fake-mega",
   },
   {
     id: "pop_tornado",
@@ -427,7 +427,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description: "A tornado kick from a pop setup. (jumping off both feet)",
     tutorialUrl: "https://www.youtube.com/watch?v=UYEVnH1WN0E",
     takeoff: "frontside",
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "skip_hook",
@@ -468,7 +468,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A failong (shuriken followed by a round kick) from a back swing.\n Called also triple-kick or flick-flack",
     tutorialUrl: "https://www.youtube.com/watch?v=jx1tC2VFUkE",
     takeoff: "swing",
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "cartwheel_switch",
@@ -734,7 +734,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A layed back, no-kick, tornado.\noften performed with the hands behind the head or on the hips.",
     tutorialUrl: "https://www.youtube.com/watch?v=Bb8tUbg09ME",
     takeoff: "back-vanish",
-    landingStance: "complete",
+    landingStance: "fake-mega",
   },
   {
     id: "touchdown_raiz",
@@ -787,7 +787,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting with the back to the direction of movement(DOM), the practitioner jumps and spins 450° and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=yArws74DOXk",
-    takeoff: "backside",
+    takeoff: "fake-backside",
     landingStance: "hyper",
   },
   {
@@ -801,8 +801,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting in a backside position, the practitioner  jumps and spins 540° degrees and then" +
       " performs a round kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=jm8lRz8ed4M",
-    takeoff: "backside",
-    landingStance: "complete",
+    takeoff: "fake-backside",
+    landingStance: "fake-mega",
   },
   {
     id: "pop_720",
@@ -881,7 +881,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A two handed scoot from an inward swing of the leading leg(master swing).",
     tutorialUrl: "https://www.youtube.com/watch?v=heNft_5ukkU&t=230s",
-    takeoff: "swing",
+    takeoff: "master-swing",
     landingStance: "complete",
   },
   {
@@ -1111,7 +1111,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A frontswing Webster from a step / a few steps backwards as the set up.",
     tutorialUrl: "https://www.youtube.com/watch?v=nPnAhsjBwDg",
-    takeoff: "semi",
+    takeoff: "semi-frontswing",
     landingStance: "frontside",
   },
   {

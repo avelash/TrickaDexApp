@@ -1,4 +1,4 @@
-import { TakeoffName, LandingStanceName } from "../data/stances";
+import { Takeoff, LandingStance } from "../data/stances";
 
 export interface Trick {
   id: string;
@@ -9,8 +9,8 @@ export interface Trick {
   difficulty: number; // 0-10
   description: string;
   tutorialUrl: string;
-  takeoff: TakeoffName;
-  landingStance: LandingStanceName;
+  takeoff: Takeoff;
+  landingStance: LandingStance;
 }
 
 

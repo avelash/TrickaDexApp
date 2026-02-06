@@ -370,7 +370,11 @@ export const ComboBuilderScreen: React.FC = () => {
             // If there's a next trick, check if we can add a transition
             if (nextTrick && currentTrick.landingStance && nextTrick.takeoff) {
                 const transition = transitions(currentTrick.landingStance, nextTrick.takeoff);
-                parts.push(transition);
+                if (nextTrick.name.toLowerCase().startsWith(transition.toLowerCase())) {
+                    //do nothing
+                } else {
+                    parts.push(transition);
+                }
             }
         }
 
