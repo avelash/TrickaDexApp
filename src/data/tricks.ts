@@ -32,6 +32,7 @@ import popTornado from "../../assets/Poptornado.png";
 import skipHook from "../../assets/skipHook.png";
 import bKick from "../../assets/butterflyKick.png";
 
+
 const TRICKS_DATA_RAW: Trick[] = [
   {
     id: "round_kick",
@@ -44,6 +45,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "the practitioner lifts their knee, pivots on their supporting foot," +
       "and extends their leg in a circular motion to strike with the shin or top of the foot",
     tutorialUrl: "https://youtu.be/O3jxtY8OTMc?si=sDN6dcydpTaAtuQV",
+    takeoff: "frontside",
+    landingStance: "backside",
   },
   {
     id: "tornado_kick",
@@ -54,6 +57,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "a jumping roundhouse kick from a cheat-step setup",
     tutorialUrl: "https://youtu.be/b0kc_Xu7qQQ?si=hUFeyGDzmRP2Kma1",
+    takeoff: "back-vanish",
+    landingStance: "complete",
   },
   {
     id: "540_kick",
@@ -64,6 +69,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A tornado kick landed in a hyper-stance",
     tutorialUrl: "https://youtu.be/HV4UYZVUS4s?si=uTcJn1I9LQTkBKD1",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
   },
   {
     id: "backflip",
@@ -74,6 +81,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A backwards 360° somersault in the air",
     tutorialUrl: "https://youtu.be/X9rHyckeTtg?si=eCkbCOcwsW6xNv5u",
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: "back_handspring",
@@ -86,6 +95,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "a 360° backwards somersault where the practitioner touches the ground with" +
       " their hands after half the rotation",
     tutorialUrl: "https://www.youtube.com/watch?v=mJgjlYwvLkw",
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: "handstand",
@@ -96,6 +107,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description: "standing on hands, with legs extended vertically.",
     tutorialUrl: "https://www.youtube.com/watch?v=KNC5lkoE2Fs&t=6s=mJgjlYwvLkw",
+    takeoff: "regular",
+    landingStance: "mega",
   },
   {
     id: "scoot",
@@ -107,6 +120,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a 180° turn on one hand, from a kneeling position to standing",
     tutorialUrl: "https://www.youtube.com/watch?v=BaSU6o-FcOs",
+    takeoff: "frontside",
+    landingStance: "complete",
   },
   {
     id: "cartwheel",
@@ -119,6 +134,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "a sideways acrobatic move where the body rotates" +
       " over the hands with legs raised, resembling a turning wheel",
     tutorialUrl: "https://youtu.be/GAbIx6oQAv4?si=Bq0mkOHVgZipA4kQ",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "hook_kick",
@@ -131,6 +148,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "a powerful turning kick where the fighter spins their body, extends the leg outward, and then hooks it back to " +
       "strike the target—usually with the heel—using the momentum from the spin for added speed and impact.",
     tutorialUrl: "https://youtu.be/SQl5Eu2LalA?si=gayUaoxsoGB1cBkZ",
+    takeoff: "backside",
+    landingStance: "frontside",
   },
   {
     id: "forward_roll",

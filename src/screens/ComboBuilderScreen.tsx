@@ -23,6 +23,7 @@ import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
+import { transitions, LANDING_STANCES, TAKEOFFS } from '../data/stances';
 import { Trick } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -309,7 +310,30 @@ export const ComboBuilderScreen: React.FC = () => {
     // Generate combo text
     const comboText = useMemo(() => {
         if (comboTricks.length === 0) return '';
-        return comboTricks.map(t => t.name).join(' -> ');
+
+        const parts: string[] = [];
+
+        for (let i = 0; i < comboTricks.length; i++) {
+            const currentTrick = comboTricks[i];
+            const nextTrick = comboTricks[i + 1];
+
+            // Add current trick name
+            parts.push(currentTrick.name);
+
+            // If there's a next trick, check if we can add a transition
+            if (nextTrick && currentTrick.landingStance && nextTrick.takeoff) {
+                // Find the stance objects
+                const landingStance = LANDING_STANCES.find(s => s.name === currentTrick.landingStance);
+                const takeoffStance = TAKEOFFS.find(s => s.name === nextTrick.takeoff);
+
+                if (landingStance && takeoffStance) {
+                    const transition = transitions(landingStance, takeoffStance);
+                    parts.push(transition);
+                }
+            }
+        }
+
+        return parts.join(' ');
     }, [comboTricks]);
 
     return (
