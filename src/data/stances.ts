@@ -1,4 +1,9 @@
-import { Stance } from "../types";
+interface Stance {
+  id: number;
+  name: string;
+  dom: "front" | "back";
+}
+
 
 export const LANDING_STANCES: Stance[] = [
     {
@@ -102,10 +107,13 @@ export const TAKEOFFS: Stance[] = [
     },
 
 ];
+export type TakeoffName = typeof TAKEOFFS[number]["name"];
+export type LandingStanceName = typeof LANDING_STANCES[number]["name"];
 
 
-export const transitions = (landingStance: Stance, takeoff: Stance): string => {
-    switch (`${landingStance.name}-${takeoff.name}`) {
+
+export const transitions = (landingStance: LandingStanceName, takeoff: TakeoffName): string => {
+    switch (`${landingStance}-${takeoff}`) {
         //landing dom = front
      case "frontside-frontside":
         return "punch";

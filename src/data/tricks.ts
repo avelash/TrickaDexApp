@@ -45,8 +45,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "the practitioner lifts their knee, pivots on their supporting foot," +
       "and extends their leg in a circular motion to strike with the shin or top of the foot",
     tutorialUrl: "https://youtu.be/O3jxtY8OTMc?si=sDN6dcydpTaAtuQV",
-    takeoff: "frontside",
-    landingStance: "backside",
+    takeoff: "swing",//INCOMPLETE
+    landingStance: "complete",
   },
   {
     id: "tornado_kick",
@@ -120,7 +120,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a 180° turn on one hand, from a kneeling position to standing",
     tutorialUrl: "https://www.youtube.com/watch?v=BaSU6o-FcOs",
-    takeoff: "frontside",
+    takeoff: "frontside", //INCOMPLETE
     landingStance: "complete",
   },
   {
@@ -149,7 +149,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "strike the target—usually with the heel—using the momentum from the spin for added speed and impact.",
     tutorialUrl: "https://youtu.be/SQl5Eu2LalA?si=gayUaoxsoGB1cBkZ",
     takeoff: "backside",
-    landingStance: "frontside",
+    landingStance: "hyper",
   },
   {
     id: "forward_roll",
@@ -161,6 +161,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a basic gymnastic move where the practitioner tucks their head and rolls forward over their back",
     tutorialUrl: "https://www.youtube.com/watch?v=pIb9DvCQ7dU",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "pop_360",
@@ -173,6 +175,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "starting with his back to the target, the practitioner jumps and " +
       "after a 180° spin, performs an outside crescent or hook kick.",
     tutorialUrl: "https://youtube.com/shorts/oG13xxzFGB0?si=rDU5iWhvVf2qVf8W",
+    takeoff: "frontside",
+    landingStance: "hyper",
   },
   {
     id: "pop_360_turbo",
@@ -183,6 +187,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 that lands on both feet with an extra 90° turn.",
     tutorialUrl: "https://www.youtube.com/watch?v=7Iaq33DHnm4",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "cork_rodeo",
@@ -195,6 +201,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "a cork with a rodeo grab, grabbing the hook kick " +
       "leg at the ankle and pulling it back into an arched position.",
     tutorialUrl: "https://www.youtube.com/watch?v=UNFAGNGyZeQ",
+    takeoff: "swing",
+    landingStance: "complete",
   },
   {
     id: "rocketboi",
@@ -207,6 +215,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A Backflip Pike with one hand reaching across the legs and the " +
       "other hand reaching behind.",
     tutorialUrl: "https://www.youtube.com/watch?v=bf8C4_8btQM",
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: " aerial",
@@ -217,6 +227,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A no handed cartwheel.",
     tutorialUrl: "https://www.youtube.com/watch?v=dSntnWrIdz4",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "frontflip",
@@ -227,6 +239,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "a forward 360° somersault in the air.",
     tutorialUrl: "https://www.youtube.com/watch?v=l-JK_sO5ZnE",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "sideflip",
@@ -237,6 +251,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "a sideways 360 somersault in the air.",
     tutorialUrl: "https://www.youtube.com/watch?v=00UsLr4LcMs",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "macaco",
@@ -249,6 +265,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting from a low crouch, one hand is placed on the ground" +
       " behind the body, and the legs swing over the head in a sweeping motion, launching the hips over.",
     tutorialUrl: "https://www.youtube.com/watch?v=sekDHtCi7QA",
+    takeoff: "backside",
+    landingStance: "complete",
   },
   {
     id: "backwards_roll",
@@ -260,6 +278,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a basic gymnastic move where the practitioner tucks their head and rolls backward over their back.",
     tutorialUrl: "https://www.youtube.com/watch?v=U_scqEjjZbM",
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: "compasso",
@@ -270,6 +290,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description: " a hook kick with the opposite hand touching the ground.",
     tutorialUrl: "https://www.youtube.com/watch?v=2PTkgrZ3Q7A",
+    takeoff: "backside",
+    landingStance: "hyper",
   },
   {
     id: "dive_cartwheel",
@@ -281,6 +303,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a cartwheel where the practitioner jumps onto their hands when entering the cartwheel.",
     tutorialUrl: "https://www.youtube.com/shorts/lOSjFr2QjkU",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "dive_roll",
@@ -291,6 +315,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: " a forward roll where the practitioner jumps into the roll.",
     tutorialUrl: "https://www.youtube.com/watch?v=m7wNLOlh5Mo",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "gumbi",
@@ -301,6 +327,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "a modified, arched-back cartwheel.",
     tutorialUrl: "https://www.youtube.com/watch?v=C3sIOHWAQoc",
+    takeoff: "front-vanish",
+    landingStance: "complete",
   },
   {
     id: "kipup",
@@ -312,6 +340,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "a transition from lying on the back to a standing position, using a powerful kick of the legs and a push from the hands.",
     tutorialUrl: "https://www.youtube.com/watch?v=T9Cq4NcvTQ4",
+    takeoff: "frontside",//INCOMPLETE
+    landingStance: "frontside",
   },
   {
     id: "roundoff",
@@ -323,6 +353,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "similar to a cartwheel, but the landing is done on both feet simultaneously, facing the opposite direction of arrival.",
     tutorialUrl: "https://www.youtube.com/watch?v=y1OoqEAb4OY",
+    takeoff: "regular",
+    landingStance: "backside",
   },
   {
     id: "one_handed_cartwheel",
@@ -333,6 +365,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 0,
     description: "A cartwheel performed using only one hand.",
     tutorialUrl: "https://www.youtube.com/watch?v=QvJveqtCe-0",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "swipe",
@@ -344,6 +378,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A round kick where the practitioner jumps during the kick, then lands on the kicking leg.",
     tutorialUrl: "https://youtu.be/3bSLmzItjlA?si=HFUpsgyPhh6rDc9O",
+    takeoff: "swing",
+    landingStance: "hyper",
   },
   {
     id: "pop_failong",
@@ -354,6 +390,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 shuriken with a round kick as well.",
     tutorialUrl: "https://www.youtube.com/watch?v=OtJ8Fk8pZEM",
+    takeoff: "frontside",
+    landingStance: "complete",
   },
   {
     id: "scoot_hyper",
@@ -364,6 +402,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A scoot landed in a hyper-stance.",
     tutorialUrl: "https://www.youtube.com/watch?v=y6OAyEW3oJM",
+    takeoff: "frontside",//INCOMPLETE
+    landingStance: "hyper",
   },
   {
     id: "pop_360_shuriken",
@@ -374,6 +414,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 landing on the kicking leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=HwWPw6Hgx_Q",
+    takeoff: "frontside",
+    landingStance: "mega",
   },
   {
     id: "pop_tornado",
@@ -384,6 +426,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A tornado kick from a pop setup. (jumping off both feet)",
     tutorialUrl: "https://www.youtube.com/watch?v=UYEVnH1WN0E",
+    takeoff: "frontside",
+    landingStance: "complete",
   },
   {
     id: "skip_hook",
@@ -395,6 +439,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "The practitioner lifts his other leg and then skip onto it while performing a hook kick.",
     tutorialUrl: "https://www.youtube.com/shorts/s2KYPGhcuSA",
+    takeoff: "swing",//INCOMPLETE
+    landingStance: "hyper",
   },
   {
     id: "butterfly_kick",
@@ -408,6 +454,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "resembling a sideways cartwheel without hands, where the body rotates horizontally through the air." +
       " The practitioner kicks one leg up and over while the other leg provides a push-off, with the body held horizontally.",
     tutorialUrl: "https://www.youtube.com/watch?v=bu_F7trIlrs&t=12s",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "swing_failong",
@@ -419,6 +467,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A failong (shuriken followed by a round kick) from a back swing.\n Called also triple-kick or flick-flack",
     tutorialUrl: "https://www.youtube.com/watch?v=jx1tC2VFUkE",
+    takeoff: "swing",
+    landingStance: "complete",
   },
   {
     id: "cartwheel_switch",
@@ -430,6 +480,9 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A cartwheel where the parctitioner switches there legs mid-way, landing on the leg the started in front.",
     tutorialUrl: "https://www.youtube.com/watch?v=vkkpKbb3XIA",
+    takeoff: "regular",
+    landingStance: "complete",
+
   },
   {
     id: "front_sweep",
@@ -441,6 +494,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A  very low round kick aimed for the target's lower calf or ankle.",
     tutorialUrl: "https://www.youtube.com/watch?v=gil8H175vSI",
+    takeoff: "backside",
+    landingStance: "hyper",//INCOMPLETE
   },
   {
     id: "back_sweep",
@@ -452,6 +507,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A very low hook kick aimed for the target's lower calf or ankle.",
     tutorialUrl: "https://www.youtube.com/watch?v=RvhimhGiym8",
+    takeoff: "backside",
+    landingStance: "hyper",
   },
   {
     id: "side_kick",
@@ -463,6 +520,9 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "The practitioner pivots on his supporting foot, rotates his hips, and drives his leg out in a straight line to the side.",
     tutorialUrl: "https://www.youtube.com/watch?v=XSfqGkoUkqQ",
+    takeoff: "swing",//INCOMPLETE
+    landingStance: "mega",//INCOMPLETE
+
   },
   {
     id: "flying_side_kick",
@@ -474,6 +534,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "The practitioner pivots on his supporting foot, rotates his hips, and drives his leg out in a straight line to the side.",
     tutorialUrl: "https://www.youtube.com/watch?v=50RAVxgTeCY",
+    takeoff: "swing",//INCOMPLETE
+    landingStance: "complete",//INCOMPLETE
   },
   {
     id: "narabong",
@@ -484,6 +546,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A tornado kick straight into a skip hook.",
     tutorialUrl: "https://www.youtube.com/shorts/x1vya4rH0sg",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
   },
   {
     id: "o_kick",
@@ -495,6 +559,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A cartwheel performed on one hand (commonly on the far hand), with a hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=litZcT0NCjc",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "front_walkover",
@@ -506,6 +572,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A handstand that transitions smoothly into a one-legged bridge, then pushes back up gracefully to a standing position.",
     tutorialUrl: "https://www.youtube.com/watch?v=ZWUNWRfL6C8",
+    takeoff: "regular",
+    landingStance: "semi",
   },
   {
     id: "back_walkover",
@@ -518,6 +586,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "From a standing position the practitioner raises one leg and bends backwards transitioning to a handstand position" +
       "through a one legged bridge and then contniues back to standing.",
     tutorialUrl: "https://www.youtube.com/watch?v=dLbDyBambPc",
+    takeoff: "swing",
+    landingStance: "hyper",
   },
   {
     id: "front_handspring",
@@ -530,6 +600,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "An acrobatic move where a person leaps forward from an upright position, uses their hands to momentarily support their" +
       " body as they invert, and then pushes off the ground with their hands to spring back to an upright position",
     tutorialUrl: "https://www.youtube.com/watch?v=ZRjqUUT453c",
+    takeoff: "regular",
+    landingStance: "frontside",
   },
   {
     id: "au_batido",
@@ -542,6 +614,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A capoeira move where a practitioner performs a handstand and then freezes, kicking out one leg to the front while twisting " +
       'the hips.\nIt is literally translated as "broken cartwheel" and is also known as the "L-kick" in breakdancing. ',
     tutorialUrl: "https://www.youtube.com/watch?v=iULIWAZ1G_c",
+    takeoff: "regular",
+    landingStance: "mega",//INCOMPLETE
   },
   {
     id: "flash_kick",
@@ -552,6 +626,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 3,
     description: "A backflip with a front kick executed half way through.",
     tutorialUrl: "https://www.youtube.com/watch?v=O4N6r0z5nBw",
+    takeoff: "backside",
+    landingStance: "hyper",
   },
   {
     id: "gainer",
@@ -562,6 +638,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 3,
     description: "A backflip performed off of one leg (from a back swing).",
     tutorialUrl: "https://www.youtube.com/watch?v=xyzq_ldkK2Q",
+    takeoff: "swing",
+    landingStance: "hyper",
   },
   {
     id: "btwist_shuriken",
@@ -573,6 +651,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Btwist in which the rotation comes from an outside cresent (A shuriken).",
     tutorialUrl: "https://www.youtube.com/watch?v=37JicKEixLs",
+    takeoff: "regular",
+    landingStance: "complete",
   },
   {
     id: "raiz",
@@ -586,6 +666,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       ' the supporting leg, a strong body arch ("eagle"), and the leg sweeping over the head.\n' +
       "Can also be thought of a no handed gumbi.",
     tutorialUrl: "https://www.youtube.com/watch?v=5J39uRaPaaI&t=29s",
+    takeoff: "front-vanish",
+    landingStance: "complete",
   },
   {
     id: "touchdown_round",
@@ -597,6 +679,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A round kick performed while touching the opposing hand to the ground.",
     tutorialUrl: "https://www.youtube.com/watch?v=Zq6TycUyMBQ",
+    takeoff: "swing",//INCOMPLETE
+    landingStance: "complete",
   },
   {
     id: "cheat_720",
@@ -609,6 +693,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       'From a "cheat" setup, the practitioner spins vertically once, then executes a hook kick before landing.' +
       "\n 720° degrees of rotation are completed when including the cheat step and take off.",
     tutorialUrl: "https://www.youtube.com/watch?v=H0X8Vtob2m0",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
   },
   {
     id: "double_leg",
@@ -621,6 +707,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "An outside flip that takes off of two feet and with piked legs and has" +
       " varying degrees of rotation. Not to be confused with a piked sideflip, the hips never rise over the chest in a doubleleg.",
     tutorialUrl: "https://www.youtube.com/watch?v=RrvbIXSzT9Y",
+    takeoff: "frontside",
+    landingStance: "backside",
   },
   {
     id: "machine",
@@ -632,6 +720,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A kind of cartwheel where the legs and hands are placed in an opposite order, creating a 360 flat spin movement.",
     tutorialUrl: "https://www.youtube.com/watch?v=NzSMOA6-868",
+    takeoff: "back-vanish",
+    landingStance: "complete",
   },
   {
     id: "lazyboi",
@@ -643,6 +733,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A layed back, no-kick, tornado.\noften performed with the hands behind the head or on the hips.",
     tutorialUrl: "https://www.youtube.com/watch?v=Bb8tUbg09ME",
+    takeoff: "back-vanish",
+    landingStance: "complete",
   },
   {
     id: "touchdown_raiz",
@@ -654,6 +746,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A raiz where the leading hand touches the ground before the feet.",
     tutorialUrl: "https://www.youtube.com/watch?v=hFVmKVHsGho",
+    takeoff: "front-vanish",
+    landingStance: "complete",
   },
   {
     id: "cork",
@@ -665,6 +759,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A gainer with a full twist.\neven though it does not say so in the prerequisites, it's recommended you know at least one twisting move before trying this one.",
     tutorialUrl: "https://www.youtube.com/watch?v=r_VnnEcCtp8",
+    takeoff: "swing",
+    landingStance: "complete",
   },
   {
     id: "rodeo_flash",
@@ -677,6 +773,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A flash kick, with an added one/two arm grab of the other leg, pulling it behind the back into an arched position.\n" +
       "this below is not a tutorial but just the only video i found.",
     tutorialUrl: "https://www.youtube.com/watch?app=desktop&v=lxKKRWuLhZ8",
+    takeoff: "backside",
+    landingStance: "hyper",
   },
   {
     id: "backside_720",
@@ -689,6 +787,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting with the back to the direction of movement(DOM), the practitioner jumps and spins 450° and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=yArws74DOXk",
+    takeoff: "backside",
+    landingStance: "hyper",
   },
   {
     id: "backside_900",
@@ -701,6 +801,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting in a backside position, the practitioner  jumps and spins 540° degrees and then" +
       " performs a round kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=jm8lRz8ed4M",
+    takeoff: "backside",
+    landingStance: "complete",
   },
   {
     id: "pop_720",
@@ -713,6 +815,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "From a setup, the practitioner jumps and spins 540° degrees and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=0A5R0VejgJQ",
+    takeoff: "frontside",
+    landingStance: "hyper",
   },
   {
     id: "illusion_twist",
@@ -725,6 +829,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A pop 360 turbo from a Butterfly-Kick setup.\n A lot of people see this as a Butterfly" +
       " Twist variation, but there is actually no twist happening, hence the name “illusion”.",
     tutorialUrl: "https://www.youtube.com/watch?v=4Vp4oX0qVTI",
+    takeoff: "regular",
+    landingStance: "frontside",
   },
   {
     id: "webster",
@@ -736,6 +842,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A front flip taking off of one leg while swinging the other leg backwards.",
     tutorialUrl: "https://www.youtube.com/watch?v=_VM9PJ1wZF4",
+    takeoff: "regular",
+    landingStance: "frontside",
   },
   {
     id: "parafuso",
@@ -747,6 +855,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Double Leg from a cheat setup.\nThe legs start apart and come together mid air, landing together.",
     tutorialUrl: "https://www.youtube.com/watch?v=mMRmjm85ZcE",
+    takeoff: "back-vanish",
+    landingStance: "backside",
   },
   {
     id: "cartwheel_helicoptero",
@@ -758,6 +868,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Cartwheel where the practitioner swings one leg down and the other one up, both in a circular motion, landing on the starting leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=d9SRfzi8fWw&t=123s",
+    takeoff: "regular",
+    landingStance: "mega",
   },
   {
     id: "master_scoot",
@@ -769,6 +881,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A two handed scoot from an inward swing of the leading leg(master swing).",
     tutorialUrl: "https://www.youtube.com/watch?v=heNft_5ukkU&t=230s",
+    takeoff: "swing",
+    landingStance: "complete",
   },
   {
     id: "moon_kick",
@@ -779,6 +893,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A slant gainer with a hook kick.",
     tutorialUrl: "https://www.youtube.com/watch?v=zedUQyqHdrM",
+    takeoff: "swing",
+    landingStance: "hyper",
   },
   {
     id: "piked_backflip",
@@ -788,7 +904,9 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["backflip"],
     difficulty: 2,
     description: "A backflip in a piked position.",
-    tutorialUrl: "https://www.youtube.com/watch?v=ZY2qjQEeeCU",
+    tutorialUrl: "https://www.youtube.com/watch?v=ZY2qjQEeeCU", 
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: "crowd_awakener",
@@ -799,6 +917,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A 180° turn into a split kick from a pop or cheat setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
+    takeoff: "frontside",
+    landingStance: "backside",
   },
   {
     id: "valdez",
@@ -809,6 +929,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A one handed Back Handspring.",
     tutorialUrl: "https://www.youtube.com/watch?v=A7lzmG8e84c",
+    takeoff: "backside",
+    landingStance: "backside",
   },
   {
     id: "flyspring",
@@ -819,6 +941,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A Front Handspring performed off of two feet.",
     tutorialUrl: "https://www.youtube.com/watch?v=_gK5vijqgv8",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "coin_drop",
@@ -831,6 +955,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "Starting the same way as a machine,\n the practitioner slides onto his back, then through" +
       " a circular motion, similar to a star kipup, he bounces back up.",
     tutorialUrl: "https://www.youtube.com/watch?v=CnCc3yJBNEs",
+    takeoff: "back-vanish",
+    landingStance: "complete",
   },
   {
     id: "btwist",
@@ -841,6 +967,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A butterfly kick with a 360° spin.",
     tutorialUrl: "https://www.youtube.com/watch?v=F88oPiATPq8",
+    takeoff: "regular",
+    landingStance: "complete",
   },
   {
     id: "butterfly_hook",
@@ -851,6 +979,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A butterfly kick with a hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=_GFD5TjWfbA",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "headspring",
@@ -862,6 +992,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A forward flip that starts by going into a headstand then kicking over to land on the feet.",
     tutorialUrl: "https://www.youtube.com/watch?v=ifqi_v1Nf0o",
+    takeoff: "frontside",
+    landingStance: "frontside",
   },
   {
     id: "spyder",
@@ -872,6 +1004,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A no-handed Machine.",
     tutorialUrl: "https://www.youtube.com/watch?v=iOl0tIdLAk8&t=15s",
+    takeoff: "back-vanish",
+    landingStance: "complete",
   },
   {
     id: "arabian",
@@ -883,6 +1017,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A backflip during which the practioner does a 180° twist tand then tucks into a frontflip.",
     tutorialUrl: "https://www.youtube.com/watch?v=YiYf_vzz3ng",
+    takeoff: "backside",
+    landingStance: "frontside",
   },
   {
     id: "cheat_720_double",
@@ -894,6 +1030,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Cheat 720 with two kicks, kick an outside cresent / hook kick during the takeoff and the regular hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=9ms_CQ6nrsY&t=2s",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
   },
   {
     id: "tricker_aerial",
@@ -906,6 +1044,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A no-handed cartwheel going over the side.\n" +
       "Note that in a regular Aerial the practitioner takes off forwards.",
     tutorialUrl: "https://www.youtube.com/watch?v=dSntnWrIdz4&t=86s",
+    takeoff: "regular",
+    landingStance: "hyper",
   },
   {
     id: "aerial_twist",
@@ -918,6 +1058,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "A Webster with a 180° twist.\n" +
       "Also can be done as a tricker aerial with a  270° twist.",
     tutorialUrl: "https://www.youtube.com/watch?v=kwE_CPll3H0&t=159s",
+    takeoff: "regular",
+    landingStance: "complete",
   },
   {
     id: "wrap_720",
@@ -931,6 +1073,8 @@ const TRICKS_DATA_RAW: Trick[] = [
       "releasing a hook kick at the end." +
       "\nCould not find a wrap 720 tutorial, if you find one please let me know through the contact form.",
     tutorialUrl: "https://www.youtube.com/watch?v=rK7ID2SO_Iw",
+    takeoff: "wrap",
+    landingStance: "hyper",
   },
   {
     id: "btwist_round",
@@ -941,6 +1085,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 3,
     description: "A Btwist with a round kick at the end.",
     tutorialUrl: "https://www.youtube.com/watch?v=hhEGnbrl86c",
+    takeoff: "regular",
+    landingStance: "complete",
   },
   {
     id: "sideswipe",
@@ -952,6 +1098,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Raiz with a swipe kick half way through, landing one the kicking leg.\nLike a laying down 540 kick.",
     tutorialUrl: "https://www.youtube.com/watch?v=pP-Ariidlus&t=153s",
+    takeoff: "front-vanish",
+    landingStance: "hyper",
   },
   {
     id: "loser",
@@ -963,6 +1111,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A frontswing Webster from a step / a few steps backwards as the set up.",
     tutorialUrl: "https://www.youtube.com/watch?v=nPnAhsjBwDg",
+    takeoff: "semi",
+    landingStance: "frontside",
   },
   {
     id: "gainer_switch",
@@ -974,6 +1124,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A gainer where the practitioner kicks the jumping leg ahead of the swinging leg, landing back on the jumping leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=lI_iCIai3aQ",
+    takeoff: "swing",
+    landingStance: "complete",
   },
   {
     id: "pop_720_double",
@@ -984,7 +1136,9 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description:
       "A Pop 720 with two kicks, an outside crescent / hook kick where a Pop 360 would kick, and the regular hook kick at the end.",
-    tutorialUrl: "https://www.youtube.com/shorts/ELo11Q7LuW0",
+    tutorialUrl: "https://www.youtube.com/shorts/ELo11Q7LuW0",  
+    takeoff: "frontside",
+    landingStance: "hyper",
   },
   {
     id: "x_out",
@@ -995,6 +1149,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A Backflip with a straddle / split-kick ",
     tutorialUrl: "https://www.youtube.com/watch?v=_UAYYooXtiQ",
+    takeoff: "backside",
+    landingStance: "backside",
   },
 ];
 

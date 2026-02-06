@@ -1,3 +1,4 @@
+import { TakeoffName, LandingStanceName } from "../data/stances";
 
 export interface Trick {
   id: string;
@@ -8,16 +9,11 @@ export interface Trick {
   difficulty: number; // 0-10
   description: string;
   tutorialUrl: string;
-  takeoff?: string;
-  landingStance?: string;
+  takeoff: TakeoffName;
+  landingStance: LandingStanceName;
 }
 
 
-export interface Stance {
-  id: number;
-  name: string;
-  dom: "front" | "back";
-}
 
 
 
