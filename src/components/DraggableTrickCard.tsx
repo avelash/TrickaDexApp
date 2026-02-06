@@ -17,7 +17,7 @@ interface DraggableTrickCardProps {
     onDragPositionChange?: (position: number | null) => void;
 }
 
-export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
+const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
     trick,
     onDrop,
     dropZoneLayout,
@@ -111,6 +111,7 @@ export const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         </View>
     );
 };
+export default React.memo(DraggableTrickCard);
 
 const styles = StyleSheet.create({
     cardContainer: {

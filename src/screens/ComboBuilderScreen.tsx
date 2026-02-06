@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Clipboard from 'expo-clipboard';
 import { SearchBar } from '../components/SearchBar';
-import { DraggableTrickCard } from '../components/DraggableTrickCard';
+import DraggableTrickCard from '../components/DraggableTrickCard';
 import { ComboDropZone } from '../components/ComboDropZone';
 import { DragOverlay } from '../components/DragOverlay';
 import { PreferencesModal, PreferencesState } from '../components/PreferencesModal';
