@@ -18,3 +18,10 @@ export interface Trick {
 
 
 export type TrickProgress = Record<string, boolean>;
+
+export interface SavedCombo {
+  id: string;
+  title: string;
+  comboText: string;
+  timestamp: number;
+}

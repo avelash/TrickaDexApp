@@ -19,7 +19,9 @@ import DraggableTrickCard from '../components/DraggableTrickCard';
 import { ComboDropZone } from '../components/ComboDropZone';
 import { DragOverlay } from '../components/DragOverlay';
 import { PreferencesModal, PreferencesState } from '../components/PreferencesModal';
+import { SaveComboModal } from '../components/SaveComboModal';
 import { useTrickProgress } from '../hooks/useTrickProgress';
+import { useSavedCombos } from '../hooks/useSavedCombos';
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { FILTER_CONFIG } from '../data/filterConfigs';
@@ -40,12 +42,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const ComboBuilderScreen: React.FC = () => {
     const { isTrickLanded } = useTrickProgress();
+    const { saveCombo } = useSavedCombos();
     const navigation = useNavigation<ComboBuilderScreenNavigationProp>();
 
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
+    const [saveComboModalVisible, setSaveComboModalVisible] = useState(false);
     const { preferences, updatePreferences } = usePreferences();
     const { favoriteTricks, isTrickFavorite } = useTrickFavorites();
 
@@ -283,6 +287,54 @@ export const ComboBuilderScreen: React.FC = () => {
         setComboTricks([]);
     }, []);
 
+    // Generate combo text
+    const comboText = useMemo(() => {
+        if (comboTricks.length === 0) return '';
+
+        const parts: string[] = [];
+
+        for (let i = 0; i < comboTricks.length; i++) {
+            const currentTrick = comboTricks[i];
+            const nextTrick = comboTricks[i + 1];
+
+            // Add current trick name
+            parts.push(currentTrick.name);
+
+            // If there's a next trick, check if we can add a transition
+            if (nextTrick && currentTrick.landingStance && nextTrick.takeoff) {
+                const transition = transitions(currentTrick.landingStance, nextTrick.takeoff);
+                if (nextTrick.name.toLowerCase().startsWith(transition.toLowerCase())) {
+                    //do nothing
+                } else {
+                    parts.push(transition);
+                }
+            }
+        }
+
+        return parts.join(' ');
+    }, [comboTricks]);
+
+    // Save combo
+    const handleSaveCombo = useCallback(() => {
+        if (!comboText) {
+            Alert.alert('No Combo', 'Please build a combo before saving.');
+            return;
+        }
+        setSaveComboModalVisible(true);
+    }, [comboText]);
+
+    const handleSaveComboConfirm = useCallback((title: string) => {
+        saveCombo(comboText, title);
+        setSaveComboModalVisible(false);
+        Alert.alert('Saved!', 'Your combo has been saved.');
+    }, [comboText, saveCombo]);
+
+    // Navigate to saved combos
+    const handleViewSavedCombos = useCallback(() => {
+        navigation.navigate('SavedCombosScreen');
+    }, [navigation]);
+
+
     // Generate random combo with N tricks based on preferences.numberOfTricks
     const handleRandomCombo = useCallback(() => {
         const count = Math.max(1, Math.round(preferences.numberOfTricks ?? 3));
@@ -354,33 +406,6 @@ export const ComboBuilderScreen: React.FC = () => {
         setComboTricks(randomTricks);
     }, [filteredTricks, preferences.numberOfTricks]);
 
-    // Generate combo text
-    const comboText = useMemo(() => {
-        if (comboTricks.length === 0) return '';
-
-        const parts: string[] = [];
-
-        for (let i = 0; i < comboTricks.length; i++) {
-            const currentTrick = comboTricks[i];
-            const nextTrick = comboTricks[i + 1];
-
-            // Add current trick name
-            parts.push(currentTrick.name);
-
-            // If there's a next trick, check if we can add a transition
-            if (nextTrick && currentTrick.landingStance && nextTrick.takeoff) {
-                const transition = transitions(currentTrick.landingStance, nextTrick.takeoff);
-                if (nextTrick.name.toLowerCase().startsWith(transition.toLowerCase())) {
-                    //do nothing
-                } else {
-                    parts.push(transition);
-                }
-            }
-        }
-
-        return parts.join(' ');
-    }, [comboTricks]);
-
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
@@ -400,7 +425,12 @@ export const ComboBuilderScreen: React.FC = () => {
                                 />
                             </TouchableOpacity>
                             <Text style={styles.headerTitle}>Combo Builder</Text>
-
+                            <TouchableOpacity
+                                style={styles.myCombosButton}
+                                onPress={handleViewSavedCombos}
+                            >
+                                <Text style={styles.myCombosButtonText}>My Combos</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
@@ -492,7 +522,17 @@ export const ComboBuilderScreen: React.FC = () => {
 
                     {/* Combo Text Display */}
                     <View style={styles.comboTextContainer}>
-                        <Text style={styles.comboTextLabel}>Combo:</Text>
+                        <View style={styles.comboTextHeader}>
+                            <Text style={styles.comboTextLabel}>Combo:</Text>
+                            {comboText && (
+                                <TouchableOpacity
+                                    style={styles.saveComboButton}
+                                    onPress={handleSaveCombo}
+                                >
+                                    <Text style={styles.saveComboButtonText}>Save Combo</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
                         <ScrollView
                             style={styles.comboTextScroll}
                             showsVerticalScrollIndicator={false}
@@ -533,6 +573,14 @@ export const ComboBuilderScreen: React.FC = () => {
                     preferences={preferences}
                     onClose={() => setPreferencesModalVisible(false)}
                     onSave={(newPreferences) => updatePreferences(newPreferences)}
+                />
+
+                {/* Save Combo Modal */}
+                <SaveComboModal
+                    visible={saveComboModalVisible}
+                    comboText={comboText}
+                    onSave={handleSaveComboConfirm}
+                    onCancel={() => setSaveComboModalVisible(false)}
                 />
             </View>
         </GestureHandlerRootView>
@@ -661,18 +709,47 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 14,
     },
+    myCombosButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: 'white',
+    },
+    myCombosButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 12,
+    },
     comboTextContainer: {
         backgroundColor: 'white',
         padding: 15,
         borderTopWidth: 1,
         borderTopColor: '#E0E0E0',
-        maxHeight: 120,
+        maxHeight: 140,
+    },
+    comboTextHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     comboTextLabel: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#2C3E50',
-        marginBottom: 8,
+    },
+    saveComboButton: {
+        backgroundColor: '#4ECDC4',
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 15,
+    },
+    saveComboButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
     },
     comboTextScroll: {
         maxHeight: 70,

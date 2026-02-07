@@ -7,6 +7,7 @@ import { TrickListScreen } from '../screens/TrickListScreen';
 import { UserProfileScreen } from '../screens/UserProfileScreen';
 import { AllLevelsProgressScreen } from '../screens/AllLevelsProgressScreen';
 import { ComboBuilderScreen } from '../screens/ComboBuilderScreen';
+import { SavedCombosScreen } from '../screens/SavedCombosScreen';
 
 // ---------- Param types ----------
 
@@ -24,6 +25,7 @@ export type ProfileStackParamList = {
 
 export type ComboStackParamList = {
     ComboBuilderScreen: undefined;
+    SavedCombosScreen: undefined;
 };
 
 export type MainTabParamList = {
@@ -74,6 +76,10 @@ function ComboStackNavigator() {
                 name="ComboBuilderScreen"
                 component={ComboBuilderScreen}
             />
+            <ComboStack.Screen
+                name="SavedCombosScreen"
+                component={SavedCombosScreen}
+            />
         </ComboStack.Navigator>
     );
 }
@@ -85,7 +91,7 @@ export function MainTabs() {
     const SIZE = 40;
     return (
         <Tab.Navigator
-        initialRouteName='TrickTab'
+            initialRouteName='TrickTab'
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarStyle: {
