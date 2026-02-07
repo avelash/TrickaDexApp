@@ -32,6 +32,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ComboStackParamList } from '../navigation/MainTabsNavigator'
 import { usePreferences } from '../hooks/usePreferences';
 import { useTrickFavorites } from '../hooks/useTrickFavorites';
+import { useRandomCombo } from '../hooks/useRandomCombo';
+import { useTrickFiltering } from '../hooks/useTrickFiltering';
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
@@ -44,14 +46,17 @@ export const ComboBuilderScreen: React.FC = () => {
     const { isTrickLanded } = useTrickProgress();
     const { saveCombo } = useSavedCombos();
     const navigation = useNavigation<ComboBuilderScreenNavigationProp>();
+    const { preferences, updatePreferences } = usePreferences();
+    const { isTrickFavorite } = useTrickFavorites();
+    const {
+        search, setSearch, activeFilters, filteredTricks,
+        handleToggleFilter, predefinedFilters
+    } = useTrickFiltering(preferences, isTrickLanded, isTrickFavorite);
+    const { generateRandomCombo } = useRandomCombo(filteredTricks, preferences.numberOfTricks);
 
-    const [activeFilters, setActiveFilters] = useState<string[]>([]);
-    const [search, setSearch] = useState<string>('');
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
     const [saveComboModalVisible, setSaveComboModalVisible] = useState(false);
-    const { preferences, updatePreferences } = usePreferences();
-    const { favoriteTricks, isTrickFavorite } = useTrickFavorites();
 
     // Drag and drop states
     const [dropZoneLayout, setDropZoneLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -92,102 +97,6 @@ export const ComboBuilderScreen: React.FC = () => {
         }
     }, []);
 
-    // Get only landed tricks
-    const preferredTricks = useMemo(
-        () => {
-            let tricks = TRICKS_DATA;
-
-            // Filter by landed status if preference is enabled
-            if (preferences.onlyLandedTricks) {
-                tricks = tricks.filter(trick => isTrickLanded(trick.id));
-            }
-
-            // Filter by difficulty level if preference is set
-            if (preferences.minLevel !== undefined && preferences.minLevel !== null) {
-                tricks = tricks.filter(trick =>
-                    (trick.difficulty ?? 0) >= preferences.minLevel
-                );
-            }
-
-            if (preferences.maxLevel !== undefined && preferences.maxLevel !== null) {
-                tricks = tricks.filter(trick =>
-                    (trick.difficulty ?? 0) <= preferences.maxLevel
-                );
-            }
-
-            return tricks;
-        },
-        [isTrickLanded, preferences.onlyLandedTricks, preferences.minLevel, preferences.maxLevel]
-    );
-
-    const predefinedFilters = useMemo(
-        () => FILTER_CONFIG.filter(f => f.name !== 'Landed' && f.name !== 'All')
-            .map(f => f.name),
-        []
-    );
-
-    // Toggle filter on/off
-    const handleToggleFilter = useCallback((filter: string) => {
-        setActiveFilters(prev => {
-            if (prev.includes(filter)) {
-                return prev.filter(f => f !== filter);
-            } else {
-                return [...prev, filter];
-            }
-        });
-    }, []);
-
-    // Filter tricks based on search and active filters
-    const filteredTricks = useMemo(() => {
-        let tricks = preferredTricks;
-        let filtersToApply = [...activeFilters];
-
-        // Check if search matches a valid filter name from FILTER_CONFIG
-        if (search && !activeFilters.includes(search)) {
-            const matchedFilter = FILTER_CONFIG.find(
-                filter => filter.name.toLowerCase() === search.toLowerCase()
-            );
-
-            if (matchedFilter) {
-                filtersToApply.push(matchedFilter.name);
-            }
-        }
-
-        // If no filters active and no search, show all
-        if (filtersToApply.length === 0 && !search) {
-            return tricks;
-        }
-
-        // Apply multiple filters
-        if (filtersToApply.length > 0) {
-            tricks = tricks.filter(trick => {
-                return filtersToApply.every(filter => {
-                    if (filter === 'Landed') {
-                        return isTrickLanded(trick.id);
-                    } else if (filter === 'Favorites') {
-                        return isTrickFavorite(trick.id);
-                    } else if (SKILL_LEVELS.map(level => level.name).includes(filter)) {
-                        const levelIdx = SKILL_LEVELS.findIndex(level => level.name === filter);
-                        return (trick.difficulty ?? 0) === levelIdx;
-                    } else {
-                        // Type filter (compare case-insensitively)
-                        return trick.types.some(type =>
-                            type.toLowerCase() === filter.toLowerCase()
-                        );
-                    }
-                });
-            });
-        }
-
-        // Apply text search filter for tricks that don't match filter names
-        if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
-            tricks = tricks.filter(trick =>
-                trick.name.toLowerCase().includes(search.toLowerCase())
-            );
-        }
-
-        return tricks;
-    }, [activeFilters, search, isTrickLanded, TRICKS_DATA, SKILL_LEVELS, isTrickFavorite]);
     // Drag handlers
     const handleDragStart = useCallback((trick: Trick, layout: { x: number; y: number; width: number; height: number }) => {
         setDraggedTrick(trick);
@@ -336,75 +245,10 @@ export const ComboBuilderScreen: React.FC = () => {
 
 
     // Generate random combo with N tricks based on preferences.numberOfTricks
-    const handleRandomCombo = useCallback(() => {
-        const count = Math.max(1, Math.round(preferences.numberOfTricks ?? 3));
-
-        if (filteredTricks.length < count) {
-            Alert.alert('Not Enough Tricks', `You need at least ${count} trick${count !== 1 ? 's' : ''} available to generate a random combo.`);
-            return;
-        }
-
-        const randomTricks: Trick[] = [];
-        const maxAttempts = 1000; // Prevent infinite loops
-        let attempts = 0;
-
-        // Helper function to check if a trick can follow the previous one
-        const canFollow = (previousTrick: Trick | null, nextTrick: Trick): boolean => {
-            if (!previousTrick) return true; // First trick can be anything
-
-            // If either trick doesn't have stance info, allow it
-            if (!previousTrick.landingStance || !nextTrick.takeoff) return true;
-
-            // Check if the transition is valid (not "---")
-            const transition = transitions(previousTrick.landingStance, nextTrick.takeoff);
-            return transition !== "---";
-        };
-
-        // Build combo sequentially, ensuring valid transitions
-        while (randomTricks.length < count && attempts < maxAttempts) {
-            attempts++;
-
-            // Get available tricks that haven't been used yet
-            const availableTricks = filteredTricks.filter(
-                trick => !randomTricks.includes(trick)
-            );
-
-            if (availableTricks.length === 0) {
-                // No more tricks available, reset and try again
-                randomTricks.length = 0;
-                attempts = 0;
-                continue;
-            }
-
-            // Filter to only tricks that can follow the last trick
-            const lastTrick = randomTricks[randomTricks.length - 1] || null;
-            const validNextTricks = availableTricks.filter(trick => canFollow(lastTrick, trick));
-
-            if (validNextTricks.length === 0) {
-                // No valid next tricks, backtrack
-                if (randomTricks.length > 0) {
-                    randomTricks.pop();
-                } else {
-                    // Can't even find a first trick, this shouldn't happen
-                    break;
-                }
-                continue;
-            }
-
-            // Pick a random valid trick
-            const randomIndex = Math.floor(Math.random() * validNextTricks.length);
-            randomTricks.push(validNextTricks[randomIndex]);
-        }
-
-        if (randomTricks.length < count) {
-            Alert.alert(
-                'Could Not Generate Combo',
-                `Only found ${randomTricks.length} trick${randomTricks.length !== 1 ? 's' : ''} with valid transitions. Try adjusting your filters or preferences.`
-            );
-        }
-
-        setComboTricks(randomTricks);
-    }, [filteredTricks, preferences.numberOfTricks]);
+    const handleRandomComboPress = useCallback(() => {
+        const result = generateRandomCombo();
+        if (result) setComboTricks(result);
+    }, [generateRandomCombo]);
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -492,7 +336,7 @@ export const ComboBuilderScreen: React.FC = () => {
                             <View style={styles.buttonGroup}>
                                 <TouchableOpacity
                                     style={styles.randomButton}
-                                    onPress={handleRandomCombo}
+                                    onPress={handleRandomComboPress}
                                 >
                                     <Text style={styles.randomButtonText}>Random</Text>
                                 </TouchableOpacity>
