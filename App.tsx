@@ -1,5 +1,5 @@
-// App.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
+import * as Updates from 'expo-updates';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -16,6 +16,23 @@ export type RootStackParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  useEffect(() => {
+    async function checkForUpdates() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync(); // 🔥 silent reload
+        }
+      } catch (e) {
+        console.log('Update check failed:', e);
+      }
+    }
+
+    checkForUpdates();
+  }, []);
+
   return (
     <NavigationContainer>
       <RootStack.Navigator
