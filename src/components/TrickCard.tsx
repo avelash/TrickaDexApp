@@ -5,7 +5,7 @@ import { Trick } from "../types";
 interface TrickCardProps {
     trick: Trick;
     isLanded: boolean;
-    onToggle: () => void;
+    onToggle: (trickId: string) => void;
     onInfo: (trick: Trick) => void;
 }
 
@@ -20,7 +20,7 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
             <TouchableOpacity
                 style={styles.iconContainerWrapper}
                 activeOpacity={0.7}
-                onPress={onToggle}
+                onPress={() => onToggle(trick.id)}
             >
                 <View
                     style={[
@@ -29,6 +29,7 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                     ]}
                 >
                     <Image
+                        key={isLanded ? 'landed' : 'notLanded'}
                         source={trick.icon}
                         style={[styles.iconImage, !isLanded && styles.iconGreyed]}
                         resizeMode='contain'

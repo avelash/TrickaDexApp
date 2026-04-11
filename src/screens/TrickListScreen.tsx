@@ -196,7 +196,7 @@ export const TrickListScreen: React.FC = () => {
                         <TrickCard
                             trick={trick}
                             isLanded={isTrickLanded(trick.id)}
-                            onToggle={() => handleToggleTrick(trick.id)}
+                            onToggle={handleToggleTrick}
                             onInfo={handleInfo}
                         />
                     </View>
