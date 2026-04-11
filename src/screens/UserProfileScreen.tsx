@@ -11,6 +11,7 @@ import {
     Easing,
     TextInput,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Trick } from '../types';
 import { useTrickProgress } from '../hooks/useTrickProgress';
 import { TRICKS_DATA } from '../data/tricks';
@@ -113,6 +114,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
 
     const { landedTricks } = useTrickProgress();
     const stats = useProfileStats(landedTricks);
+    const insets = useSafeAreaInsets();
 
     const progressAnim = useRef(new Animated.Value(0)).current;
     const numberAnim = useRef(new Animated.Value(0)).current;
@@ -195,10 +197,10 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
     if (userName === '') return null;
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <View style={styles.headerBg}>
+                <View style={[styles.headerBg, { paddingTop: insets.top + 34 }]}>
                 </View>
 
                 <View style={styles.profileCard}>
@@ -295,14 +297,14 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
             </ScrollView>
 
             {selectedTrick && <TrickCardInfo trick={selectedTrick} onClose={() => setSelectedTrick(null)} />}
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F7F7F7' },
     scrollContent: { flexGrow: 1, paddingBottom: 40 },
-    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 ,paddingTop: 78 , maxHeight: 80},
+    headerBg: { backgroundColor: '#4ECDC4' ,padding: 20 , maxHeight: 80},
     backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     backIcon: { width: 24, height: 24, tintColor: 'white', resizeMode: 'contain' },
     profileCard: { marginHorizontal: 20, marginTop: -20, backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },

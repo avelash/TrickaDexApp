@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image, } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image,  } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TrickCard } from '../components/TrickCard';
 import { TrickCardInfo } from '../components/TrickCardInfo';
 import { Trick } from '../types';
@@ -38,6 +38,7 @@ interface TrickRow {
 export const TrickListScreen: React.FC = () => {
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
     const { isTrickFavorite } = useTrickFavorites();
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<TrickListScreenNavigationProp>();
     const rootNavigation = useNavigation<RootNav>();
     const route = useRoute<TrickListScreenRouteProp>();
@@ -229,7 +230,7 @@ export const TrickListScreen: React.FC = () => {
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
                 <View style={styles.headerRow}>
                     <Text style={styles.headerTitle}>Trickadex</Text>
                     <TouchableOpacity
@@ -314,7 +315,6 @@ const styles = StyleSheet.create({
     header: {
         backgroundColor: '#4ECDC4',
         padding: 20,
-        paddingTop: 36,
         minHeight: 80,
     },
     headerTitle: {

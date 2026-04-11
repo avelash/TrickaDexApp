@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, StatusBar, Image, Dimensions, TextInput, Button, Modal } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -79,7 +80,7 @@ export const WelcomeScreen: React.FC = () => {
     }));
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content"/>
             {icons.map((icon, idx) => (
                 <Image
@@ -109,7 +110,7 @@ export const WelcomeScreen: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 

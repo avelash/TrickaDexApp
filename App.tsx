@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import * as Updates from 'expo-updates';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import FeedbackScreen from './src/screens/FeedbackScreen';
@@ -34,15 +35,17 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <RootStack.Navigator
-        initialRouteName="WelcomeScreen"
-        screenOptions={{ headerShown: false }}
-      >
-        <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-        <RootStack.Screen name="MainTabs" component={MainTabs} />
-        <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <RootStack.Navigator
+          initialRouteName="WelcomeScreen"
+          screenOptions={{ headerShown: false }}
+        >
+          <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+          <RootStack.Screen name="MainTabs" component={MainTabs} />
+          <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
