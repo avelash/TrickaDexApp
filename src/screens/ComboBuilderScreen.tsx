@@ -11,7 +11,7 @@ import {
     Animated,
     Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Clipboard from 'expo-clipboard';
 import { SearchBar } from '../components/SearchBar';
@@ -38,6 +38,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const ComboBuilderScreen: React.FC = () => {
     const { isTrickLanded } = useTrickProgress();
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<ComboBuilderScreenNavigationProp>();
 
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -315,7 +316,7 @@ export const ComboBuilderScreen: React.FC = () => {
                     <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
                     {/* Header */}
-                    <View style={styles.header}>
+                    <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
                         <View style={styles.headerRow}>
                             <TouchableOpacity
                                 style={styles.preferencesButton}
@@ -474,7 +475,6 @@ const styles = StyleSheet.create({
     header: {
         backgroundColor: '#4ECDC4',
         padding: 20,
-        paddingTop: 36,
         minHeight: 80,
         alignContent: 'center'
     },

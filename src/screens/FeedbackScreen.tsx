@@ -11,7 +11,7 @@ import {
     StatusBar,
     Image,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,6 +22,7 @@ const FeedbackScreen: React.FC = () => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const insets = useSafeAreaInsets();
 
     // dropdown states
     const [open, setOpen] = useState(false);
@@ -93,13 +94,13 @@ const FeedbackScreen: React.FC = () => {
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
+            <View style={[styles.header, { height: insets.top + 60 }]}>
+                <TouchableOpacity style={[styles.backButton, { paddingTop: insets.top + 20 }]} onPress={navigation.goBack}>
                     <Image source={require("../../assets/return.png")} style={styles.backIcon} />
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.card}>
+            <View style={[styles.card, { top: insets.top + 40 }]}>
                 <Text style={styles.title}>Send Feedback</Text>
 
                 <TextInput
@@ -172,7 +173,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     header: {
-        height: 100,
         width: "100%",
         backgroundColor: "#4ECDC4",
     },
@@ -182,12 +182,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         paddingLeft: 20,
-        paddingTop: 60,
     },
     backIcon: { width: 24, height: 24, tintColor: "white", resizeMode: "contain" },
     card: {
         position: "absolute",
-        top: 80,
         width: "90%",
         backgroundColor: "#fff",
         borderRadius: 20,
