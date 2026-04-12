@@ -887,7 +887,7 @@ const TRICKS_DATA_RAW: Trick[] = [
   {
     id: "master_swipe",
     name: "Master Swipe",
-    icon: require("../../assets/master_swipe_icon.png"),
+    icon: require("../../assets/masterSwipe_icon.png"),
     types: ["transition", "flip"],
     prerequisites: ["swipe", "dive_cartwheel"],
     difficulty: 1,
