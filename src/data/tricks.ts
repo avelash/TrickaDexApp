@@ -892,7 +892,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["swipe", "dive_cartwheel"],
     difficulty: 1,
     description:
-      "A Dive Cartwheel from an inward swing of the leading leg(master swing). After te initial swing the  practitioner swipes his non-leading over the leading leg.",
+      "A Dive Cartwheel from an inward swing of the leading leg(master swing). After the initial swing the  practitioner swipes his non-leading leg over the leading leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=Zt77Q-_umJE&t=57s",
     takeoff: "master-swing",
     landingStance: "hyper",
