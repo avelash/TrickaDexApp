@@ -885,6 +885,19 @@ const TRICKS_DATA_RAW: Trick[] = [
     landingStance: "complete",
   },
   {
+    id: "master_swipe",
+    name: "Master Swipe",
+    icon: require("../../assets/master_swipe_icon.png"),
+    types: ["transition", "flip"],
+    prerequisites: ["swipe", "dive_cartwheel"],
+    difficulty: 1,
+    description:
+      "A Dive Cartwheel from an inward swing of the leading leg(master swing). After te initial swing the  practitioner swipes his non-leading over the leading leg.",
+    tutorialUrl: "https://www.youtube.com/watch?v=Zt77Q-_umJE&t=57s",
+    takeoff: "master-swing",
+    landingStance: "hyper",
+  },
+  {
     id: "moon_kick",
     name: "Moon Kick",
     icon: require("../../assets/moonKick_icon.png"),

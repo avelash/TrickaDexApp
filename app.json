@@ -7,7 +7,6 @@
     "icon": "./assets/app_icon_round.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-
     "updates": {
       "url": "https://u.expo.dev/8df339c4-daae-4680-9e90-b0812fcab2b9",
       "checkAutomatically": "ON_LOAD",
@@ -16,17 +15,19 @@
     "runtimeVersion": {
       "policy": "appVersion"
     },
-
     "splash": {
       "image": "./assets/app_icon_round.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.avelashansky.TrickaDexApp",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
-
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/app_icon_round.png",
@@ -36,11 +37,9 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.avelashansky.TrickaDexApp"
     },
-
     "web": {
       "favicon": "./assets/app_icon_round.png"
     },
-
     "extra": {
       "eas": {
         "projectId": "8df339c4-daae-4680-9e90-b0812fcab2b9"

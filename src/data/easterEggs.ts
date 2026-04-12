@@ -3,7 +3,9 @@ interface EasterEggName {
 }
 export const easterEggNames: EasterEggName = {
     "michael guthrie" : "G.O.A.T",
-    "royi tsuk" : "Alofsrael(2025)"
+    "royi tsuk" : "Alofsrael(2025)",
+    "scott skelton" : "Mr Double ABCDEFUCKYEAH",
+    
 
 
 }
