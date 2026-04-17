@@ -321,13 +321,19 @@ export const ComboBuilderScreen: React.FC = () => {
                         </View>
                     </View>
 
-                    {/* Search Bar */}
-                    <SearchBar
-                        filters={predefinedFilters}
-                        activeFilters={activeFilters}
-                        onToggleFilter={handleToggleFilter}
-                        onSearch={setSearch}
-                    />
+                    {/* Main Content ScrollView */}
+                    <ScrollView 
+                        style={{ flex: 1 }} 
+                        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+                        showsVerticalScrollIndicator={true}
+                    >
+                        {/* Search Bar */}
+                        <SearchBar
+                            filters={predefinedFilters}
+                            activeFilters={activeFilters}
+                            onToggleFilter={handleToggleFilter}
+                            onSearch={setSearch}
+                        />
 
                     {/* Filter Summary */}
                     {activeFilters.length > 0 && (
@@ -448,6 +454,8 @@ export const ComboBuilderScreen: React.FC = () => {
                         </ScrollView>
                     </View>
 
+                    </ScrollView>
+
                 </SafeAreaView>
 
                 {/* Drag Overlay - OUTSIDE SafeAreaView to render above everything */}
@@ -563,7 +571,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     dropZoneContainer: {
-        flex: 1,
+        flexGrow: 1,
         paddingHorizontal: 15,
         paddingTop: 15,
     },

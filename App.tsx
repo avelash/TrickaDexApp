@@ -3,7 +3,16 @@ import * as Updates from 'expo-updates';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import { I18nManager } from 'react-native';
+// Force LTR
+if (I18nManager.isRTL) {
+  I18nManager.allowRTL(false);
+  I18nManager.forceRTL(false);
+  Updates.reloadAsync();
+} else {
+  I18nManager.allowRTL(false);
+  I18nManager.forceRTL(false);
+}
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import FeedbackScreen from './src/screens/FeedbackScreen';
 import { MainTabs } from './src/navigation/MainTabsNavigator';
