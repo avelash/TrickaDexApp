@@ -1124,8 +1124,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A frontswing Webster from a step / a few steps backwards as the set up.",
     tutorialUrl: "https://www.youtube.com/watch?v=nPnAhsjBwDg",
-    takeoff: "semi-frontswing",
-    landingStance: "frontside",
+    takeoff: "fake-backside",
+    landingStance: "backside",
   },
   {
     id: "gainer_switch",
