@@ -118,7 +118,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: [],
     difficulty: 0,
     description:
-      "a 180° turn on one hand, from a kneeling position to standing",
+      "a 180°turn on one hand, from a kneeling position to standing",
     tutorialUrl: "https://www.youtube.com/watch?v=BaSU6o-FcOs",
     takeoff: "frontside", //INCOMPLETE
     landingStance: "complete",
@@ -1212,6 +1212,30 @@ const TRICKS_DATA_RAW: Trick[] = [
     tutorialUrl: "https://www.youtube.com/watch?v=GA4s3J1wkwU&t=14s",
     takeoff: "front-vanish",
     landingStance: "backside",
+  },
+  {
+    id: "cartwheel_mega",
+    name: "Cartwheel Mega",
+    icon: require("../../assets/cartwheelMega_icon.png"),
+    types: ["transition"],
+    prerequisites: ["cartwheel"],
+    difficulty: 1,
+    description: "A Cartwheel with a 90° turn and a switch of the legs,landing on the starting leg in a Mega stance.\n(on the \"hook\" leg facing the DOM).",
+    tutorialUrl: "https://www.instagram.com/reel/DUarzsHjeoN/",
+    takeoff: "regular",
+    landingStance: "mega",
+  },
+  {
+    id: "aerial_semi",
+    name: "Aerial Semi",
+    icon: require("../../assets/aerialSemi_icon.png"),
+    types: ["flip", "transition"],
+    prerequisites: ["tricker_aerial"],
+    difficulty: 2,
+    description: "A Tricker Aerial with a 90° turn, landing in a semi stance.\n(on the \"round\" leg facing the DOM)",
+    tutorialUrl: "https://www.youtube.com/watch?v=afxPbp8Wxa4",
+    takeoff: "regular",
+    landingStance: "semi",
   }
 ];
 
