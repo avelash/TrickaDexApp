@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
   ScrollView,
   Image,
   Linking,
+  BackHandler,
 } from "react-native";
 import { Trick } from "../types";
 import { TRICKS_DATA } from "../data/tricks";
@@ -167,6 +169,22 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
       useNativeDriver: false,
     }).start();
   }, [anim]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        onClose();
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+
+      return () => backHandler.remove();
+    }, [onClose])
+  );
 
   const animatedStyle = {
     width: anim.interpolate({

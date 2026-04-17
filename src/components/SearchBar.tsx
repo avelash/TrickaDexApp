@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Keyboard, Image, ScrollView, Dimensions } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Keyboard, Image, ScrollView, Dimensions, BackHandler } from 'react-native';
 import { FILTER_CONFIG, FilterConfig } from '../data/filterConfigs';
 
 interface SearchBarProps {
@@ -94,6 +95,25 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onSearch('');
         Keyboard.dismiss();
     }, [onSearch, setIsSearchOpen]);
+
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                if (isSearchOpen) {
+                    handleCloseOverlay();
+                    return true;
+                }
+                return false;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [isSearchOpen, handleCloseOverlay])
+    );
 
     const handleFocus = useCallback(() => {
         setIsSearchOpen(true);
