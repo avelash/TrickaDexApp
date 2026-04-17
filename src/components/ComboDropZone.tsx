@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Animated, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Trick } from '../types';
 
 interface ComboDropZoneProps {
@@ -10,10 +11,98 @@ interface ComboDropZoneProps {
     isOver?: boolean;
     hoverIndex: number | null;
     draggedTrick: Trick | null;
+    draggedTrickOriginIndex?: number | null;
     scrollViewRef?: React.RefObject<ScrollView | null>;
     onStartScroll?: (direction: 'left' | 'right') => void;
     onStopScroll?: () => void;
+    onDragStartComboTrick?: (trick: Trick, index: number, layout: { x: number; y: number; width: number; height: number }) => void;
+    onDragMoveComboTrick?: (translateX: number, translateY: number) => void;
+    onDragEndComboTrick?: () => void;
 }
+
+interface DraggableComboCardProps {
+    trick: Trick;
+    index: number;
+    isBeingDragged?: boolean;
+    onRemoveTrick: (index: number) => void;
+    onDragStartComboTrick?: (trick: Trick, index: number, layout: { x: number; y: number; width: number; height: number }) => void;
+    onDragMoveComboTrick?: (translateX: number, translateY: number) => void;
+    onDragEndComboTrick?: () => void;
+}
+
+const DraggableComboCard: React.FC<DraggableComboCardProps> = ({
+    trick,
+    index,
+    isBeingDragged = false,
+    onRemoveTrick,
+    onDragStartComboTrick,
+    onDragMoveComboTrick,
+    onDragEndComboTrick,
+}) => {
+    const viewRef = useRef<View>(null);
+    const dragStartedRef = useRef(false);
+
+    const onGestureEvent = (event: any) => {
+        const movementDistance = Math.sqrt(event.translationX ** 2 + event.translationY ** 2);
+        
+        if (movementDistance > 2 && !dragStartedRef.current && onDragStartComboTrick) {
+            dragStartedRef.current = true;
+            if (viewRef.current) {
+                viewRef.current.measureInWindow((x, y, width, height) => {
+                    onDragStartComboTrick(trick, index, { x, y, width, height });
+                });
+            }
+        }
+        
+        if (dragStartedRef.current && onDragMoveComboTrick) {
+            onDragMoveComboTrick(event.translationX, event.translationY);
+        }
+    };
+
+    const panGesture = Gesture.Pan()
+        .onStart(() => {
+            dragStartedRef.current = false;
+        })
+        .onUpdate((event) => {
+            onGestureEvent(event);
+        })
+        .onEnd(() => {
+            if (dragStartedRef.current && onDragEndComboTrick) {
+                onDragEndComboTrick();
+            }
+            dragStartedRef.current = false;
+        });
+
+    return (
+        <View style={[styles.comboCardWrapper, isBeingDragged && { opacity: 0 }]}>
+            <GestureDetector gesture={panGesture}>
+                <View ref={viewRef} style={styles.comboCard} collapsable={false}>
+                    <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => onRemoveTrick(index)}
+                    >
+                        <Text style={styles.removeButtonText}>✕</Text>
+                    </TouchableOpacity>
+                    <View style={styles.comboIconContainer}>
+                        <Image
+                            source={trick.icon}
+                            style={styles.comboIconImage}
+                            resizeMode="contain"
+                            resizeMethod="resize"
+                        />
+                    </View>
+                    <Text
+                        style={styles.comboTrickName}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {trick.name}
+                    </Text>
+                </View>
+            </GestureDetector>
+        </View>
+    );
+};
 
 export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     tricks,
@@ -23,9 +112,13 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     isOver = false,
     hoverIndex,
     draggedTrick,
+    draggedTrickOriginIndex,
     scrollViewRef,
     onStartScroll,
-    onStopScroll
+    onStopScroll,
+    onDragStartComboTrick,
+    onDragMoveComboTrick,
+    onDragEndComboTrick
 }) => {
     const viewRef = useRef<View>(null);
 
@@ -93,31 +186,15 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                         {isOver && draggedTrick && hoverIndex === index && (
                             <View style={styles.dropIndicator} />
                         )}
-                        <View style={styles.comboCardWrapper}>
-                            <View style={styles.comboCard}>
-                                <TouchableOpacity
-                                    style={styles.removeButton}
-                                    onPress={() => onRemoveTrick(index)}
-                                >
-                                    <Text style={styles.removeButtonText}>✕</Text>
-                                </TouchableOpacity>
-                                <View style={styles.comboIconContainer}>
-                                    <Image
-                                        source={trick.icon}
-                                        style={styles.comboIconImage}
-                                        resizeMode="contain"
-                                        resizeMethod='resize'
-                                    />
-                                </View>
-                                <Text
-                                    style={styles.comboTrickName}
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    {trick.name}
-                                </Text>
-                            </View>
-                        </View>
+                        <DraggableComboCard
+                            trick={trick}
+                            index={index}
+                            isBeingDragged={draggedTrickOriginIndex === index}
+                            onRemoveTrick={onRemoveTrick}
+                            onDragStartComboTrick={onDragStartComboTrick}
+                            onDragMoveComboTrick={onDragMoveComboTrick}
+                            onDragEndComboTrick={onDragEndComboTrick}
+                        />
                     </React.Fragment>
                 ))}
                 {isOver && draggedTrick && hoverIndex === tricks.length && (

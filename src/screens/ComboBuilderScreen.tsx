@@ -65,6 +65,7 @@ export const ComboBuilderScreen: React.FC = () => {
     const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
     const [isOverDropZone, setIsOverDropZone] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const [draggedTrickOriginIndex, setDraggedTrickOriginIndex] = useState<number | null>(null);
     const [scrollOffset, setScrollOffset] = useState(0);
     const dragTranslateX = useRef(new Animated.Value(0)).current;
     const dragTranslateY = useRef(new Animated.Value(0)).current;
@@ -158,6 +159,47 @@ export const ComboBuilderScreen: React.FC = () => {
             }
         }
     }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll, scrollOffset]);
+
+    const handleDragStartComboTrick = useCallback((trick: Trick, index: number, layout: { x: number; y: number; width: number; height: number }) => {
+        setDraggedTrick(trick);
+        setDragStartPosition({ x: layout.x, y: layout.y });
+        dragTranslateX.setValue(0);
+        dragTranslateY.setValue(0);
+        setDraggedTrickOriginIndex(index);
+        
+        // We leave the item in the array so it doesn't unmount and break the gesture!
+        // We will visually hide it by setting its opacity to 0 inside ComboDropZone.
+    }, []);
+
+    const handleDragEndComboTrick = useCallback(() => {
+        // Cache draggedTrick into a local variable before nulling state, or use the state directly if we hadn't nulled it.
+        const trickToDrop = draggedTrick;
+        const originIndex = draggedTrickOriginIndex;
+        setDraggedTrick(null);
+        setDragStartPosition(null);
+
+        if (isOverDropZone && hoverIndex !== null && trickToDrop && originIndex !== null) {
+            setComboTricks(prev => {
+                const newCombo = [...prev];
+                // Remove the old item first
+                newCombo.splice(originIndex, 1);
+                
+                // Adjust hover index due to the removal
+                let adjustedHover = hoverIndex;
+                if (hoverIndex > originIndex) {
+                    adjustedHover -= 1;
+                }
+                
+                // Insert at the new hoverIndex
+                newCombo.splice(adjustedHover, 0, trickToDrop);
+                return newCombo;
+            });
+        }
+        
+        setIsOverDropZone(false);
+        setHoverIndex(null);
+        setDraggedTrickOriginIndex(null);
+    }, [isOverDropZone, hoverIndex, draggedTrick, draggedTrickOriginIndex]);
 
     const handleDragEnd = useCallback(() => {
         setDraggedTrick(null);
@@ -359,9 +401,13 @@ export const ComboBuilderScreen: React.FC = () => {
                             isOver={isOverDropZone}
                             hoverIndex={hoverIndex}
                             draggedTrick={draggedTrick}
+                            draggedTrickOriginIndex={draggedTrickOriginIndex}
                             scrollViewRef={scrollViewRef}
                             onStartScroll={startAutoScroll}
                             onStopScroll={stopAutoScroll}
+                            onDragStartComboTrick={handleDragStartComboTrick}
+                            onDragMoveComboTrick={handleDragMove}
+                            onDragEndComboTrick={handleDragEndComboTrick}
                         />
                     </View>
 
