@@ -1270,7 +1270,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 3,
     description: "A cork with a D-Leg shape.",
     tutorialUrl: "https://www.youtube.com/watch?v=kUsm5WV91y8&t=6s",
-    takeoff: "fake-backside",
+    takeoff: "swing",
     landingStance: "complete",
   }
 ];
