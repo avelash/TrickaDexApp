@@ -16,12 +16,14 @@ import { Trick } from "../types";
 import { TRICKS_DATA } from "../data/tricks";
 import { SKILL_LEVELS } from "../data/skillLevels";
 import { useTrickFavorites } from "../hooks/useTrickFavorites";
+import { useExcludedTricks } from "../hooks/useExcludedTricks";
 
 const { width, height } = Dimensions.get("window");
 const MARGIN_TOP = 60;
+const MARGIN_BOTTOM = 120; // Extra margin for the bottom tabs
 const MARGIN_SIDE = 20;
 const displayWidth = width - MARGIN_SIDE * 2;
-const displayHeight = height - MARGIN_TOP * 2;
+const displayHeight = height - MARGIN_TOP - MARGIN_BOTTOM;
 
 const styles = StyleSheet.create({
   overlay: {
@@ -44,14 +46,15 @@ const styles = StyleSheet.create({
     zIndex: 10000,
   },
   container: {
-    width: displayWidth,
-    height: displayHeight,
+    flex: 1,
     backgroundColor: "#fff",
     borderRadius: 20,
+    elevation: 5,
+  },
+  contentContainer: {
     paddingTop: 40,
     paddingHorizontal: 24,
-    paddingBottom: 24,
-    elevation: 5,
+    paddingBottom: 50,
   },
   closeButton: {
     position: "absolute",
@@ -127,6 +130,34 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     tintColor: "#f44337ff",
   },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 20,
+    left: 24,
+    zIndex: 2,
+  },
+  checkboxRender: {
+    width: 16,
+    height: 16,
+    borderWidth: 1.5,
+    borderColor: "#2C3E50",
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
+  },
+  checkboxInner: {
+    width: 8,
+    height: 8,
+    backgroundColor: "#FF5252",
+    borderRadius: 2,
+  },
+  checkboxLabel: {
+    fontSize: 12,
+    color: "#777",
+  },
 });
 
 interface TrickCardInfoProps {
@@ -139,7 +170,9 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
   onClose,
 }) => {
   const { isTrickFavorite, toggleFavorite } = useTrickFavorites();
+  const { isTrickExcluded, toggleExcluded } = useExcludedTricks();
   const isFavorite = isTrickFavorite(trick.id);
+  const isExcluded = isTrickExcluded(trick.id);
 
   const skillLevelColor =
     typeof trick.difficulty === "number"
@@ -210,7 +243,7 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity>
 
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           {/* Title */}
           <View style={styles.headerRow}>
             <Text style={styles.name}>{trick.name}</Text>
@@ -248,8 +281,6 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
             <Text style={styles.preReq}>Prerequisites:</Text> {preReqNames}.
           </Text>
 
-
-
           {trick.tutorialUrl && (
             <TouchableOpacity
               style={styles.tutorialButton}
@@ -258,7 +289,18 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
               <Text style={styles.tutorialButtonText}>Watch Tutorial</Text>
             </TouchableOpacity>
           )}
+
         </ScrollView>
+        <TouchableOpacity
+          style={styles.checkboxContainer}
+          onPress={() => toggleExcluded(trick.id)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.checkboxRender}>
+            {isExcluded && <View style={styles.checkboxInner} />}
+          </View>
+          <Text style={styles.checkboxLabel}>Do not include in random combos</Text>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );

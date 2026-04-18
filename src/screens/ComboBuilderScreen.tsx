@@ -34,6 +34,7 @@ import { usePreferences } from '../hooks/usePreferences';
 import { useTrickFavorites } from '../hooks/useTrickFavorites';
 import { useRandomCombo } from '../hooks/useRandomCombo';
 import { useTrickFiltering } from '../hooks/useTrickFiltering';
+import { useExcludedTricks } from '../hooks/useExcludedTricks';
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
@@ -49,11 +50,17 @@ export const ComboBuilderScreen: React.FC = () => {
     const navigation = useNavigation<ComboBuilderScreenNavigationProp>();
     const { preferences, updatePreferences } = usePreferences();
     const { isTrickFavorite } = useTrickFavorites();
+    const { isTrickExcluded } = useExcludedTricks();
     const {
         search, setSearch, activeFilters, filteredTricks,
         handleToggleFilter, predefinedFilters
     } = useTrickFiltering(preferences, isTrickLanded, isTrickFavorite);
-    const { generateRandomCombo } = useRandomCombo(filteredTricks, preferences.numberOfTricks);
+    
+    const randomComboPool = useMemo(() => {
+        return filteredTricks.filter(trick => !isTrickExcluded(trick.id));
+    }, [filteredTricks, isTrickExcluded]);
+
+    const { generateRandomCombo } = useRandomCombo(randomComboPool, preferences.numberOfTricks);
 
     const [comboTricks, setComboTricks] = useState<Trick[]>([]);
     const [preferencesModalVisible, setPreferencesModalVisible] = useState(false);
