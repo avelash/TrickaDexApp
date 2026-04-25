@@ -1332,6 +1332,71 @@ const TRICKS_DATA_RAW: Trick[] = [
     tutorialUrl: "https://www.youtube.com/shorts/vT4vowo3UD0",
     takeoff: "swing",
     landingStance: "complete",
+  },
+  {
+    id: "aerial_mega",
+    name: "Aerial Mega",
+    icon: require("../../assets/aerialMega_icon.png"),
+    types: ["flip", "transition"],
+    prerequisites: ["tricker_aerial", "cartwheel_mega"],
+    difficulty: 4,
+    description: "A Tricker Aerial with a switch if the legs landing on the leading leg in a Mega stance.",
+    tutorialUrl: "https://www.youtube.com/watch?v=RmOk9PX1Xaw",
+    takeoff: "regular",
+    landingStance: "mega",
+  },
+  {
+    id: "gms",
+    name: "GMS",
+    icon: require("../../assets/GMS_icon.png"),
+    types: ["flip"],
+    prerequisites: ["tricker_aerial", "master_swipe"],
+    difficulty: 3,
+    description: "Grand Master Swipe: A no-handed Master Swipe.",
+    tutorialUrl: "https://www.youtube.com/watch?v=9f7VOj4vmJ8",
+    takeoff: "master-swing",
+    landingStance: "hyper",
+  },
+  {
+    id: "jackknife",
+    name: "Jackknife",
+    icon: require("../../assets/jacknife_icon.png"),
+    types: ["kick"],
+    prerequisites: ["540_kick","cheat_720","narabong"],
+    difficulty: 3,
+    description: "A Cheat 720 with a round kick executed before the hook kick " +
+    "or a 540 that finishes with a hook kick. Could be thought of as a Narabong " +
+    "all executed in the air.",
+    tutorialUrl: "https://www.youtube.com/watch?v=6atixAPa8kU&t=373s",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
+  },
+  {
+    id: "wackknife",
+    name: "Wackknife",
+    icon: require("../../assets/wackKnife_icon.png"),
+    types: ["kick"],
+    prerequisites: ["tornado_kick"],
+    difficulty: 3,
+    description: "a cheat kick that has roughly 180° of in-air rotation, " +
+    "with 2-3 kicks (depending on how you count it). Basically a jackknife " +
+    "with no rotation.",
+    tutorialUrl: "https://www.youtube.com/watch?v=dRBZ8GH3Pnc",
+    takeoff: "back-vanish",
+    landingStance: "hyper",
+  },
+  {
+    id: "wrap_full",
+    name: "Wrap Full",
+    icon: require("../../assets/wrapFull_icon.png"),
+    types: ["flip", "twist"],
+    prerequisites: ["full_twist", "wrap_720"],
+    difficulty: 3,
+    description: "A Full Twist that takes off of one leg, from a hyper stance, " +
+    "where the leading leg is “wrapped” behind the planted leg. ",
+    tutorialUrl: "https://www.youtube.com/watch?v=gisXbG3YzPg",
+    takeoff: "wrap",
+    landingStance: "complete",
   }
 
 ];
