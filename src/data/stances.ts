@@ -32,7 +32,7 @@ export const allowedTakeoffs = (landingStance: LandingStance): Takeoff[] => {
         case "frontside":
             return ["frontside", "regular"];
         case "semi":
-            return ["front-vanish", "regular"];
+            return ["front-vanish"];
         case "mega":
             return ["regular", "front-vanish"];
         case "backside":
@@ -54,7 +54,7 @@ export const allowedAfterLandings = (Takeoff: Takeoff): LandingStance[] => {
         case "front-vanish":
             return ["semi","mega","hyper","fake-mega"];
         case "regular":
-            return ["frontside","semi","mega","hyper","complete"];
+            return ["frontside","mega","hyper","complete"];
         case "backside":
             return ["backside","complete"];
         case "fake-backside":
