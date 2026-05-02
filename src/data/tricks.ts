@@ -175,7 +175,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "starting with his back to the target, the practitioner jumps and " +
       "after a 180° spin, performs an outside crescent or hook kick.",
     tutorialUrl: "https://youtube.com/shorts/oG13xxzFGB0?si=rDU5iWhvVf2qVf8W",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "hyper",
   },
   {
@@ -187,7 +187,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 that lands on both feet with an extra 90° turn.",
     tutorialUrl: "https://www.youtube.com/watch?v=7Iaq33DHnm4",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "frontside",
   },
   {
@@ -251,8 +251,8 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "a sideways 360 somersault in the air.",
     tutorialUrl: "https://www.youtube.com/watch?v=00UsLr4LcMs",
-    takeoff: "frontside",
-    landingStance: "frontside",
+    takeoff: "pop",
+    landingStance: "fake-mega",
   },
   {
     id: "macaco",
@@ -390,7 +390,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 shuriken with a round kick as well.",
     tutorialUrl: "https://www.youtube.com/watch?v=OtJ8Fk8pZEM",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "fake-mega",
   },
   {
@@ -414,7 +414,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A pop 360 landing on the kicking leg.",
     tutorialUrl: "https://www.youtube.com/watch?v=HwWPw6Hgx_Q",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "fake-mega",
   },
   {
@@ -426,7 +426,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A tornado kick from a pop setup. (jumping off both feet)",
     tutorialUrl: "https://www.youtube.com/watch?v=UYEVnH1WN0E",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "fake-mega",
   },
   {
@@ -707,7 +707,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "An outside flip that takes off of two feet and with piked legs and has" +
       " varying degrees of rotation. Not to be confused with a piked sideflip, the hips never rise over the chest in a doubleleg.",
     tutorialUrl: "https://www.youtube.com/watch?v=RrvbIXSzT9Y",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "backside",
   },
   {
@@ -815,7 +815,7 @@ const TRICKS_DATA_RAW: Trick[] = [
       "From a setup, the practitioner jumps and spins 540° degrees and then" +
       " performs a hook kick towards the target.",
     tutorialUrl: "https://www.youtube.com/watch?v=0A5R0VejgJQ",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "hyper",
   },
   {
@@ -930,7 +930,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 1,
     description: "A 180° turn into a split kick from a pop or cheat setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=KM6Wsh74LEQ",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "backside",
   },
   {
@@ -1150,7 +1150,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     description:
       "A Pop 720 with two kicks, an outside crescent / hook kick where a Pop 360 would kick, and the regular hook kick at the end.",
     tutorialUrl: "https://www.youtube.com/shorts/ELo11Q7LuW0",  
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "hyper",
   },
   {
@@ -1174,7 +1174,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     difficulty: 2,
     description: "A Pop Tornado landing on the kicking leg.\nSame as a 540 kick but from a pop setup.",
     tutorialUrl: "https://www.youtube.com/watch?v=n34HUjvQibM",
-    takeoff: "frontside",
+    takeoff: "pop",
     landingStance: "hyper",
   },
   {
@@ -1317,7 +1317,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     prerequisites: ["swing_720", "backside_900"],
     difficulty: 3,
     description: "Similar to a Backside 900 but from a swing setup.\nSimilar to a Cork Round but completely vertical",
-    tutorialUrl: "https://www.youtube.com/watch?v=DM9w0Eu61sI",
+    tutorialUrl: "https://www.youtube.com/watch?v=Gi7yVq-OQLc&t=1s",
     takeoff: "swing",
     landingStance: "fake-mega",
   },

@@ -14,7 +14,8 @@ export type LandingStance =
       "fake-mega";// tornado
       
 export type Takeoff = 
-"frontside" | //frontflip, pop kicks
+"frontside" | //frontflip,
+  "pop" | //pop 360
    "front-vanish" | //raiz, gumbi
     "regular" | // cartwheel, btwist
      "backside" | //backflip, 
@@ -37,7 +38,7 @@ export const allowedTakeoffs = (landingStance: LandingStance): Takeoff[] => {
         case "backside":
             return ["backside", "fake-backside"];
         case "hyper":
-            return ["frontside", "front-vanish", "regular", "fake-backside", "master-swing", "wrap", "back-vanish"];
+            return ["pop", "front-vanish", "regular", "fake-backside", "master-swing", "wrap", "back-vanish"];
         case "complete":
             return ["regular", "backside", "fake-backside", "swing", "back-vanish", "master-swing"];
         case "fake-mega":

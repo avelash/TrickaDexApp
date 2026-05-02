@@ -8,7 +8,7 @@ import {
     Alert,
     StatusBar,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { useSavedCombos } from '../hooks/useSavedCombos';
 import { useNavigation } from '@react-navigation/native';
@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 export const SavedCombosScreen: React.FC = () => {
     const { savedCombos, deleteCombo } = useSavedCombos();
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
 
     const handleCopyCombo = async (comboText: string) => {
         await Clipboard.setStringAsync(comboText);
@@ -53,7 +54,7 @@ export const SavedCombosScreen: React.FC = () => {
             <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
                 <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => navigation.goBack()}
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
     header: {
         backgroundColor: '#4ECDC4',
         padding: 20,
-        paddingTop: 36,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
