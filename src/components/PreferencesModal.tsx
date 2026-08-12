@@ -9,6 +9,7 @@ import {
     Switch,
 } from 'react-native';
 import { SKILL_LEVELS } from '../data/skillLevels';
+import { useLanguage, useLabels } from '../i18n';
 
 export interface PreferencesState {
     onlyLandedTricks: boolean;
@@ -31,6 +32,8 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
     onSave,
 }) => {
     const [localPreferences, setLocalPreferences] = useState<PreferencesState>(preferences);
+    const { t } = useLanguage();
+    const { levelLabel } = useLabels();
 
     // Sync local state when preferences prop changes
     useEffect(() => {
@@ -87,7 +90,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>Preferences</Text>
+                    <Text style={styles.modalTitle}>{t('prefs.title')}</Text>
 
                     <ScrollView
                         style={styles.scrollContainer}
@@ -96,7 +99,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                         {/* Only Landed Tricks Toggle */}
                         <View style={styles.settingSection}>
                             <View style={styles.settingHeader}>
-                                <Text style={styles.settingLabel}>Include Only Landed Tricks</Text>
+                                <Text style={styles.settingLabel}>{t('prefs.onlyLanded')}</Text>
                                 <Switch
                                     value={localPreferences.onlyLandedTricks}
                                     onValueChange={handleLandedTricksToggle}
@@ -108,7 +111,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
 
                         {/* Min Level Dropdown */}
                         <View style={styles.settingSection}>
-                            <Text style={styles.settingLabel}>Minimum Level</Text>
+                            <Text style={styles.settingLabel}>{t('prefs.minLevel')}</Text>
                             <View style={styles.levelSelector}>
                                 {SKILL_LEVELS.map(level => (
                                     <TouchableOpacity
@@ -127,7 +130,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                                                 styles.levelButtonTextActive,
                                             ]}
                                         >
-                                            {level.name}
+                                            {levelLabel(level.number)}
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
@@ -136,7 +139,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
 
                         {/* Max Level Dropdown */}
                         <View style={styles.settingSection}>
-                            <Text style={styles.settingLabel}>Maximum Level</Text>
+                            <Text style={styles.settingLabel}>{t('prefs.maxLevel')}</Text>
                             <View style={styles.levelSelector}>
                                 {SKILL_LEVELS.map(level => (
                                     <TouchableOpacity
@@ -155,7 +158,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                                                 styles.levelButtonTextActive,
                                             ]}
                                         >
-                                            {level.name}
+                                            {levelLabel(level.number)}
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
@@ -163,7 +166,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                         </View>
                         {/* Number of Tricks for Random */}
                         <View style={styles.settingSection}>
-                            <Text style={styles.settingLabel}>Random combo size</Text>
+                            <Text style={styles.settingLabel}>{t('prefs.comboSize')}</Text>
                             <View style={styles.stepperContainer}>
                                 <TouchableOpacity
                                     style={styles.stepperButton}
@@ -183,7 +186,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                                     <Text style={styles.stepperButtonText}>+</Text>
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.hintText}>Choose how many tricks the Random button should pick (1–10).</Text>
+                            <Text style={styles.hintText}>{t('prefs.comboSizeHint')}</Text>
                         </View>
                     </ScrollView>
 
@@ -193,13 +196,13 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                             style={styles.cancelButton}
                             onPress={onClose}
                         >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                            <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.saveButton}
                             onPress={handleSave}
                         >
-                            <Text style={styles.saveButtonText}>Save</Text>
+                            <Text style={styles.saveButtonText}>{t('common.save')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

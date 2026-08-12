@@ -25,10 +25,15 @@ import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserName } from '../hooks/useUserDetails';
 import { easterEggNames } from '../data/easterEggs';
+import { useLanguage, useLabels, LANGUAGE_LABELS, Language } from '../i18n';
 
 interface ProfileStats {
-    focus: string;
+    /** Translation key suffix for the focus subtitle, e.g. 'wellRounded'. */
+    focusKey: string;
+    /** English SKILL_LEVELS name, kept for filtering. 'Unranked' when none. */
     currentLevel: string;
+    /** Index into SKILL_LEVELS, or -1 when unranked. */
+    currentLevelIdx: number;
     levelProgressPct: number;
     totalLanded: number;
 }
@@ -53,14 +58,14 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
         });
 
         const totalTypes = typeCounts.kick + typeCounts.flip + typeCounts.twist;
-        let focus = 'Well Rounded';
+        let focus = 'wellRounded';
         if (totalTypes > 0) {
             const kickPct = (typeCounts.kick / totalTypes) * 100;
             const flipPct = (typeCounts.flip / totalTypes) * 100;
             const twistPct = (typeCounts.twist / totalTypes) * 100;
-            if (kickPct > 45) focus = 'Kicker';
-            else if (flipPct > 45) focus = 'Flipper';
-            else if (twistPct > 45) focus = 'Twister';
+            if (kickPct > 45) focus = 'kicker';
+            else if (flipPct > 45) focus = 'flipper';
+            else if (twistPct > 45) focus = 'twister';
         }
 
         const tricksByTier: { [tier: number]: number } = {};
@@ -85,11 +90,12 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
                 : 0;
         }
 
-        if (currentLevelIdx === -1 || landedTrickIds.length < 10) focus = 'New to tricks';
+        if (currentLevelIdx === -1 || landedTrickIds.length < 10) focus = 'newToTricks';
 
         return {
-            focus,
+            focusKey: focus,
             currentLevel: currentLevelIdx >= 0 ? SKILL_LEVELS[currentLevelIdx].name : 'Unranked',
+            currentLevelIdx,
             levelProgressPct,
             totalLanded: landedTrickIds.length,
         };
@@ -112,6 +118,8 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
     type RootNav = NativeStackNavigationProp<RootStackParamList>;
     const rootNavigation = useNavigation<RootNav>();
 
+    const { t, language, setLanguage } = useLanguage();
+    const { levelLabel } = useLabels();
     const { landedTricks } = useTrickProgress();
     const stats = useProfileStats(landedTricks);
     const insets = useSafeAreaInsets();
@@ -221,18 +229,20 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                         )}
                     </View>
 
-                    <Text style={styles.focusSubtitle}>{getFocusSubtitle(userName, stats.focus)}</Text>
+                    <Text style={styles.focusSubtitle}>{getFocusSubtitle(userName, t(`profile.${stats.focusKey}` as any))}</Text>
                     <View style={styles.divider} />
 
                     <View style={styles.levelSection}>
-                        <Text style={styles.levelLabel}>CURRENT LEVEL</Text>
+                        <Text style={styles.levelLabel}>{t('profile.currentLevel')}</Text>
                         <Text style={[styles.levelTitle, { color: getLevelColor(stats.currentLevel) }]}>
-                            {stats.currentLevel}
+                            {stats.currentLevelIdx >= 0
+                                ? levelLabel(stats.currentLevelIdx)
+                                : t('profile.unranked')}
                         </Text>
                     </View>
 
                     <View style={styles.progressSection}>
-                        <Text style={styles.levelLabel}>LEVEL PROGRESS</Text>
+                        <Text style={styles.levelLabel}>{t('profile.levelProgress')}</Text>
                         <TouchableOpacity onPress={handleProgressBarPress}>
                             <View style={styles.progressBarBgHorizontal}>
                                 <Animated.View
@@ -256,14 +266,14 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                             style={styles.allLevelsButton}
                             activeOpacity={0.6}
                         >
-                            <Text style={styles.allLevelsText}>all levels progress</Text>
+                            <Text style={styles.allLevelsText}>{t('profile.allLevelsProgress')}</Text>
                             <Text style={styles.allLevelsArrow}>›</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View>
                         <View style={{ marginBottom: 24 }}>
-                            <Text style={[styles.levelLabel, { marginBottom: 12 }]}>Next Tricks to Master</Text>
+                            <Text style={[styles.levelLabel, { marginBottom: 12 }]}>{t('profile.nextTricks')}</Text>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 {suggestedTricks.map(trick => (
                                     <TrickCard key={trick.id} trick={trick} isLanded={true} onToggle={() => { }} onInfo={handleInfo} />
@@ -288,9 +298,38 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                                 activeOpacity={0.6}
                             >
 
-                                <Text style={styles.allLevelsText}>All next Learns</Text>
+                                <Text style={styles.allLevelsText}>{t('profile.allNextLearns')}</Text>
                                 <Text style={styles.allLevelsArrow}>›</Text>
                             </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <View style={styles.divider} />
+
+                    <View style={styles.languageSection}>
+                        <Text style={styles.levelLabel}>{t('profile.language')}</Text>
+                        <View style={styles.languageOptions}>
+                            {(Object.keys(LANGUAGE_LABELS) as Language[]).map(code => (
+                                <TouchableOpacity
+                                    key={code}
+                                    style={[
+                                        styles.languageButton,
+                                        language === code && styles.languageButtonActive,
+                                    ]}
+                                    onPress={() => setLanguage(code)}
+                                    accessibilityRole="button"
+                                    accessibilityState={{ selected: language === code }}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.languageButtonText,
+                                            language === code && styles.languageButtonTextActive,
+                                        ]}
+                                    >
+                                        {LANGUAGE_LABELS[code]}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
                 </View>
@@ -308,8 +347,8 @@ const styles = StyleSheet.create({
     backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     backIcon: { width: 24, height: 24, tintColor: 'white', resizeMode: 'contain' },
     profileCard: { marginHorizontal: 20, marginTop: -20, backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },
-    userName: { fontSize: 32, fontWeight: 'bold', color: '#1F2937', marginBottom: 8, textAlign: 'left' },
-    focusSubtitle: { fontSize: 18, fontWeight: '600', color: '#6B7280', marginBottom: 16, textAlign: 'left' },
+    userName: { fontSize: 32, fontWeight: 'bold', color: '#1F2937', marginBottom: 8, textAlign: 'auto' },
+    focusSubtitle: { fontSize: 18, fontWeight: '600', color: '#6B7280', marginBottom: 16, textAlign: 'auto' },
     divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 16 },
     levelSection: { marginBottom: 24 },
     levelLabel: { fontSize: 12, fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 },
@@ -322,4 +361,17 @@ const styles = StyleSheet.create({
     allLevelsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, paddingHorizontal: 4 },
     allLevelsText: { fontSize: 12, fontWeight: '700', color: '#4ECDC4', textTransform: 'uppercase', letterSpacing: 0.6 },
     allLevelsArrow: { fontSize: 20, color: '#9CA3AF', fontWeight: '300' },
+    languageSection: { marginTop: 4 },
+    languageOptions: { flexDirection: 'row', gap: 10, marginTop: 12 },
+    languageButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 18,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        backgroundColor: '#FFF',
+    },
+    languageButtonActive: { backgroundColor: '#4ECDC4', borderColor: '#4ECDC4' },
+    languageButtonText: { fontSize: 14, fontWeight: '600', color: '#6B7280' },
+    languageButtonTextActive: { color: '#FFF' },
 });

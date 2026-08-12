@@ -18,6 +18,7 @@ import type { ProfileStackParamList } from '../navigation/MainTabsNavigator'
 
 import { TRICKS_DATA } from '../data/tricks';
 import { SKILL_LEVELS } from '../data/skillLevels';
+import { useLanguage, useLabels } from '../i18n';
 import { useTrickProgress } from '../hooks/useTrickProgress';
 
 type AllLevelsProgressNavigationProp = NativeStackNavigationProp<
@@ -40,6 +41,8 @@ interface LevelProgressBarProps {
 }
 
 const LevelProgressBar: React.FC<LevelProgressBarProps> = ({ level, onPress }) => {
+    const { t } = useLanguage();
+    const { levelLabel } = useLabels();
     const animatedWidth = useRef(new Animated.Value(0)).current;
     const [displayedPct, setDisplayedPct] = useState(0);
     const [showMastered, setShowMastered] = useState(false);
@@ -89,9 +92,9 @@ const LevelProgressBar: React.FC<LevelProgressBarProps> = ({ level, onPress }) =
             ]}
         >
             <View style={styles.levelHeader}>
-                <Text style={styles.levelName}>{level.name}</Text>
+                <Text style={styles.levelName}>{levelLabel(level.tier)}</Text>
                 <Text style={styles.levelStats}>
-                    {level.landed} / {level.total} tricks
+                    {t('progress.levelStats', { landed: level.landed, total: level.total })}
                 </Text>
             </View>
 
@@ -118,7 +121,7 @@ const LevelProgressBar: React.FC<LevelProgressBarProps> = ({ level, onPress }) =
                         ]}
                     >
                         {showMastered ? (
-                            <Text style={styles.masteredText}>Mastered</Text>
+                            <Text style={styles.masteredText}>{t('progress.mastered')}</Text>
                         ) : displayedPct > 15 ? (
                             <Text style={styles.progressText}>{displayedPct}%</Text>
                         ) : null}
@@ -142,6 +145,7 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
     const navigation = useNavigation<ProfileNav>();
     type RootNav = NativeStackNavigationProp<RootStackParamList>;
     const rootNavigation = useNavigation<RootNav>();
+    const { t } = useLanguage();
     const { landedTricks } = useTrickProgress();
     const insets = useSafeAreaInsets();
 
@@ -198,7 +202,7 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
                         style={styles.backIcon}
                     />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Level Progress</Text>
+                <Text style={styles.headerTitle}>{t('progress.title')}</Text>
             </View>
 
             <ScrollView
@@ -207,7 +211,7 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
                 showsVerticalScrollIndicator={false}
             >
                 <Text style={styles.subtitle}>
-                    Track your progress across all skill levels
+                    {t('progress.subtitle')}
                 </Text>
 
                 <View style={styles.levelsList}>
@@ -221,9 +225,9 @@ type ProfileNav = NativeStackNavigationProp<ProfileStackParamList, 'AllLevelsPro
                 </View>
 
                 <View style={styles.summaryCard}>
-                    <Text style={styles.summaryTitle}>Overall Progress</Text>
+                    <Text style={styles.summaryTitle}>{t('progress.overall')}</Text>
                     <Text style={styles.summaryText}>
-                        {totalLanded} / {TRICKS_DATA.length} tricks landed
+                        {t('progress.overallStats', { landed: totalLanded, total: TRICKS_DATA.length })}
                     </Text>
                 </View>
             </ScrollView>

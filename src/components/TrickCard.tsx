@@ -1,6 +1,7 @@
 import React, {memo } from "react";
 import { Linking, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { Trick } from "../types";
+import { useTrickText } from "../i18n";
 
 interface TrickCardProps {
     trick: Trick;
@@ -15,6 +16,8 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
     onToggle,
     onInfo,
 }) => {
+    const { trickName } = useTrickText();
+
     return (
         <View style={styles.cardContainer}>
             <TouchableOpacity
@@ -47,7 +50,7 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                     numberOfLines={1}
                     ellipsizeMode="tail"
                 >
-                    {trick.name}
+                    {trickName(trick)}
                 </Text>
                 <TouchableOpacity onPress={() => onInfo(trick)}>
                     <Image

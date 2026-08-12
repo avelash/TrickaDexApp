@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLanguage } from "../i18n";
 import { SavedCombo } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 
 const STORAGE_KEY = "@TrickaDexApp_savedCombos";
 
 export const useSavedCombos = () => {
+  const { t } = useLanguage();
   const [savedCombos, setSavedCombos] = useState<SavedCombo[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -33,7 +35,7 @@ export const useSavedCombos = () => {
   const saveCombo = (comboText: string, title: string = "") => {
     const newCombo: SavedCombo = {
       id: Date.now().toString(),
-      title: title.trim() || "Untitled Combo",
+      title: title.trim() || t("savedCombos.untitled"),
       comboText,
       timestamp: Date.now(),
     };

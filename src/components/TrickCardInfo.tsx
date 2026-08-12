@@ -15,6 +15,7 @@ import {
 import { Trick } from "../types";
 import { TRICKS_DATA } from "../data/tricks";
 import { SKILL_LEVELS } from "../data/skillLevels";
+import { useLanguage, useLabels, useTrickText } from "../i18n";
 import { useTrickFavorites } from "../hooks/useTrickFavorites";
 import { useExcludedTricks } from "../hooks/useExcludedTricks";
 
@@ -99,6 +100,11 @@ const styles = StyleSheet.create({
     textAlign: "justify",
     marginBottom: 12,
   },
+  // Hebrew body copy reads right-to-left; the surrounding layout stays LTR.
+  paragraphRTL: {
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
   difficulty: {
     fontWeight: "bold",
     color: "#2C3E50",
@@ -169,6 +175,9 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
   trick,
   onClose,
 }) => {
+  const { t, isRTL } = useLanguage();
+  const { levelLabel } = useLabels();
+  const { trickName, trickDescription, trickNameById } = useTrickText();
   const { isTrickFavorite, toggleFavorite } = useTrickFavorites();
   const { isTrickExcluded, toggleExcluded } = useExcludedTricks();
   const isFavorite = isTrickFavorite(trick.id);
@@ -180,18 +189,18 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
       : "#000";
   const skillLevelName =
     typeof trick.difficulty === "number"
-      ? SKILL_LEVELS[trick.difficulty].name
-      : "Unknown";
+      ? levelLabel(trick.difficulty)
+      : t("common.unknown");
 
   const preReqNames =
     trick.prerequisites && trick.prerequisites.length > 0
       ? trick.prerequisites
         .map((id: string) => {
-          const found = TRICKS_DATA.find((t) => t.id === id);
-          return found ? found.name : id;
+          const found = TRICKS_DATA.find((item) => item.id === id);
+          return found ? trickNameById(id, found.name) : id;
         })
         .join(", ")
-      : "None";
+      : t("common.none");
 
   const anim = useRef(new Animated.Value(0)).current;
 
@@ -246,7 +255,7 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           {/* Title */}
           <View style={styles.headerRow}>
-            <Text style={styles.name}>{trick.name}</Text>
+            <Text style={styles.name}>{trickName(trick)}</Text>
             <TouchableOpacity
               style={styles.favoriteButton}
               onPress={() => toggleFavorite(trick.id)}
@@ -267,18 +276,18 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
           </View>
 
           {/* Main text section */}
-          <Text style={styles.paragraph}>
-            {trick.description}{"\n\n"}
+          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>
+            {trickDescription(trick)}{"\n\n"}
             <Text style={styles.difficulty}>
-              Skill Level:
+              {t("trickInfo.skillLevel")}
             </Text>
             {"   "}
             <Text style={{ color: skillLevelColor }}>{skillLevelName}</Text>
 
           </Text>
 
-          <Text style={styles.paragraph}>
-            <Text style={styles.preReq}>Prerequisites:</Text> {preReqNames}.
+          <Text style={[styles.paragraph, isRTL && styles.paragraphRTL]}>
+            <Text style={styles.preReq}>{t("trickInfo.prerequisites")}</Text> {preReqNames}.
           </Text>
 
           {trick.tutorialUrl && (
@@ -286,7 +295,7 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
               style={styles.tutorialButton}
               onPress={() => Linking.openURL(trick.tutorialUrl!)}
             >
-              <Text style={styles.tutorialButtonText}>Watch Tutorial</Text>
+              <Text style={styles.tutorialButtonText}>{t("trickInfo.watchTutorial")}</Text>
             </TouchableOpacity>
           )}
 
@@ -299,7 +308,7 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
           <View style={styles.checkboxRender}>
             {isExcluded && <View style={styles.checkboxInner} />}
           </View>
-          <Text style={styles.checkboxLabel}>Do not include in random combos</Text>
+          <Text style={styles.checkboxLabel}>{t("trickInfo.excludeFromRandom")}</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>

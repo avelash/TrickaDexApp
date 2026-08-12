@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
 import { useUserName } from '../hooks/useUserDetails';
+import { useLanguage, useLabels, trickMatchesSearch, findFilterByName } from '../i18n';
 
 
 type TrickListScreenNavigationProp = NativeStackNavigationProp<
@@ -32,10 +33,13 @@ interface TrickRow {
     id: string;
     type: 'section-header' | 'trick-row';
     levelName?: string;
+    levelIndex?: number;
     tricks?: Trick[];
 }
 
 export const TrickListScreen: React.FC = () => {
+    const { t } = useLanguage();
+    const { levelLabel } = useLabels();
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
     const { isTrickFavorite } = useTrickFavorites();
     const insets = useSafeAreaInsets();
@@ -89,12 +93,10 @@ export const TrickListScreen: React.FC = () => {
 
         // Check if search matches a valid filter name from FILTER_CONFIG
         if (search && !activeFilters.includes(search)) {
-            const matchedFilter = FILTER_CONFIG.find(
-                filter => filter.name.toLowerCase() === search.toLowerCase()
-            );
+            const matchedFilter = findFilterByName(search);
 
             if (matchedFilter) {
-                filtersToApply.push(matchedFilter.name);
+                filtersToApply.push(matchedFilter);
             }
         }
 
@@ -127,10 +129,8 @@ export const TrickListScreen: React.FC = () => {
         }
 
         // Apply text search filter for tricks that don't match filter names
-        if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
-            tricks = tricks.filter(trick =>
-                trick.name.toLowerCase().includes(search.toLowerCase())
-            );
+        if (search && !findFilterByName(search)) {
+            tricks = tricks.filter(trick => trickMatchesSearch(trick, search));
         }
 
         return tricks;
@@ -157,6 +157,7 @@ export const TrickListScreen: React.FC = () => {
                 id: `header-${idx}`,
                 type: 'section-header',
                 levelName,
+                levelIndex: idx,
             });
 
             // Add trick rows (2 per row)
@@ -186,7 +187,11 @@ export const TrickListScreen: React.FC = () => {
 
     const renderItem = useCallback(({ item }: { item: TrickRow }) => {
         if (item.type === 'section-header') {
-            return <Text style={styles.levelTitle}>{item.levelName}</Text>;
+            return (
+                <Text style={styles.levelTitle}>
+                    {item.levelIndex !== undefined ? levelLabel(item.levelIndex) : item.levelName}
+                </Text>
+            );
         }
 
         return (
@@ -203,25 +208,25 @@ export const TrickListScreen: React.FC = () => {
                 ))}
             </View>
         );
-    }, [isTrickLanded, handleToggleTrick, handleInfo]);
+    }, [isTrickLanded, handleToggleTrick, handleInfo, levelLabel]);
 
     const renderEmptyState = useCallback(() => (
         <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
                 {activeFilters.length > 0
-                    ? 'No tricks match the selected filters'
-                    : 'No tricks found'}
+                    ? t('trickList.noMatch')
+                    : t('trickList.empty')}
             </Text>
             {activeFilters.length > 0 && (
                 <TouchableOpacity
                     onPress={() => setActiveFilters([])}
                     style={styles.clearFiltersButton}
                 >
-                    <Text style={styles.clearFiltersText}>Clear filters</Text>
+                    <Text style={styles.clearFiltersText}>{t('trickList.clearFilters')}</Text>
                 </TouchableOpacity>
             )}
         </View>
-    ), [activeFilters]);
+    ), [activeFilters, t]);
 
     const keyExtractor = useCallback((item: TrickRow) => item.id, []);
 
@@ -232,10 +237,10 @@ export const TrickListScreen: React.FC = () => {
             {/* Header */}
             <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
                 <View style={styles.headerRow}>
-                    <Text style={styles.headerTitle}>Trickadex</Text>
+                    <Text style={styles.headerTitle}>{t('trickList.title')}</Text>
                     <TouchableOpacity
                         style={styles.menuButton}
-                        accessibilityLabel="Feedback"
+                        accessibilityLabel={t('trickList.feedback')}
                         onPress={() => {
 
                             rootNavigation.navigate('FeedbackScreen');

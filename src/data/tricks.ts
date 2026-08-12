@@ -219,7 +219,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     landingStance: "backside",
   },
   {
-    id: " aerial",
+    id: "aerial",
     name: "Aerial",
     icon: aerial,
     types: ["flip", "transition"],

@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Animated, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Trick } from '../types';
+import { scrollAlongFromEvent } from '../utils/comboDragGeometry';
+import { useLanguage, useTrickText } from '../i18n';
 
 interface ComboDropZoneProps {
     tricks: Trick[];
@@ -13,8 +15,10 @@ interface ComboDropZoneProps {
     draggedTrick: Trick | null;
     draggedTrickOriginIndex?: number | null;
     scrollViewRef?: React.RefObject<ScrollView | null>;
-    onStartScroll?: (direction: 'left' | 'right') => void;
+    onStartScroll?: (direction: 'back' | 'forward') => void;
     onStopScroll?: () => void;
+    /** Reports scroll position in distance-along-sequence terms. */
+    onScrollMetrics?: (metrics: { scrollAlong: number; contentWidth: number; viewportWidth: number }) => void;
     onDragStartComboTrick?: (trick: Trick, index: number, layout: { x: number; y: number; width: number; height: number }) => void;
     onDragMoveComboTrick?: (translateX: number, translateY: number) => void;
     onDragEndComboTrick?: () => void;
@@ -41,6 +45,7 @@ const DraggableComboCard: React.FC<DraggableComboCardProps> = ({
 }) => {
     const viewRef = useRef<View>(null);
     const dragStartedRef = useRef(false);
+    const { trickName } = useTrickText();
 
     const onGestureEvent = (event: any) => {
         const movementDistance = Math.sqrt(event.translationX ** 2 + event.translationY ** 2);
@@ -118,16 +123,24 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
     onStopScroll,
     onDragStartComboTrick,
     onDragMoveComboTrick,
-    onDragEndComboTrick
+    onDragEndComboTrick,
+    onScrollMetrics
 }) => {
     const viewRef = useRef<View>(null);
+    const { t, isRTL } = useLanguage();
 
     const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        // We'll handle auto-scroll in the drag move handler instead
-        if (onStopScroll) {
-            onStopScroll();
+        // The scroll view is the source of truth for scroll position; the drag
+        // handler needs it in sequence terms, not physical pixels.
+        if (onScrollMetrics) {
+            const { contentSize, layoutMeasurement } = event.nativeEvent;
+            onScrollMetrics({
+                scrollAlong: scrollAlongFromEvent(event.nativeEvent, isRTL),
+                contentWidth: contentSize.width,
+                viewportWidth: layoutMeasurement.width,
+            });
         }
-    }, [onStopScroll]);
+    }, [onScrollMetrics, isRTL]);
 
     // Clean up auto-scroll when unmounting
     useEffect(() => {
@@ -160,8 +173,8 @@ export const ComboDropZone: React.FC<ComboDropZoneProps> = ({
                 style={[styles.emptyDropZone, isOver && styles.dropZoneActive]}
             >
                 <Image style={styles.emptyDropZoneIcon} source={require('../../assets/down-arrow.png')} resizeMethod='resize'/>
-                <Text style={styles.emptyDropZoneText}>Drag tricks here</Text>
-                <Text style={styles.emptyDropZoneSubtext}>Build your combo by dragging tricks from above</Text>
+                <Text style={styles.emptyDropZoneText}>{t('dropZone.title')}</Text>
+                <Text style={styles.emptyDropZoneSubtext}>{t('dropZone.subtitle')}</Text>
             </View>
         );
     }

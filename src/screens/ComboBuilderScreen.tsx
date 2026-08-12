@@ -35,6 +35,13 @@ import { useTrickFavorites } from '../hooks/useTrickFavorites';
 import { useRandomCombo } from '../hooks/useRandomCombo';
 import { useTrickFiltering } from '../hooks/useTrickFiltering';
 import { useExcludedTricks } from '../hooks/useExcludedTricks';
+import { useLanguage, useLabels, useTrickText } from '../i18n';
+import {
+    autoScrollDirection,
+    insertIndexAt,
+    isPointInside,
+    physicalScrollX,
+} from '../utils/comboDragGeometry';
 
 type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
     ComboStackParamList,
@@ -44,6 +51,9 @@ type ComboBuilderScreenNavigationProp = NativeStackNavigationProp<
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const ComboBuilderScreen: React.FC = () => {
+    const { t, isRTL } = useLanguage();
+    const { transitionLabel } = useLabels();
+    const { trickName } = useTrickText();
     const { isTrickLanded } = useTrickProgress();
     const { saveCombo } = useSavedCombos();
     const insets = useSafeAreaInsets();
@@ -73,31 +83,36 @@ export const ComboBuilderScreen: React.FC = () => {
     const [isOverDropZone, setIsOverDropZone] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
     const [draggedTrickOriginIndex, setDraggedTrickOriginIndex] = useState<number | null>(null);
-    const [scrollOffset, setScrollOffset] = useState(0);
+    const [scrollMetrics, setScrollMetrics] = useState({
+        scrollAlong: 0,
+        contentWidth: 0,
+        viewportWidth: 0,
+    });
+    const scrollMetricsRef = useRef(scrollMetrics);
+    scrollMetricsRef.current = scrollMetrics;
     const dragTranslateX = useRef(new Animated.Value(0)).current;
     const dragTranslateY = useRef(new Animated.Value(0)).current;
     const scrollViewRef = useRef<ScrollView | null>(null);
     const autoScrollTimer = useRef<NodeJS.Timeout | null>(null);
 
-    const startAutoScroll = useCallback((direction: 'left' | 'right') => {
-        if (!autoScrollTimer.current && scrollViewRef.current) {
-            const scrollAmount = direction === 'right' ? 20 : -20;
+    const startAutoScroll = useCallback((direction: 'back' | 'forward') => {
+        if (autoScrollTimer.current || !scrollViewRef.current) return;
 
-            autoScrollTimer.current = setInterval(() => {
-                const scrollView = scrollViewRef.current;
-                if (scrollView) {
-                    setScrollOffset(prev => {
-                        const newOffset = Math.max(0, prev + scrollAmount);
-                        scrollView.scrollTo({
-                            x: newOffset,
-                            animated: false
-                        });
-                        return newOffset;
-                    });
-                }
-            }, 50);
-        }
-    }, []);
+        const step = direction === 'forward' ? 20 : -20;
+
+        autoScrollTimer.current = setInterval(() => {
+            const scrollView = scrollViewRef.current;
+            if (!scrollView) return;
+
+            const { scrollAlong, contentWidth, viewportWidth } = scrollMetricsRef.current;
+            const nextAlong = Math.max(0, scrollAlong + step);
+
+            scrollView.scrollTo({
+                x: physicalScrollX(nextAlong, contentWidth, viewportWidth, isRTL),
+                animated: false,
+            });
+        }, 50);
+    }, [isRTL]);
 
     const stopAutoScroll = useCallback(() => {
         if (autoScrollTimer.current) {
@@ -118,54 +133,37 @@ export const ComboBuilderScreen: React.FC = () => {
         dragTranslateX.setValue(translateX);
         dragTranslateY.setValue(translateY);
 
-        if (dragStartPosition && dropZoneLayout) {
-            const currentX = dragStartPosition.x + translateX;
-            const currentY = dragStartPosition.y + translateY;
+        if (!dragStartPosition || !dropZoneLayout) return;
 
-            // Check if over drop zone
-            const isOver = currentX >= dropZoneLayout.x &&
-                currentX <= dropZoneLayout.x + dropZoneLayout.width &&
-                currentY >= dropZoneLayout.y &&
-                currentY <= dropZoneLayout.y + dropZoneLayout.height;
+        const pointerX = dragStartPosition.x + translateX;
+        const pointerY = dragStartPosition.y + translateY;
 
-            setIsOverDropZone(isOver);
+        const isOver = isPointInside(dropZoneLayout, pointerX, pointerY);
+        setIsOverDropZone(isOver);
 
-            if (isOver) {
-                // Calculate relative X position within drop zone
-                const relativeX = currentX - dropZoneLayout.x;
-
-                // Check if we're near the edges for auto-scroll
-                const scrollZoneSize = 60; // pixels from edge that triggers scroll
-
-                if (relativeX < scrollZoneSize && relativeX >= 0) {
-                    // Near left edge, scroll left
-                    startAutoScroll('left');
-                } else if (relativeX > dropZoneLayout.width - scrollZoneSize && relativeX <= dropZoneLayout.width) {
-                    // Near right edge, scroll right
-                    startAutoScroll('right');
-                } else {
-                    stopAutoScroll();
-                }
-
-                // Calculate hover index based on X position within drop zone
-                // Account for scroll offset and use midpoint logic
-                const CARD_WIDTH = 130; // card width + spacing (120 + 10 spacing)
-                const CARD_HALF_WIDTH = CARD_WIDTH / 2;
-
-                // Add scroll offset to relative position
-                const adjustedX = relativeX + scrollOffset;
-
-                // Calculate index using midpoint logic
-                // If we're past the midpoint of a card, we should insert at the next index
-                const newHoverIndex = Math.round(adjustedX / CARD_WIDTH);
-
-                setHoverIndex(Math.min(newHoverIndex, comboTricks.length));
-            } else {
-                setHoverIndex(null);
-                stopAutoScroll();
-            }
+        if (!isOver) {
+            setHoverIndex(null);
+            stopAutoScroll();
+            return;
         }
-    }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll, scrollOffset]);
+
+        const scrollDirection = autoScrollDirection(dropZoneLayout, pointerX, isRTL);
+        if (scrollDirection) {
+            startAutoScroll(scrollDirection);
+        } else {
+            stopAutoScroll();
+        }
+
+        setHoverIndex(
+            insertIndexAt(
+                dropZoneLayout,
+                pointerX,
+                scrollMetricsRef.current.scrollAlong,
+                comboTricks.length,
+                isRTL
+            )
+        );
+    }, [dragStartPosition, dropZoneLayout, comboTricks.length, startAutoScroll, stopAutoScroll, isRTL]);
 
     const handleDragStartComboTrick = useCallback((trick: Trick, index: number, layout: { x: number; y: number; width: number; height: number }) => {
         setDraggedTrick(trick);
@@ -216,7 +214,7 @@ export const ComboBuilderScreen: React.FC = () => {
     }, []);
 
     // Handle trick drop
-    const handleTrickDrop = useCallback((trick: Trick, position: number) => {
+    const handleTrickDrop = useCallback((trick: Trick) => {
         if (isOverDropZone && hoverIndex !== null) {
             setComboTricks(prev => {
                 const newCombo = [...prev];
@@ -257,7 +255,7 @@ export const ComboBuilderScreen: React.FC = () => {
             const nextTrick = comboTricks[i + 1];
 
             // Add current trick name
-            parts.push(currentTrick.name);
+            parts.push(trickName(currentTrick));
 
             // If there's a next trick, check if we can add a transition
             if (nextTrick && currentTrick.landingStance && nextTrick.takeoff) {
@@ -265,28 +263,28 @@ export const ComboBuilderScreen: React.FC = () => {
                 if (nextTrick.name.toLowerCase().startsWith(transition.toLowerCase())) {
                     //do nothing
                 } else {
-                    parts.push(transition);
+                    parts.push(transitionLabel(transition));
                 }
             }
         }
 
         return parts.join(' ');
-    }, [comboTricks]);
+    }, [comboTricks, trickName, transitionLabel]);
 
     // Save combo
     const handleSaveCombo = useCallback(() => {
         if (!comboText) {
-            Alert.alert('No Combo', 'Please build a combo before saving.');
+            Alert.alert(t('combo.noComboTitle'), t('combo.noComboMessage'));
             return;
         }
         setSaveComboModalVisible(true);
-    }, [comboText]);
+    }, [comboText, t]);
 
     const handleSaveComboConfirm = useCallback((title: string) => {
         saveCombo(comboText, title);
         setSaveComboModalVisible(false);
-        Alert.alert('Saved!', 'Your combo has been saved.');
-    }, [comboText, saveCombo]);
+        Alert.alert(t('combo.savedTitle'), t('combo.savedMessage'));
+    }, [comboText, saveCombo, t]);
 
     // Navigate to saved combos
     const handleViewSavedCombos = useCallback(() => {
@@ -318,12 +316,12 @@ export const ComboBuilderScreen: React.FC = () => {
                                     style={styles.preferencesIcon}
                                 />
                             </TouchableOpacity>
-                            <Text style={styles.headerTitle}>Combo Builder</Text>
+                            <Text style={styles.headerTitle}>{t('combo.title')}</Text>
                             <TouchableOpacity
                                 style={styles.myCombosButton}
                                 onPress={handleViewSavedCombos}
                             >
-                                <Text style={styles.myCombosButtonText}>My Combos</Text>
+                                <Text style={styles.myCombosButtonText}>{t('combo.myCombos')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -346,14 +344,14 @@ export const ComboBuilderScreen: React.FC = () => {
                     {activeFilters.length > 0 && (
                         <View style={styles.filterSummary}>
                             <Text style={styles.filterSummaryText}>
-                                {filteredTricks.length} trick{filteredTricks.length !== 1 ? 's' : ''} available
+                                {t('combo.tricksAvailable', { count: filteredTricks.length })}
                             </Text>
                         </View>
                     )}
 
                     {/* Horizontal Scrollable Trick List */}
                     <View style={styles.trickListContainer}>
-                        <Text style={styles.sectionTitle}>Your Tricks</Text>
+                        <Text style={styles.sectionTitle}>{t('combo.yourTricks')}</Text>
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -377,8 +375,8 @@ export const ComboBuilderScreen: React.FC = () => {
                                 <View style={styles.emptyState}>
                                     <Text style={styles.emptyStateText}>
                                         {activeFilters.length > 0
-                                            ? 'No tricks match the selected filters'
-                                            : 'No landed tricks yet'}
+                                            ? t('combo.noMatch')
+                                            : t('combo.noLanded')}
                                     </Text>
                                 </View>
                             )}
@@ -388,20 +386,20 @@ export const ComboBuilderScreen: React.FC = () => {
                     {/* Drop Zone */}
                     <View style={styles.dropZoneContainer}>
                         <View style={styles.dropZoneHeader}>
-                            <Text style={styles.sectionTitle}>Build Your Combo</Text>
+                            <Text style={styles.sectionTitle}>{t('combo.build')}</Text>
                             <View style={styles.buttonGroup}>
                                 <TouchableOpacity
                                     style={styles.randomButton}
                                     onPress={handleRandomComboPress}
                                 >
-                                    <Text style={styles.randomButtonText}>Random</Text>
+                                    <Text style={styles.randomButtonText}>{t('combo.random')}</Text>
                                 </TouchableOpacity>
                                 {comboTricks.length > 0 && (
                                     <TouchableOpacity
                                         style={styles.clearButton}
                                         onPress={handleClearCombo}
                                     >
-                                        <Text style={styles.clearButtonText}>Clear</Text>
+                                        <Text style={styles.clearButtonText}>{t('common.clear')}</Text>
                                     </TouchableOpacity>
                                 )}
                             </View>
@@ -418,6 +416,7 @@ export const ComboBuilderScreen: React.FC = () => {
                             scrollViewRef={scrollViewRef}
                             onStartScroll={startAutoScroll}
                             onStopScroll={stopAutoScroll}
+                            onScrollMetrics={setScrollMetrics}
                             onDragStartComboTrick={handleDragStartComboTrick}
                             onDragMoveComboTrick={handleDragMove}
                             onDragEndComboTrick={handleDragEndComboTrick}
@@ -427,13 +426,13 @@ export const ComboBuilderScreen: React.FC = () => {
                     {/* Combo Text Display */}
                     <View style={styles.comboTextContainer}>
                         <View style={styles.comboTextHeader}>
-                            <Text style={styles.comboTextLabel}>Combo:</Text>
+                            <Text style={styles.comboTextLabel}>{t('combo.label')}</Text>
                             {comboText && (
                                 <TouchableOpacity
                                     style={styles.saveComboButton}
                                     onPress={handleSaveCombo}
                                 >
-                                    <Text style={styles.saveComboButtonText}>Save Combo</Text>
+                                    <Text style={styles.saveComboButtonText}>{t('combo.save')}</Text>
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -446,7 +445,7 @@ export const ComboBuilderScreen: React.FC = () => {
                                     <Text style={[styles.comboText, { flex: 1 }]} >{comboText}</Text>
                                     <TouchableOpacity onPress={() => {
                                         Clipboard.setStringAsync(comboText);
-                                        Alert.alert("Your combo has been copied to the clipboard.");
+                                        Alert.alert(t('combo.copiedToClipboard'));
                                     }}
                                         style={{ flexShrink: 0 }}
                                     >
@@ -455,7 +454,7 @@ export const ComboBuilderScreen: React.FC = () => {
                                 </View>
                             ) : (
                                 <Text style={styles.comboTextEmpty}>
-                                    Drag tricks to build your combo
+                                    {t('combo.emptyHint')}
                                 </Text>
                             )}
                         </ScrollView>

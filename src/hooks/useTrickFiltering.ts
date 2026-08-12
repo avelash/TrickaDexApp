@@ -3,6 +3,7 @@ import { TRICKS_DATA } from '../data/tricks';
 import { FILTER_CONFIG } from '../data/filterConfigs';
 import { SKILL_LEVELS } from '../data/skillLevels';
 import { Trick } from '../types';
+import { trickMatchesSearch, findFilterByName } from '../i18n/search';
 
 export const useTrickFiltering = (
     preferences: any, 
@@ -34,10 +35,8 @@ export const useTrickFiltering = (
 
         // Match search text to filter categories
         if (search && !activeFilters.includes(search)) {
-            const matchedFilter = FILTER_CONFIG.find(
-                filter => filter.name.toLowerCase() === search.toLowerCase()
-            );
-            if (matchedFilter) filtersToApply.push(matchedFilter.name);
+            const matchedFilter = findFilterByName(search);
+            if (matchedFilter) filtersToApply.push(matchedFilter);
         }
 
         if (filtersToApply.length === 0 && !search) return tricks;
@@ -56,8 +55,8 @@ export const useTrickFiltering = (
             });
         }
 
-        if (search && !FILTER_CONFIG.some(f => f.name.toLowerCase() === search.toLowerCase())) {
-            tricks = tricks.filter(trick => trick.name.toLowerCase().includes(search.toLowerCase()));
+        if (search && !findFilterByName(search)) {
+            tricks = tricks.filter(trick => trickMatchesSearch(trick, search));
         }
 
         return tricks;

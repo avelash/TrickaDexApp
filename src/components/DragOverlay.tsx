@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, Animated } from 'react-native';
 import { Trick } from '../types';
+import { useTrickText } from '../i18n';
 
 interface DragOverlayProps {
     trick: Trick | null;
@@ -16,6 +17,7 @@ export const DragOverlay: React.FC<DragOverlayProps> = ({
     translateY,
 }) => {
     const scale = useRef(new Animated.Value(1)).current;
+    const { trickName } = useTrickText();
 
     useEffect(() => {
         if (trick && startPosition) {
@@ -66,7 +68,7 @@ export const DragOverlay: React.FC<DragOverlayProps> = ({
                             numberOfLines={1}
                             ellipsizeMode="tail"
                         >
-                            {trick.name}
+                            {trickName(trick)}
                         </Text>
                     </View>
                 </View>

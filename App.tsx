@@ -1,21 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Updates from 'expo-updates';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { I18nManager } from 'react-native';
-// Force LTR
-if (I18nManager.isRTL) {
-  I18nManager.allowRTL(false);
-  I18nManager.forceRTL(false);
-  Updates.reloadAsync();
-} else {
-  I18nManager.allowRTL(false);
-  I18nManager.forceRTL(false);
-}
+// Layout direction is driven by the selected language; see LanguageProvider.
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import FeedbackScreen from './src/screens/FeedbackScreen';
 import { MainTabs } from './src/navigation/MainTabsNavigator';
+import { LanguageProvider } from './src/i18n';
+import { runMigrations } from './src/data/migrations';
 
 export type RootStackParamList = {
   WelcomeScreen: undefined;
@@ -26,6 +19,14 @@ export type RootStackParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const [migrated, setMigrated] = useState(false);
+
+  // Migrations rewrite stored trick ids, so they must finish before any screen
+  // mounts and reads progress/favorites/excluded state.
+  useEffect(() => {
+    runMigrations().finally(() => setMigrated(true));
+  }, []);
+
   useEffect(() => {
     async function checkForUpdates() {
       try {
@@ -43,18 +44,22 @@ export default function App() {
     checkForUpdates();
   }, []);
 
+  if (!migrated) return null;
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <RootStack.Navigator
-          initialRouteName="WelcomeScreen"
-          screenOptions={{ headerShown: false }}
-        >
-          <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-          <RootStack.Screen name="MainTabs" component={MainTabs} />
-          <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
-        </RootStack.Navigator>
-      </NavigationContainer>
+      <LanguageProvider>
+        <NavigationContainer>
+          <RootStack.Navigator
+            initialRouteName="WelcomeScreen"
+            screenOptions={{ headerShown: false }}
+          >
+            <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+            <RootStack.Screen name="MainTabs" component={MainTabs} />
+            <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
+          </RootStack.Navigator>
+        </NavigationContainer>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Keyboard, Image, ScrollView, Dimensions, BackHandler } from 'react-native';
 import { FILTER_CONFIG, FilterConfig } from '../data/filterConfigs';
+import { useLanguage, useLabels } from '../i18n';
 
 interface SearchBarProps {
     filters: string[];
@@ -40,6 +41,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     searchOpen: externalSearchOpen,
     setSearchOpen: externalSetSearchOpen
 }) => {
+    const { t, isRTL } = useLanguage();
+    const { filterLabel, categoryLabel } = useLabels();
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [searchOpenLocal, setSearchOpenLocal] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -140,7 +143,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     <TouchableOpacity
                         onPress={handleCloseOverlay}
                         style={styles.iconButton}
-                        accessibilityLabel="Close search"
+                        accessibilityLabel={t('search.close')}
                         accessibilityRole="button"
                     >
                         <Image
@@ -152,7 +155,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     <TouchableOpacity
                         onPress={handleIconPress}
                         style={styles.iconButton}
-                        accessibilityLabel="Open search"
+                        accessibilityLabel={t('search.open')}
                         accessibilityRole="button"
                     >
                         <Image
@@ -167,24 +170,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     <View
                         style={styles.filterChipsContainer}
                         accessibilityRole="list"
-                        accessibilityLabel="Active filters"
+                        accessibilityLabel={t('search.activeFilters')}
                     >
                         {activeFilterConfigs.map((filterConfig) => (
                             <View
                                 key={filterConfig.name}
                                 style={[styles.filterBox, { backgroundColor: filterConfig.color }]}
-                                accessibilityLabel={`Filter: ${filterConfig.name}`}
+                                accessibilityLabel={`${t('filter.category.type')}: ${filterLabel(filterConfig.name)}`}
                             >
                                 <Image
                                     source={filterConfig.icon}
                                     style={styles.filterBoxIcon}
                                     resizeMethod='resize'
                                 />
-                                <Text style={styles.filterBoxText}>{filterConfig.name}</Text>
+                                <Text style={styles.filterBoxText}>{filterLabel(filterConfig.name)}</Text>
                                 <TouchableOpacity
                                     onPress={() => handleRemoveFilter(filterConfig.name)}
                                     style={styles.filterBoxClose}
-                                    accessibilityLabel={`Remove ${filterConfig.name} filter`}
+                                    accessibilityLabel={filterLabel(filterConfig.name)}
                                     accessibilityRole="button"
                                 >
                                     <Text style={styles.filterBoxCloseText}>✕</Text>
@@ -201,14 +204,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                         styles.input,
                         !showInput && styles.inputHidden
                     ]}
-                    placeholder={!isSearchOpen ? "Search tricks or filter..." : ""}
+                    placeholder={!isSearchOpen ? t('search.placeholder') : ""}
                     value={searchText}
                     onChangeText={handleChange}
                     onFocus={handleFocus}
                     placeholderTextColor="#999"
-                    accessibilityLabel="Search input"
-                    accessibilityHint="Enter trick name or select a filter"
-                    textAlign="left"
+                    accessibilityLabel={t('search.inputLabel')}
+                    accessibilityHint={t('search.inputHint')}
+                    textAlign={isRTL ? 'right' : 'left'}
                     editable={true}
                 />
             </View>
@@ -223,7 +226,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     >
                         {Object.entries(GROUPED_FILTERS).map(([category, categoryFilters]) => (
                             <View key={category} style={styles.categorySection}>
-                                <Text style={styles.categoryTitle}>{category}</Text>
+                                <Text style={styles.categoryTitle}>{categoryLabel(category)}</Text>
                                 <View style={styles.categoryRow}>
                                     {categoryFilters.map((filterItem) => {
                                         const isActive = activeFilters.includes(filterItem.name);
@@ -236,7 +239,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                                                     isActive && styles.suggestionActive
                                                 ]}
                                                 onPress={() => handleFilterToggle(filterItem.name)}
-                                                accessibilityLabel={`Filter by ${filterItem.name}`}
+                                                accessibilityLabel={filterLabel(filterItem.name)}
                                                 accessibilityRole="button"
                                                 accessibilityState={{ selected: isActive }}
                                             >
@@ -249,7 +252,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                                                     styles.suggestionText,
                                                     isActive && styles.suggestionTextActive
                                                 ]}>
-                                                    {filterItem.name}
+                                                    {filterLabel(filterItem.name)}
                                                 </Text>
                                             </TouchableOpacity>
                                         );

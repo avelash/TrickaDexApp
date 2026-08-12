@@ -1,5 +1,5 @@
 // FeedbackScreen.tsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     View,
     Text,
@@ -16,8 +16,10 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+import { useLanguage } from "../i18n";
 
 const FeedbackScreen: React.FC = () => {
+    const { t } = useLanguage();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
@@ -27,12 +29,17 @@ const FeedbackScreen: React.FC = () => {
     // dropdown states
     const [open, setOpen] = useState(false);
     const [subject, setSubject] = useState("Bug Report");
-    const [items, setItems] = useState([
-        { label: "Bug Report", value: "Bug Report" },
-        { label: "Contribute to Development", value: "Contribute to Development" },
-        { label: "Contribute Funds", value: "Contribute Funds" },
-        { label: "Wrong Trick Info", value: "Wrong Trick Info" },
-    ]);
+    // Values stay English because they are submitted to the feedback backend;
+    // only the labels are translated.
+    const items = useMemo(
+        () => [
+            { label: t("feedback.subjectBug"), value: "Bug Report" },
+            { label: t("feedback.subjectContributeDev"), value: "Contribute to Development" },
+            { label: t("feedback.subjectContributeFunds"), value: "Contribute Funds" },
+            { label: t("feedback.subjectWrongInfo"), value: "Wrong Trick Info" },
+        ],
+        [t]
+    );
 
     // navigation (typed)
     type FeedbackNavigationProp = NativeStackNavigationProp<RootStackParamList, "FeedbackScreen">;
@@ -40,15 +47,15 @@ const FeedbackScreen: React.FC = () => {
 
     const validate = () => {
         if (!name || name.length > 30) {
-            Alert.alert("Validation Error", "Name is required (max 30 characters).");
+            Alert.alert(t("feedback.validationTitle"), t("feedback.validationName"));
             return false;
         }
         if (!email || email.length > 30) {
-            Alert.alert("Validation Error", "Email is required (max 30 characters).");
+            Alert.alert(t("feedback.validationTitle"), t("feedback.validationEmail"));
             return false;
         }
         if (message.length < 20 || message.length > 300) {
-            Alert.alert("Validation Error", "Message must be between 20 and 300 characters.");
+            Alert.alert(t("feedback.validationTitle"), t("feedback.validationMessage"));
             return false;
         }
         return true;
@@ -77,13 +84,13 @@ const FeedbackScreen: React.FC = () => {
 
             if (!response.ok) throw new Error("Network response was not ok");
 
-            Alert.alert("✅ Success", "Your feedback was sent successfully!");
+            Alert.alert(t("feedback.successTitle"), t("feedback.successMessage"));
             setName("");
             setEmail("");
             setMessage("");
             setSubject("Bug Report");
         } catch (error) {
-            Alert.alert("❌ Error", "Failed to send feedback. Please try again later.");
+            Alert.alert(t("feedback.errorTitle"), t("feedback.errorMessage"));
             console.error(error);
         } finally {
             setLoading(false);
@@ -101,10 +108,10 @@ const FeedbackScreen: React.FC = () => {
             </View>
 
             <View style={[styles.card, { top: insets.top + 40 }]}>
-                <Text style={styles.title}>Send Feedback</Text>
+                <Text style={styles.title}>{t("feedback.title")}</Text>
 
                 <TextInput
-                    placeholder="Your Name"
+                    placeholder={t("feedback.namePlaceholder")}
                     value={name}
                     onChangeText={setName}
                     maxLength={30}
@@ -112,7 +119,7 @@ const FeedbackScreen: React.FC = () => {
                 />
 
                 <TextInput
-                    placeholder="Your Email"
+                    placeholder={t("feedback.emailPlaceholder")}
                     value={email}
                     onChangeText={setEmail}
                     maxLength={30}
@@ -128,8 +135,8 @@ const FeedbackScreen: React.FC = () => {
                         items={items}
                         setOpen={setOpen}
                         setValue={setSubject}
-                        setItems={setItems}
-                        placeholder="Select subject"
+                        setItems={() => { }}
+                        placeholder={t("feedback.subjectPlaceholder")}
                         style={styles.dropdown}
                         dropDownContainerStyle={styles.dropdownContainer}
                         textStyle={styles.dropdownText}
@@ -141,7 +148,7 @@ const FeedbackScreen: React.FC = () => {
                 </View>
 
                 <TextInput
-                    placeholder="Your Message"
+                    placeholder={t("feedback.messagePlaceholder")}
                     value={message}
                     onChangeText={setMessage}
                     multiline
@@ -158,7 +165,7 @@ const FeedbackScreen: React.FC = () => {
                     {loading ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={styles.buttonText}>Submit</Text>
+                        <Text style={styles.buttonText}>{t("feedback.submit")}</Text>
                     )}
                 </TouchableOpacity>
             </View>

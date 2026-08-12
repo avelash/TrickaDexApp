@@ -8,6 +8,7 @@ import {
     StyleSheet,
     ScrollView,
 } from 'react-native';
+import { useLanguage } from '../i18n';
 
 interface SaveComboModalProps {
     visible: boolean;
@@ -23,6 +24,7 @@ export const SaveComboModal: React.FC<SaveComboModalProps> = ({
     onCancel,
 }) => {
     const [title, setTitle] = useState('');
+    const { t } = useLanguage();
 
     const handleSave = () => {
         onSave(title);
@@ -43,22 +45,22 @@ export const SaveComboModal: React.FC<SaveComboModalProps> = ({
         >
             <View style={styles.overlay}>
                 <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Save Combo</Text>
+                    <Text style={styles.modalTitle}>{t('saveCombo.title')}</Text>
 
                     <View style={styles.comboTextContainer}>
-                        <Text style={styles.comboLabel}>Combo:</Text>
+                        <Text style={styles.comboLabel}>{t('saveCombo.comboLabel')}</Text>
                         <ScrollView style={styles.comboScroll} showsVerticalScrollIndicator={false}>
                             <Text style={styles.comboText}>{comboText}</Text>
                         </ScrollView>
                     </View>
 
                     <View style={styles.inputContainer}>
-                        <Text style={styles.inputLabel}>Title (optional):</Text>
+                        <Text style={styles.inputLabel}>{t('saveCombo.titleLabel')}</Text>
                         <TextInput
                             style={styles.input}
                             value={title}
                             onChangeText={setTitle}
-                            placeholder="Enter combo title..."
+                            placeholder={t('saveCombo.placeholder')}
                             placeholderTextColor="#999"
                             maxLength={50}
                         />
@@ -69,13 +71,13 @@ export const SaveComboModal: React.FC<SaveComboModalProps> = ({
                             style={[styles.button, styles.cancelButton]}
                             onPress={handleCancel}
                         >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                            <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.button, styles.saveButton]}
                             onPress={handleSave}
                         >
-                            <Text style={styles.saveButtonText}>Save</Text>
+                            <Text style={styles.saveButtonText}>{t('common.save')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

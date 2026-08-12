@@ -2,17 +2,19 @@ import { useCallback } from 'react';
 import { Alert } from 'react-native';
 import { Trick } from '../types';
 import { transitions, allowedAfterLandings } from '../data/stances';
+import { useLanguage } from '../i18n';
 
 export const useRandomCombo = (
     filteredTricks: Trick[], 
     trickCountPreference: number
 ) => {
-    
+    const { t } = useLanguage();
+
     const generateRandomCombo = useCallback((): Trick[] | null => {
         const count = Math.max(1, Math.round(trickCountPreference ?? 3));
 
         if (filteredTricks.length < count) {
-            Alert.alert('Not Enough Tricks', `You need at least ${count} tricks available.`);
+            Alert.alert(t('random.notEnoughTitle'), t('random.notEnoughMessage', { count }));
             return null;
         }
         
@@ -144,7 +146,7 @@ export const useRandomCombo = (
         }
 
         if (reversedCombo.length < count) {
-            Alert.alert('Could Not Generate', 'Could not find a valid combination after many attempts. Try adding more tricks.');
+            Alert.alert(t('random.failedTitle'), t('random.failedMessage'));
             return null;
         }
 

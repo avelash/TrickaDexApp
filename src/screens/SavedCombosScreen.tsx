@@ -12,25 +12,27 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as Clipboard from 'expo-clipboard';
 import { useSavedCombos } from '../hooks/useSavedCombos';
 import { useNavigation } from '@react-navigation/native';
+import { useLanguage } from '../i18n';
 
 export const SavedCombosScreen: React.FC = () => {
     const { savedCombos, deleteCombo } = useSavedCombos();
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
+    const { t, language } = useLanguage();
 
     const handleCopyCombo = async (comboText: string) => {
         await Clipboard.setStringAsync(comboText);
-        Alert.alert('Copied!', 'Combo has been copied to clipboard.');
+        Alert.alert(t('savedCombos.copiedTitle'), t('savedCombos.copiedMessage'));
     };
 
     const handleDeleteCombo = (comboId: string, title: string) => {
         Alert.alert(
-            'Delete Combo',
-            `Are you sure you want to delete "${title}"?`,
+            t('savedCombos.deleteTitle'),
+            t('savedCombos.deleteMessage', { title }),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                    text: 'Delete',
+                    text: t('common.delete'),
                     style: 'destructive',
                     onPress: () => deleteCombo(comboId),
                 },
@@ -40,7 +42,7 @@ export const SavedCombosScreen: React.FC = () => {
 
     const formatDate = (timestamp: number) => {
         const date = new Date(timestamp);
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
@@ -61,7 +63,7 @@ export const SavedCombosScreen: React.FC = () => {
                 >
                     <Text style={styles.backButtonText}>←</Text>
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>My Combos</Text>
+                <Text style={styles.headerTitle}>{t('savedCombos.title')}</Text>
                 <View style={styles.backButton} />
             </View>
 
@@ -69,9 +71,9 @@ export const SavedCombosScreen: React.FC = () => {
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
                 {savedCombos.length === 0 ? (
                     <View style={styles.emptyState}>
-                        <Text style={styles.emptyStateText}>No saved combos yet</Text>
+                        <Text style={styles.emptyStateText}>{t('savedCombos.empty')}</Text>
                         <Text style={styles.emptyStateSubtext}>
-                            Save combos from the Combo Builder to see them here
+                            {t('savedCombos.emptyHint')}
                         </Text>
                     </View>
                 ) : (
@@ -87,13 +89,13 @@ export const SavedCombosScreen: React.FC = () => {
                                     style={styles.copyButton}
                                     onPress={() => handleCopyCombo(combo.comboText)}
                                 >
-                                    <Text style={styles.copyButtonText}>Copy</Text>
+                                    <Text style={styles.copyButtonText}>{t('common.copy')}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.deleteButton}
                                     onPress={() => handleDeleteCombo(combo.id, combo.title)}
                                 >
-                                    <Text style={styles.deleteButtonText}>Delete</Text>
+                                    <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

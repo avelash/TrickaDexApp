@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, StatusBar, Image, Dimensions, TextInput, Button, Modal } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, Image, Dimensions, TextInput, Button, Modal, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../App'; // adjust path if needed
+import { useLanguage, LANGUAGE_LABELS, Language } from '../i18n';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'WelcomeScreen'>;
 
@@ -12,6 +13,7 @@ export const WelcomeScreen: React.FC = () => {
     const navigation = useNavigation<WelcomeScreenNavigationProp>();
     const { width, height } = Dimensions.get('window');
 
+    const { t, language, setLanguage, isRTL } = useLanguage();
     const [name, setName] = useState('');
     const [showNameModal, setShowNameModal] = useState(false);
 
@@ -91,22 +93,48 @@ export const WelcomeScreen: React.FC = () => {
                 />
             ))}
             <View style={styles.centerContent}>
-                <Text style={styles.appName}>TrickaDex</Text>
-                <Text style={styles.subtitle}>Track your tricking journey</Text>
+                <Text style={styles.appName}>{t('welcome.title')}</Text>
+                <Text style={styles.subtitle}>{t('welcome.subtitle')}</Text>
             </View>
 
             {/* Name input modal */}
             <Modal visible={showNameModal} transparent={true} animationType="fade">
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.label}>What's your name?</Text>
+                        <Text style={styles.label}>{t('welcome.language')}</Text>
+                        <View style={styles.languageOptions}>
+                            {(Object.keys(LANGUAGE_LABELS) as Language[]).map(code => (
+                                <TouchableOpacity
+                                    key={code}
+                                    style={[
+                                        styles.languageButton,
+                                        language === code && styles.languageButtonActive,
+                                    ]}
+                                    onPress={() => setLanguage(code)}
+                                    accessibilityRole="button"
+                                    accessibilityState={{ selected: language === code }}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.languageButtonText,
+                                            language === code && styles.languageButtonTextActive,
+                                        ]}
+                                    >
+                                        {LANGUAGE_LABELS[code]}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <Text style={styles.label}>{t('welcome.namePrompt')}</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Enter your name"
+                            placeholder={t('welcome.namePlaceholder')}
                             value={name}
                             onChangeText={setName}
+                            textAlign={isRTL ? 'right' : 'left'}
                         />
-                        <Button title="Save" onPress={handleSaveName} />
+                        <Button title={t('common.save')} onPress={handleSaveName} />
                     </View>
                 </View>
             </Modal>
@@ -162,6 +190,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: { fontSize: 18, marginBottom: 10 },
+    languageOptions: { flexDirection: 'row', gap: 10, marginBottom: 22 },
+    languageButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+    languageButtonActive: { backgroundColor: '#4ECDC4', borderColor: '#4ECDC4' },
+    languageButtonText: { fontSize: 15, fontWeight: '600', color: '#666' },
+    languageButtonTextActive: { color: '#fff' },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',

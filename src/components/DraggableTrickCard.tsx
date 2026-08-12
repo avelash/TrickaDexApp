@@ -5,10 +5,12 @@ import {
     GestureDetector,
 } from 'react-native-gesture-handler';
 import { Trick } from '../types';
+import { useTrickText } from '../i18n';
+import { isPointInside } from '../utils/comboDragGeometry';
 
 interface DraggableTrickCardProps {
     trick: Trick;
-    onDrop: (trick: Trick, position: number) => void;
+    onDrop: (trick: Trick) => void;
     dropZoneLayout?: { x: number; y: number; width: number; height: number } | null;
     comboTricks?: Trick[];
     onDragStart?: (layout: { x: number; y: number; width: number; height: number }) => void;
@@ -26,6 +28,7 @@ const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
     onDragMove,
     onDragEnd,
 }) => {
+    const { trickName } = useTrickText();
     const cardLayout = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
     const viewRef = useRef<View>(null);
     const dragStartedRef = useRef(false);
@@ -55,22 +58,10 @@ const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         }
     };
 
-    const calculateDropPosition = (absoluteX: number, absoluteY: number): number => {
-        if (!dropZoneLayout || comboTricks.length === 0) return 0;
-
-        const isOverDropZone =
-            absoluteX >= dropZoneLayout.x &&
-            absoluteX <= dropZoneLayout.x + dropZoneLayout.width &&
-            absoluteY >= dropZoneLayout.y &&
-            absoluteY <= dropZoneLayout.y + dropZoneLayout.height;
-
-        if (!isOverDropZone) return -1;
-
-        const CARD_WIDTH = 163;
-        const relativeX = absoluteX - dropZoneLayout.x;
-        const position = Math.floor(relativeX / CARD_WIDTH);
-        return Math.max(0, Math.min(position, comboTricks.length));
-    };
+    // The screen owns the insert index (it tracks hover position and scroll),
+    // so this only decides whether the drop lands inside the zone at all.
+    const isOverDropZone = (absoluteX: number, absoluteY: number): boolean =>
+        !!dropZoneLayout && isPointInside(dropZoneLayout, absoluteX, absoluteY);
 
     const panGesture = Gesture.Pan()
         .onStart(() => {
@@ -85,9 +76,8 @@ const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
                 const draggedX = cardLayout.current.x + event.translationX;
                 const draggedY = cardLayout.current.y + event.translationY;
 
-                const dropPosition = calculateDropPosition(draggedX, draggedY);
-                if (dropPosition >= 0) {
-                    onDrop(trick, dropPosition);
+                if (isOverDropZone(draggedX, draggedY)) {
+                    onDrop(trick);
                 }
             }
 
@@ -105,7 +95,7 @@ const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
 
             <View style={styles.bottomBar}>
                 <Text style={styles.trickName} numberOfLines={1} ellipsizeMode="tail">
-                    {trick.name}
+                    {trickName(trick)}
                 </Text>
             </View>
         </View>
