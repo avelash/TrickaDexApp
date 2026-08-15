@@ -1,11 +1,21 @@
-import React, {memo } from "react";
-import { Linking, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import React, { memo, useEffect, useRef, useState } from "react";
+import { Animated, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { Trick } from "../types";
 import { useTrickText } from "../i18n";
+import { ParticleBurst } from "./celebrations/ParticleBurst";
+import { tapFeedback } from "../utils/haptics";
 
 interface TrickCardProps {
     trick: Trick;
     isLanded: boolean;
+    /** True when prerequisites are still unmet — shown as a locked card. */
+    isLocked?: boolean;
+    /**
+     * Set only when the rider just landed this trick by tapping it. Progress
+     * loads from storage asynchronously, so inferring the moment from isLanded
+     * would fire the celebration for every landed card on app open.
+     */
+    justLanded?: boolean;
     onToggle: (trickId: string) => void;
     onInfo: (trick: Trick) => void;
 }
@@ -13,10 +23,38 @@ interface TrickCardProps {
 const TrickCardComponent: React.FC<TrickCardProps> = ({
     trick,
     isLanded,
+    isLocked = false,
+    justLanded = false,
     onToggle,
     onInfo,
 }) => {
     const { trickName } = useTrickText();
+    const pop = useRef(new Animated.Value(1)).current;
+    const wasCelebrated = useRef(justLanded);
+    const [burstKey, setBurstKey] = useState(0);
+
+    // Driven by the explicit tap signal, never by isLanded changing.
+    useEffect(() => {
+        if (justLanded && !wasCelebrated.current) {
+            tapFeedback();
+            setBurstKey(key => key + 1);
+            Animated.sequence([
+                Animated.spring(pop, {
+                    toValue: 1.22,
+                    friction: 4,
+                    tension: 140,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(pop, {
+                    toValue: 1,
+                    friction: 5,
+                    tension: 120,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+        wasCelebrated.current = justLanded;
+    }, [justLanded, pop]);
 
     return (
         <View style={styles.cardContainer}>
@@ -25,12 +63,27 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                 activeOpacity={0.7}
                 onPress={() => onToggle(trick.id)}
             >
-                <View
+                <Animated.View
                     style={[
                         styles.iconContainer,
                         isLanded && styles.iconContainerLanded,
+                        { transform: [{ scale: pop }] },
                     ]}
                 >
+                    {burstKey > 0 && (
+                        <ParticleBurst
+                            burstKey={burstKey}
+                            count={10}
+                            spread={46}
+                            size={6}
+                            duration={700}
+                        />
+                    )}
+                    {isLocked && !isLanded && (
+                        <View style={styles.lockBadge}>
+                            <Text style={styles.lockGlyph}>🔒</Text>
+                        </View>
+                    )}
                     <Image
                         key={isLanded ? 'landed' : 'notLanded'}
                         source={trick.icon}
@@ -38,7 +91,7 @@ const TrickCardComponent: React.FC<TrickCardProps> = ({
                         resizeMode='contain'
                         resizeMethod='resize'
                     />
-                </View>
+                </Animated.View>
             </TouchableOpacity>
 
             <View style={styles.bottomBar}>
@@ -97,6 +150,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 10,
         overflow: "hidden",
+    },
+    lockBadge: {
+        position: 'absolute',
+        top: 6,
+        right: 8,
+        zIndex: 5,
+        opacity: 0.55,
+    },
+    lockGlyph: {
+        fontSize: 13,
     },
     iconContainerLanded: {
         backgroundColor: "#E9F7F6",

@@ -25,6 +25,7 @@ import { TrickCardInfo } from "../components/TrickCardInfo";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserName } from '../hooks/useUserDetails';
 import { easterEggNames } from '../data/easterEggs';
+import { getCurrentLevelIndex } from '../utils/progress';
 import { useLanguage, useLabels, LANGUAGE_LABELS, Language } from '../i18n';
 
 interface ProfileStats {
@@ -68,18 +69,8 @@ const useProfileStats = (landedTricks: { [key: string]: boolean }): ProfileStats
             else if (twistPct > 45) focus = 'twister';
         }
 
-        const tricksByTier: { [tier: number]: number } = {};
-        landedTrickObjects.forEach(trick => {
-            tricksByTier[trick.difficulty] = (tricksByTier[trick.difficulty] || 0) + 1;
-        });
-
-        let currentLevelIdx = -1;
-        for (let tier = 7; tier >= 0; tier--) {
-            if (tricksByTier[tier] >= 4) {
-                currentLevelIdx = tier;
-                break;
-            }
-        }
+        // Shared with the level-up celebration so both agree on the threshold.
+        const currentLevelIdx = getCurrentLevelIndex(landedTricks, TRICKS_DATA);
 
         let levelProgressPct = 0;
         if (currentLevelIdx >= 0) {
