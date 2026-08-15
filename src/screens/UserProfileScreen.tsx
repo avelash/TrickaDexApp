@@ -120,7 +120,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
     const [displayedNumber, setDisplayedNumber] = useState(0);
     const [selectedTrick, setSelectedTrick] = useState<Trick | null>(null);
 
-    const { userName, setUserName } = useUserName();
+    const { userName, setUserName, loading: nameLoading } = useUserName();
     const [isEditingName, setIsEditingName] = useState(false);
     const [editedName, setEditedName] = useState('');
 
@@ -193,7 +193,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
         setIsEditingName(false);
     };
 
-    if (userName === '') return null;
+    if (nameLoading) return null;
 
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -215,7 +215,9 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
                             />
                         ) : (
                             <TouchableOpacity activeOpacity={1} onPress={handleNamePress}>
-                                <Text style={styles.userName}>{userName}</Text>
+                                <Text style={[styles.userName, !userName && styles.userNameHint]}>
+                                    {userName || t('profile.addName')}
+                                </Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -297,6 +299,19 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = () => {
 
                     <View style={styles.divider} />
 
+                    <TouchableOpacity
+                        onPress={() =>
+                            rootNavigation.navigate('OnboardingScreen', { tricksOnly: true })
+                        }
+                        style={styles.allLevelsButton}
+                        activeOpacity={0.6}
+                    >
+                        <Text style={styles.allLevelsText}>{t('onboarding.redo')}</Text>
+                        <Text style={styles.allLevelsArrow}>›</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.divider} />
+
                     <View style={styles.languageSection}>
                         <Text style={styles.levelLabel}>{t('profile.language')}</Text>
                         <View style={styles.languageOptions}>
@@ -339,6 +354,7 @@ const styles = StyleSheet.create({
     backIcon: { width: 24, height: 24, tintColor: 'white', resizeMode: 'contain' },
     profileCard: { marginHorizontal: 20, marginTop: -20, backgroundColor: 'white', borderRadius: 16, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 6 },
     userName: { fontSize: 32, fontWeight: 'bold', color: '#1F2937', marginBottom: 8, textAlign: 'auto' },
+    userNameHint: { color: '#9CA3AF' },
     focusSubtitle: { fontSize: 18, fontWeight: '600', color: '#6B7280', marginBottom: 16, textAlign: 'auto' },
     divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 16 },
     levelSection: { marginBottom: 24 },

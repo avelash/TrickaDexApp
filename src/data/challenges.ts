@@ -1,11 +1,21 @@
 import { Trick, TrickProgress } from "../types";
 import { createRandom, hashSeed, pickOne } from "../utils/seededRandom";
 import { generateCombo } from "../utils/comboGenerator";
+import { MONTHLY_SAMPLERS } from "./samplers";
 
-export type ChallengeKind = "reps" | "learn" | "combo";
+/**
+ * Bump whenever generation rules change. Challenges are snapshotted into
+ * storage for their period, so without a version stamp a challenge issued by
+ * older code keeps being served until the period rolls over.
+ */
+export const GENERATOR_VERSION = 2;
+
+export type ChallengeKind = "reps" | "learn" | "combo" | "watch";
 
 export interface Challenge {
   kind: ChallengeKind;
+  /** Generation rules this was built with; see GENERATOR_VERSION. */
+  version?: number;
   /** Stable id for the period, so completion survives an app restart. */
   id: string;
   xp: number;
@@ -13,10 +23,15 @@ export interface Challenge {
   trickIds: string[];
   /** Rep count, only meaningful for the "reps" kind. */
   reps?: number;
+  /** Video to watch, only meaningful for the "watch" kind. */
+  url?: string;
+  /** Video title, only meaningful for the "watch" kind. Not translated. */
+  title?: string;
 }
 
 const DAILY_XP = 50;
 const WEEKLY_XP = 150;
+const MONTHLY_XP = 150;
 
 const landedTricksOf = (tricks: Trick[], landed: TrickProgress) =>
   tricks.filter(trick => landed[trick.id]);
@@ -48,6 +63,7 @@ export const generateDailyChallenge = (
     if (target) {
       return {
         kind: "learn",
+        version: GENERATOR_VERSION,
         id: `daily-${key}`,
         xp: DAILY_XP,
         trickIds: [target.id],
@@ -61,6 +77,7 @@ export const generateDailyChallenge = (
     const base = 12 - target.difficulty;
     return {
       kind: "reps",
+      version: GENERATOR_VERSION,
       id: `daily-${key}`,
       xp: DAILY_XP,
       trickIds: [target.id],
@@ -72,6 +89,7 @@ export const generateDailyChallenge = (
   return fallback
     ? {
         kind: "learn",
+        version: GENERATOR_VERSION,
         id: `daily-${key}`,
         xp: DAILY_XP,
         trickIds: [fallback.id],
@@ -99,6 +117,7 @@ export const generateWeeklyChallenge = (
 
   return {
     kind: "combo",
+    version: GENERATOR_VERSION,
     id: `weekly-${key}`,
     xp: WEEKLY_XP,
     trickIds: combo.map(trick => trick.id),
@@ -112,4 +131,23 @@ export const rankFromXp = (xp: number): number => {
   let rank = 0;
   while (xpForRank(rank + 1) <= xp) rank++;
   return rank;
+};
+
+/**
+ * Monthly sampler: a hand-picked video rather than anything generated, so it is
+ * looked up rather than seeded. Returns null for a month with no entry.
+ */
+export const generateMonthlyChallenge = (key: string): Challenge | null => {
+  const sampler = MONTHLY_SAMPLERS[key];
+  if (!sampler) return null;
+
+  return {
+    kind: "watch",
+    version: GENERATOR_VERSION,
+    id: `monthly-${key}`,
+    xp: MONTHLY_XP,
+    trickIds: [],
+    url: sampler.url,
+    title: sampler.title,
+  };
 };

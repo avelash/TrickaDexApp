@@ -38,3 +38,7 @@ export const weekKey = (date = new Date()): string => {
   copy.setDate(copy.getDate() - copy.getDay());
   return `${copy.getFullYear()}-${copy.getMonth() + 1}-${copy.getDate()}`;
 };
+
+/** Calendar-month key used for the hand-curated monthly sampler. */
+export const monthKey = (date = new Date()): string =>
+  `${date.getFullYear()}-${date.getMonth() + 1}`;

@@ -19,20 +19,22 @@ export const ChallengesScreen: React.FC = () => {
     const { landedTricks } = useTrickProgress();
     const {
         xp, rank, rankProgress, xpToNextRank, streak,
-        daily, weekly, isCompleted, complete, swapsLeft, swap,
+        daily, weekly, monthly, isCompleted, complete, swapsLeft, swap,
     } = useChallenges(TRICKS_DATA, landedTricks);
 
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
-            <StatusBar barStyle="light-content" backgroundColor="#7C3AED" hidden={true} />
+            <StatusBar barStyle="light-content" backgroundColor="#4ECDC4" hidden={true} />
 
             <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-                <Text style={styles.headerTitle}>{t('challenge.title')}</Text>
-                {streak > 0 && (
-                    <Text style={styles.streak}>
-                        🔥 {t('challenge.streak', { count: streak })}
-                    </Text>
-                )}
+                <View style={styles.headerRow}>
+                    <Text style={styles.headerTitle}>{t('challenge.title')}</Text>
+                    {streak > 0 && (
+                        <Text style={styles.streak}>
+                            🔥 {t('challenge.streak', { count: streak })}
+                        </Text>
+                    )}
+                </View>
             </View>
 
             <ScrollView
@@ -91,7 +93,19 @@ export const ChallengesScreen: React.FC = () => {
                     />
                 )}
 
-                {!daily && !weekly && (
+                {monthly && (
+                    <ChallengeCard
+                        challenge={monthly}
+                        completed={isCompleted(monthly)}
+                        accent="#F97316"
+                        periodLabel={t('challenge.monthly')}
+                        canSwap={false}
+                        onComplete={() => complete(monthly)}
+                        onSwap={() => { }}
+                    />
+                )}
+
+                {!daily && !weekly && !monthly && (
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyText}>{t('challenge.none')}</Text>
                     </View>
@@ -103,16 +117,31 @@ export const ChallengesScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F7F7F7' },
+    // Matches the trick list / saved combos header so the tabs read as one app.
     header: {
-        backgroundColor: '#7C3AED',
-        paddingHorizontal: 20,
-        paddingBottom: 18,
+        backgroundColor: '#4ECDC4',
+        padding: 20,
+        minHeight: 80,
+    },
+    headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    headerTitle: { fontSize: 30, fontWeight: 'bold', color: 'white' },
-    streak: { fontSize: 13, fontWeight: '700', color: '#FDE68A' },
+    headerTitle: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        flex: 1,
+    },
+    streak: {
+        position: 'absolute',
+        right: 0,
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#FFF7CC',
+    },
     scrollView: { flex: 1 },
     scrollContent: { padding: 15, paddingBottom: 40 },
     xpCard: {

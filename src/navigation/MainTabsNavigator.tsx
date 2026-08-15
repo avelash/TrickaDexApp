@@ -9,6 +9,7 @@ import { AllLevelsProgressScreen } from '../screens/AllLevelsProgressScreen';
 import { ComboBuilderScreen } from '../screens/ComboBuilderScreen';
 import { SavedCombosScreen } from '../screens/SavedCombosScreen';
 import { ChallengesScreen } from '../screens/ChallengesScreen';
+import { useOnboarding } from '../hooks/useOnboarding';
 
 // ---------- Param types ----------
 
@@ -107,6 +108,11 @@ function ChallengeStackNavigator() {
 export function MainTabs() {
     const FOCUSED_SIZE = 60;
     const SIZE = 40;
+    // Challenges are generated from landed tricks and frozen for the period, so
+    // showing the tab before onboarding would cache a challenge built from an
+    // empty dex. Removing the screen entirely (rather than hiding its button)
+    // also stops useChallenges mounting at all.
+    const { completed: onboarded } = useOnboarding();
     return (
         <Tab.Navigator
             initialRouteName='TrickTab'
@@ -167,25 +173,27 @@ export function MainTabs() {
                     },
                 }}
             />
-            <Tab.Screen
-                name="ChallengeTab"
-                component={ChallengeStackNavigator}
-                options={{
-                    tabBarLabel: () => null,
-                    tabBarIcon: ({ focused }) => (
-                        <Image
-                            source={require('../../assets/NextLearns.png')}
-                            style={{
-                                width: focused ? FOCUSED_SIZE : SIZE,
-                                height: focused ? FOCUSED_SIZE : SIZE,
-                                opacity: focused ? 1 : 0.8,
-                                borderRadius: 10,
-                            }}
-                            resizeMode="contain"
-                        />
-                    ),
-                }}
-            />
+            {onboarded && (
+                <Tab.Screen
+                    name="ChallengeTab"
+                    component={ChallengeStackNavigator}
+                    options={{
+                        tabBarLabel: () => null,
+                        tabBarIcon: ({ focused }) => (
+                            <Image
+                                source={require('../../assets/challenge.png')}
+                                style={{
+                                    width: focused ? FOCUSED_SIZE : SIZE,
+                                    height: focused ? FOCUSED_SIZE : SIZE,
+                                    opacity: focused ? 1 : 0.8,
+                                    borderRadius: 10,
+                                }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
+                />
+            )}
             <Tab.Screen
                 name="ComboTab"
                 component={ComboStackNavigator}
