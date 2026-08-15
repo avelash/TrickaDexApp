@@ -77,7 +77,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     name: "Backflip",
     icon: backflip,
     types: ["flip"],
-    prerequisites: ["back_roll"],
+    prerequisites: ["backwards_roll"],
     difficulty: 2,
     description: "A backwards 360° somersault in the air",
     tutorialUrl: "https://youtu.be/X9rHyckeTtg?si=eCkbCOcwsW6xNv5u",
@@ -728,7 +728,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     name: "Lazyboi",
     icon: require("../../assets/lazyboi_icon.png"),
     types: ["transition"],
-    prerequisites: ["tornado", "compasso"],
+    prerequisites: ["tornado_kick", "compasso"],
     difficulty: 1,
     description:
       "A layed back, no-kick, tornado.\noften performed with the hands behind the head or on the hips.",

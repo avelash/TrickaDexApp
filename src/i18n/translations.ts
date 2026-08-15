@@ -31,6 +31,7 @@ const en = {
   "trickList.noMatch": "No tricks match the selected filters",
   "trickList.empty": "No tricks found",
   "trickList.clearFilters": "Clear filters",
+  "trickList.found": "{count} tricks found",
 
   // Search bar
   "search.close": "Close search",
@@ -143,6 +144,37 @@ const en = {
   "feedback.successMessage": "Your feedback was sent successfully!",
   "feedback.errorMessage": "Failed to send feedback. Please try again later.",
 
+  // Celebrations
+  "celebrate.landed": "LANDED",
+  "celebrate.unlocked": "This unlocked {count} new trick(s)",
+  "celebrate.levelUpEyebrow": "LEVEL UP",
+  "celebrate.levelUpSubtitle": "You've reached a new skill level. Keep stacking.",
+  "celebrate.continue": "Let's go",
+  "common.close": "Close",
+
+  // Challenges & XP
+  "challenge.title": "Challenges",
+  "challenge.daily": "DAILY",
+  "challenge.weekly": "WEEKLY",
+  "challenge.reps": "Do {count} clean reps of {trick}",
+  "challenge.learn": "Try a new trick today: {trick}",
+  "challenge.combo": "Land this combo:",
+  "challenge.markDone": "Mark as done",
+  "challenge.done": "Completed",
+  "challenge.none": "Land a few tricks to unlock challenges",
+  "challenge.streak": "{count} day streak",
+  "challenge.swap": "Swap",
+  "challenge.swapsLeft": "{count} swaps left this week",
+  "challenge.noSwaps": "No swaps left this week",
+  "xp.rank": "DEDICATION LVL {rank}",
+  "xp.toNext": "{count} XP to the next dedication level",
+  "xp.total": "{count} XP",
+  "trickList.toNextLevel": "{count} more {level} tricks to level up",
+  "trickList.locked": "Needs {tricks}",
+  "trickList.unlearnTitle": "Un-land this trick?",
+  "trickList.unlearnMessage": "{trick} will be marked as not landed. Tricks that depend on it may lock again.",
+  "trickList.unlearnConfirm": "Un-land",
+
   // Tabs
   "tab.tricks": "Tricks",
   "tab.profile": "Profile",
@@ -233,6 +265,7 @@ const he: Record<TranslationKey, string> = {
   "trickList.noMatch": "אין טריקים שמתאימים לסינון שנבחר",
   "trickList.empty": "לא נמצאו טריקים",
   "trickList.clearFilters": "ניקוי סינון",
+  "trickList.found": "{count} טריקים נמצאו",
 
   // Search bar
   "search.close": "סגירת חיפוש",
@@ -253,7 +286,7 @@ const he: Record<TranslationKey, string> = {
   "combo.myCombos": "הקומבואים שלי",
   "combo.yourTricks": "הטריקים שלך",
   "combo.noMatch": "אין טריקים שמתאימים לסינון שנבחר",
-  "combo.noLanded": "עדיין לא נחתו טריקים",
+  "combo.noLanded": "עדיין לא  ננחתו תרגילים",
   "combo.build": "בנו את הקומבו שלכם",
   "combo.random": "אקראי",
   "combo.clear": "ניקוי",
@@ -344,6 +377,37 @@ const he: Record<TranslationKey, string> = {
   "feedback.successMessage": "המשוב שלכם נשלח בהצלחה!",
   "feedback.errorMessage": "שליחת המשוב נכשלה. נסו שוב מאוחר יותר.",
 
+  // Celebrations
+  "celebrate.landed": "נחתנ!",
+  "celebrate.unlocked": "נפתחו {count} טריקים חדשים",
+  "celebrate.levelUpEyebrow": "עלית רמה",
+  "celebrate.levelUpSubtitle": "הגעת לרמת קושי חדשה. ממשיכים לצבור.",
+  "celebrate.continue": "יאללה",
+  "common.close": "סגירה",
+
+  // Challenges & XP
+  "challenge.title": "אתגרים",
+  "challenge.daily": "יומי",
+  "challenge.weekly": "שבועי",
+  "challenge.reps": "בצעו {count} חזרות נקיות של {trick}",
+  "challenge.learn": "נסו טריק חדש היום: {trick}",
+  "challenge.combo": "תנחתו את הקומבו הזה:",
+  "challenge.markDone": "סמנו כבוצע",
+  "challenge.done": "הושלם",
+  "challenge.none": "תנחתו כמה טריקים כדי לפתוח אתגרים",
+  "challenge.streak": "רצף של {count} ימים",
+  "challenge.swap": "החלפה",
+  "challenge.swapsLeft": "נשארו {count} החלפות השבוע",
+  "challenge.noSwaps": "לא נשארו החלפות השבוע",
+  "xp.rank": "רמת מסירות {rank}",
+  "xp.toNext": "{count} XP לרמת המסירות הבאה",
+  "xp.total": "{count} XP",
+  "trickList.toNextLevel": "עוד {count} טריקים ברמת {level} כדי לעלות רמה",
+  "trickList.locked": "דורש {tricks}",
+  "trickList.unlearnTitle": "לבטל את נחיתת הטריק?",
+  "trickList.unlearnMessage": "{trick} יסומן כלא נחת. טריקים שתלויים בו עלולים להינעל שוב.",
+  "trickList.unlearnConfirm": "בטל נחיתה",
+
   // Tabs
   "tab.tricks": "טריקים",
   "tab.profile": "פרופיל",
@@ -354,7 +418,7 @@ const he: Record<TranslationKey, string> = {
   "filter.flip": "סלטה",
   "filter.twist": "טוויסט",
   "filter.transition": "מעבר",
-  "filter.landed": "נחת",
+  "filter.landed": "נחתנ",
   "filter.nextLearns": "הבא ללמידה",
   "filter.favorites": "מועדפים",
   "filter.category.level": "רמה",

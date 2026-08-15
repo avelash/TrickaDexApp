@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image,  } from 'react-native';
+import { StyleSheet, View, Text, FlatList, StatusBar, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TrickCard } from '../components/TrickCard';
 import { TrickCardInfo } from '../components/TrickCardInfo';
@@ -15,7 +15,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import type { TrickStackParamList } from '../navigation/MainTabsNavigator'
 import { useUserName } from '../hooks/useUserDetails';
-import { useLanguage, useLabels, trickMatchesSearch, findFilterByName } from '../i18n';
+import { useLanguage, useLabels, useTrickText, trickMatchesSearch, findFilterByName } from '../i18n';
+import { useCelebrations } from '../hooks/useCelebrations';
+import { getCurrentLevelIndex, TRICKS_PER_LEVEL } from '../utils/progress';
+import { UnlockToast } from '../components/celebrations/UnlockToast';
+import { LevelUpOverlay } from '../components/celebrations/LevelUpOverlay';
 
 
 type TrickListScreenNavigationProp = NativeStackNavigationProp<
@@ -40,7 +44,10 @@ interface TrickRow {
 export const TrickListScreen: React.FC = () => {
     const { t } = useLanguage();
     const { levelLabel } = useLabels();
+    const { trickName } = useTrickText();
     const { toggleTrick, isTrickLanded, landedTricks } = useTrickProgress();
+    const { landing, levelUp, celebrate, dismissLanding, dismissLevelUp } =
+        useCelebrations(TRICKS_DATA);
     const { isTrickFavorite } = useTrickFavorites();
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<TrickListScreenNavigationProp>();
@@ -51,6 +58,8 @@ export const TrickListScreen: React.FC = () => {
     const [search, setSearch] = useState<string>('');
     const [searchOpen, setSearchOpen] = useState(false);
     const [modalTrick, setModalTrick] = useState<Trick | null>(null);
+    // Set only by a tap, so celebrations never fire when progress loads.
+    const [justLandedId, setJustLandedId] = useState<string | null>(null);
     const userName = useUserName().userName;
 
     // Apply initial filter from navigation params
@@ -181,9 +190,45 @@ export const TrickListScreen: React.FC = () => {
         setModalTrick(null);
     }, []);
 
+    const applyToggle = useCallback((trickId: string) => {
+        const { before, after } = toggleTrick(trickId);
+        celebrate(trickId, before, after);
+
+        if (after[trickId] && !before[trickId]) {
+            setJustLandedId(trickId);
+        }
+    }, [toggleTrick, celebrate]);
+
+    // Clear the flag once the burst has played, so re-renders do not replay it.
+    useEffect(() => {
+        if (!justLandedId) return;
+        const timer = setTimeout(() => setJustLandedId(null), 1200);
+        return () => clearTimeout(timer);
+    }, [justLandedId]);
+
     const handleToggleTrick = useCallback((trickId: string) => {
-        toggleTrick(trickId);
-    }, [toggleTrick]);
+        // Un-landing can re-lock dependent tricks, so confirm it first.
+        if (!isTrickLanded(trickId)) {
+            applyToggle(trickId);
+            return;
+        }
+
+        const trick = TRICKS_DATA.find(item => item.id === trickId);
+        Alert.alert(
+            t('trickList.unlearnTitle'),
+            t('trickList.unlearnMessage', {
+                trick: trick ? trickName(trick) : '',
+            }),
+            [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                    text: t('trickList.unlearnConfirm'),
+                    style: 'destructive',
+                    onPress: () => applyToggle(trickId),
+                },
+            ]
+        );
+    }, [applyToggle, isTrickLanded, t, trickName]);
 
     const renderItem = useCallback(({ item }: { item: TrickRow }) => {
         if (item.type === 'section-header') {
@@ -201,6 +246,8 @@ export const TrickListScreen: React.FC = () => {
                         <TrickCard
                             trick={trick}
                             isLanded={isTrickLanded(trick.id)}
+                            isLocked={!trick.prerequisites.every(id => landedTricks[id])}
+                            justLanded={trick.id === justLandedId}
                             onToggle={handleToggleTrick}
                             onInfo={handleInfo}
                         />
@@ -208,7 +255,7 @@ export const TrickListScreen: React.FC = () => {
                 ))}
             </View>
         );
-    }, [isTrickLanded, handleToggleTrick, handleInfo, levelLabel]);
+    }, [isTrickLanded, handleToggleTrick, handleInfo, levelLabel, landedTricks, justLandedId]);
 
     const renderEmptyState = useCallback(() => (
         <View style={styles.emptyState}>
@@ -229,6 +276,22 @@ export const TrickListScreen: React.FC = () => {
     ), [activeFilters, t]);
 
     const keyExtractor = useCallback((item: TrickRow) => item.id, []);
+
+    // How many more tricks in the next tier before the rider levels up.
+    const nextLevelHint = useMemo(() => {
+        const current = getCurrentLevelIndex(landedTricks, TRICKS_DATA);
+        const target = current + 1;
+        if (target > 7) return null;
+
+        const landedInTarget = TRICKS_DATA.filter(
+            trick => trick.difficulty === target && landedTricks[trick.id]
+        ).length;
+
+        const remaining = TRICKS_PER_LEVEL - landedInTarget;
+        if (remaining <= 0) return null;
+
+        return { remaining, level: levelLabel(target) };
+    }, [landedTricks, levelLabel]);
 
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -254,6 +317,17 @@ export const TrickListScreen: React.FC = () => {
                 </View>
             </View>
 
+            {nextLevelHint && (
+                <View style={styles.levelHint}>
+                    <Text style={styles.levelHintText}>
+                        {t('trickList.toNextLevel', {
+                            count: nextLevelHint.remaining,
+                            level: nextLevelHint.level,
+                        })}
+                    </Text>
+                </View>
+            )}
+
             {/* Search Bar with Multiple Filters */}
             <SearchBar
                 filters={predefinedFilters}
@@ -268,7 +342,7 @@ export const TrickListScreen: React.FC = () => {
             {activeFilters.length > 0 && (
                 <View style={styles.filterSummary}>
                     <Text style={styles.filterSummaryText}>
-                        {filteredTricks.length} trick{filteredTricks.length !== 1 ? 's' : ''} found
+                        {t('trickList.found', { count: filteredTricks.length })}
                     </Text>
                 </View>
             )}
@@ -292,11 +366,41 @@ export const TrickListScreen: React.FC = () => {
                     <TrickCardInfo trick={modalTrick} onClose={handleCloseModal} />
                 </View>
             )}
+
+            {/* Celebrations */}
+            {landing && !modalTrick && (
+                <UnlockToast
+                    trick={landing.trick}
+                    unlocked={landing.unlocked}
+                    onDismiss={dismissLanding}
+                    onSelectTrick={(trick) => {
+                        dismissLanding();
+                        setModalTrick(trick);
+                    }}
+                />
+            )}
+
+            {levelUp !== null && (
+                <LevelUpOverlay levelIndex={levelUp} onDismiss={dismissLevelUp} />
+            )}
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    levelHint: {
+        backgroundColor: '#F1FBFA',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#DCF3F1',
+    },
+    levelHintText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#3AA9A1',
+        textAlign: 'center',
+    },
     menuButton: {
         marginRight: 10,
         padding: 4,

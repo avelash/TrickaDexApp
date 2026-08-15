@@ -8,6 +8,7 @@ import { UserProfileScreen } from '../screens/UserProfileScreen';
 import { AllLevelsProgressScreen } from '../screens/AllLevelsProgressScreen';
 import { ComboBuilderScreen } from '../screens/ComboBuilderScreen';
 import { SavedCombosScreen } from '../screens/SavedCombosScreen';
+import { ChallengesScreen } from '../screens/ChallengesScreen';
 
 // ---------- Param types ----------
 
@@ -28,10 +29,15 @@ export type ComboStackParamList = {
     SavedCombosScreen: undefined;
 };
 
+export type ChallengeStackParamList = {
+    ChallengesScreen: undefined;
+};
+
 export type MainTabParamList = {
     TrickTab: undefined;
     ProfileTab: undefined;
     ComboTab: undefined;
+    ChallengeTab: undefined;
 };
 
 // ---------- Navigators ----------
@@ -39,6 +45,7 @@ export type MainTabParamList = {
 const TrickStack = createNativeStackNavigator<TrickStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const ComboStack = createNativeStackNavigator<ComboStackParamList>();
+const ChallengeStack = createNativeStackNavigator<ChallengeStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // ---------- Stacks inside each tab ----------
@@ -81,6 +88,17 @@ function ComboStackNavigator() {
                 component={SavedCombosScreen}
             />
         </ComboStack.Navigator>
+    );
+}
+
+function ChallengeStackNavigator() {
+    return (
+        <ChallengeStack.Navigator screenOptions={{ headerShown: false }}>
+            <ChallengeStack.Screen
+                name="ChallengesScreen"
+                component={ChallengesScreen}
+            />
+        </ChallengeStack.Navigator>
     );
 }
 
@@ -147,6 +165,25 @@ export function MainTabs() {
                     tabBarItemStyle: {
                         marginBottom: 15,
                     },
+                }}
+            />
+            <Tab.Screen
+                name="ChallengeTab"
+                component={ChallengeStackNavigator}
+                options={{
+                    tabBarLabel: () => null,
+                    tabBarIcon: ({ focused }) => (
+                        <Image
+                            source={require('../../assets/NextLearns.png')}
+                            style={{
+                                width: focused ? FOCUSED_SIZE : SIZE,
+                                height: focused ? FOCUSED_SIZE : SIZE,
+                                opacity: focused ? 1 : 0.8,
+                                borderRadius: 10,
+                            }}
+                            resizeMode="contain"
+                        />
+                    ),
                 }}
             />
             <Tab.Screen

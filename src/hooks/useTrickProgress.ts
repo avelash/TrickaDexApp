@@ -30,13 +30,16 @@ export const useTrickProgress = () => {
     }
   };
 
+  /** Returns the progress either side of the toggle, for celebration checks. */
   const toggleTrick = (trickId: string) => {
-    const newProgress = {
+    const before = landedTricks;
+    const after = {
       ...landedTricks,
       [trickId]: !landedTricks[trickId],
     };
-    setLandedTricks(newProgress);
-    saveProgress(newProgress);
+    setLandedTricks(after);
+    saveProgress(after);
+    return { before, after };
   };
 
   const getLandedCount = () =>

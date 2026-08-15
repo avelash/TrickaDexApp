@@ -7,6 +7,7 @@ import {
 import { Trick } from '../types';
 import { useTrickText } from '../i18n';
 import { isPointInside } from '../utils/comboDragGeometry';
+import { dragFeedback } from '../utils/haptics';
 
 interface DraggableTrickCardProps {
     trick: Trick;
@@ -42,6 +43,7 @@ const DraggableTrickCard: React.FC<DraggableTrickCardProps> = ({
         // Trigger drag start on first significant movement
         if (movementDistance > 2 && !dragStartedRef.current && cardLayout.current && onDragStart) {
             dragStartedRef.current = true;
+            dragFeedback();
             onDragStart(cardLayout.current);
         }
 
