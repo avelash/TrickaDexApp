@@ -27,11 +27,11 @@ export const useUserName = () => {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const storedName = await AsyncStorage.getItem("userName");
-        const name = storedName || "Alex Thompson";
-        setUserNameState(name);
+        // No placeholder name: an empty value lets each screen show its own
+        // hint rather than a fake name the rider never chose.
+        setUserNameState(await AsyncStorage.getItem("userName"));
       } catch {
-        setUserNameState("Alex Thompson");
+        setUserNameState(null);
       } finally {
         setLoading(false);
       }

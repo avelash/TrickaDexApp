@@ -8,10 +8,13 @@ import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import FeedbackScreen from './src/screens/FeedbackScreen';
 import { MainTabs } from './src/navigation/MainTabsNavigator';
 import { LanguageProvider } from './src/i18n';
+import { OnboardingProvider } from './src/hooks/useOnboarding';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { runMigrations } from './src/data/migrations';
 
 export type RootStackParamList = {
   WelcomeScreen: undefined;
+  OnboardingScreen: { tricksOnly?: boolean } | undefined;
   MainTabs: undefined;
   FeedbackScreen: undefined;
 };
@@ -49,16 +52,19 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <LanguageProvider>
-        <NavigationContainer>
-          <RootStack.Navigator
-            initialRouteName="WelcomeScreen"
-            screenOptions={{ headerShown: false }}
-          >
-            <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
-            <RootStack.Screen name="MainTabs" component={MainTabs} />
-            <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
-          </RootStack.Navigator>
-        </NavigationContainer>
+        <OnboardingProvider>
+          <NavigationContainer>
+            <RootStack.Navigator
+              initialRouteName="WelcomeScreen"
+              screenOptions={{ headerShown: false }}
+            >
+              <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+              <RootStack.Screen name="OnboardingScreen" component={OnboardingScreen} />
+              <RootStack.Screen name="MainTabs" component={MainTabs} />
+              <RootStack.Screen name="FeedbackScreen" component={FeedbackScreen} />
+            </RootStack.Navigator>
+          </NavigationContainer>
+        </OnboardingProvider>
       </LanguageProvider>
     </SafeAreaProvider>
   );

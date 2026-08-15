@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Challenge } from "../data/challenges";
 import { TRICKS_DATA } from "../data/tricks";
 import { Trick } from "../types";
@@ -31,7 +31,8 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
     .map(id => TRICKS_DATA.find(trick => trick.id === id))
     .filter(Boolean) as Trick[];
 
-  if (tricks.length === 0) return null;
+  // A watch challenge is a video, so it has no tricks to resolve.
+  if (challenge.kind !== "watch" && tricks.length === 0) return null;
 
   const describe = () => {
     switch (challenge.kind) {
@@ -44,6 +45,8 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
         return t("challenge.learn", { trick: trickName(tricks[0]) });
       case "combo":
         return t("challenge.combo");
+      case "watch":
+        return t("challenge.watch");
       default:
         return "";
     }
@@ -92,7 +95,23 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
         </View>
       )}
 
-      {challenge.kind !== "combo" && (
+      {challenge.kind === "watch" && challenge.title && (
+        <Text style={styles.videoTitle}>{challenge.title}</Text>
+      )}
+
+      {challenge.kind === "watch" && challenge.url && (
+        <TouchableOpacity
+          style={[styles.watchButton, { borderColor: accent }]}
+          onPress={() => Linking.openURL(challenge.url!)}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.watchText, { color: accent }]}>
+            ▶  {t("challenge.watchButton")}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {challenge.kind !== "combo" && challenge.kind !== "watch" && (
         <View style={styles.singleRow}>
           <Image
             source={tricks[0].icon}
@@ -180,6 +199,24 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1F2937",
     lineHeight: 22,
+  },
+  videoTitle: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#475569",
+    lineHeight: 20,
+  },
+  watchButton: {
+    marginTop: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignItems: "center",
+  },
+  watchText: {
+    fontWeight: "800",
+    fontSize: 15,
   },
   singleRow: {
     alignItems: "center",
