@@ -50,6 +50,11 @@ export default function App() {
   // Gated on `migrated` so a reload can never land mid-migration. Migrations are
   // idempotent and write their flag last, so an interrupted run recovers — but
   // there is no reason to interrupt one.
+  //
+  // This duplicates the native ON_LOAD check in app.json, deliberately. The
+  // native one runs before the JS bundle loads and is the only way a bundle
+  // that fails to render can ever heal itself, so it stays. This one applies an
+  // update in the current session rather than the next launch.
   useEffect(() => {
     if (!migrated) return;
 
