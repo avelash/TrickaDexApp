@@ -11,6 +11,7 @@ import {
   readOnboardingComplete,
   setOnboardingComplete,
 } from "../data/onboarding";
+import { AppSplash } from "../components/AppSplash";
 
 interface OnboardingContextValue {
   completed: boolean;
@@ -54,7 +55,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({
     [completed, complete, reset]
   );
 
-  if (loading) return null;
+  if (loading) return <AppSplash />;
 
   return (
     <OnboardingContext.Provider value={value}>

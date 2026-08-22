@@ -11,6 +11,12 @@ import { LanguageProvider } from './src/i18n';
 import { OnboardingProvider } from './src/hooks/useOnboarding';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { runMigrations } from './src/data/migrations';
+import { AppSplash } from './src/components/AppSplash';
+import { withTimeout } from './src/utils/withTimeout';
+
+const MIGRATION_TIMEOUT_MS = 8000;
+const UPDATE_CHECK_TIMEOUT_MS = 5000;
+const UPDATE_FETCH_TIMEOUT_MS = 20000;
 
 export type RootStackParamList = {
   WelcomeScreen: undefined;
@@ -26,18 +32,37 @@ export default function App() {
 
   // Migrations rewrite stored trick ids, so they must finish before any screen
   // mounts and reads progress/favorites/excluded state.
+  //
+  // Fails open: if a storage read never settles, the timer releases the gate
+  // anyway. Blocking forever would leave the app on a blank screen with no way
+  // out, which is far worse than running with an unmigrated store.
   useEffect(() => {
-    runMigrations().finally(() => setMigrated(true));
+    const fallback = setTimeout(() => setMigrated(true), MIGRATION_TIMEOUT_MS);
+
+    runMigrations().finally(() => {
+      clearTimeout(fallback);
+      setMigrated(true);
+    });
+
+    return () => clearTimeout(fallback);
   }, []);
 
+  // Gated on `migrated` so a reload can never land mid-migration. Migrations are
+  // idempotent and write their flag last, so an interrupted run recovers — but
+  // there is no reason to interrupt one.
   useEffect(() => {
+    if (!migrated) return;
+
     async function checkForUpdates() {
       try {
-        const update = await Updates.checkForUpdateAsync();
+        const update = await withTimeout(
+          Updates.checkForUpdateAsync(),
+          UPDATE_CHECK_TIMEOUT_MS
+        );
 
         if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
-          await Updates.reloadAsync(); // 🔥 silent reload
+          await withTimeout(Updates.fetchUpdateAsync(), UPDATE_FETCH_TIMEOUT_MS);
+          await Updates.reloadAsync();
         }
       } catch (e) {
         console.log('Update check failed:', e);
@@ -45,9 +70,9 @@ export default function App() {
     }
 
     checkForUpdates();
-  }, []);
+  }, [migrated]);
 
-  if (!migrated) return null;
+  if (!migrated) return <AppSplash />;
 
   return (
     <SafeAreaProvider>

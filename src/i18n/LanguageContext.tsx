@@ -10,6 +10,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { I18nManager } from "react-native";
 import * as Updates from "expo-updates";
 import { Language, TranslationKey, translations } from "./translations";
+import { AppSplash } from "../components/AppSplash";
+import { withTimeout } from "../utils/withTimeout";
+
+const RELOAD_TIMEOUT_MS = 5000;
 
 const STORAGE_KEY = "appLanguage";
 
@@ -43,10 +47,15 @@ const applyLayoutDirection = (language: Language): boolean => {
   return needsReload;
 };
 
-const reload = () => {
-  Updates.reloadAsync().catch(error =>
-    console.error("Failed to reload after language change:", error)
-  );
+/** Resolves false when the reload could not be performed. */
+const reload = async (): Promise<boolean> => {
+  try {
+    await Updates.reloadAsync();
+    return true;
+  } catch (error) {
+    console.error("Failed to reload after language change:", error);
+    return false;
+  }
 };
 
 interface LanguageContextValue {
@@ -86,9 +95,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // A mismatch here means the app relaunched before the layout direction
         // took effect; reload once so the native side catches up.
+        //
+        // If the reload fails there is no second chance, so rendering must be
+        // released anyway — otherwise `loading` stays true and the app sits on a
+        // blank screen forever, with the layout direction merely mismatched.
         if (applyLayoutDirection(language)) {
-          reload();
-          return;
+          // A successful reload never resolves — the app restarts — so the
+          // timeout only matters when the reload silently hangs.
+          const reloaded = await withTimeout(reload(), RELOAD_TIMEOUT_MS).catch(
+            () => false
+          );
+          if (reloaded) return;
         }
       } catch (error) {
         console.error("Failed to load language:", error);
@@ -121,8 +138,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [language, setLanguage, loading]);
 
   // Hold rendering until the stored language is known, so a returning Hebrew
-  // user never sees a flash of English on the welcome screen.
-  if (loading) return null;
+  // user never sees a flash of English on the welcome screen. Show the splash
+  // rather than nothing, so a slow read never looks like a broken app.
+  if (loading) return <AppSplash />;
 
   return (
     <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
