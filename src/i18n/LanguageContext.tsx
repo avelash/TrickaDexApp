@@ -59,6 +59,13 @@ const requestLayoutDirection = (language: Language): boolean => {
   return needsReload;
 };
 
+/** Direction is correct, so a future switch gets a fresh attempt. */
+const clearDirectionAttempt = () => {
+  AsyncStorage.removeItem(DIRECTION_ATTEMPT_KEY).catch(error =>
+    console.error("Failed to clear direction attempt:", error)
+  );
+};
+
 /**
  * Reloads at most once per direction change, and only ever once.
  *
@@ -88,14 +95,17 @@ const reloadOnceForDirection = async (language: Language): Promise<boolean> => {
     return false;
   }
 
-  return requestReload("layout direction");
-};
+  const reloaded = await requestReload("layout direction");
 
-/** Direction is correct, so a future switch gets a fresh attempt. */
-const clearDirectionAttempt = () => {
-  AsyncStorage.removeItem(DIRECTION_ATTEMPT_KEY).catch(error =>
-    console.error("Failed to clear direction attempt:", error)
-  );
+  if (!reloaded) {
+    // Something else is already restarting the app (typically an update being
+    // applied). That restart re-runs this check on the next boot, so the
+    // attempt must not be counted as spent — otherwise the direction would be
+    // abandoned for a reload it never actually got.
+    clearDirectionAttempt();
+  }
+
+  return reloaded;
 };
 
 interface LanguageContextValue {
