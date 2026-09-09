@@ -13,6 +13,7 @@ import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { runMigrations } from './src/data/migrations';
 import { AppSplash } from './src/components/AppSplash';
 import { withTimeout } from './src/utils/withTimeout';
+import { requestReload } from './src/utils/appReload';
 
 const MIGRATION_TIMEOUT_MS = 8000;
 const UPDATE_CHECK_TIMEOUT_MS = 5000;
@@ -67,7 +68,7 @@ export default function App() {
 
         if (update.isAvailable) {
           await withTimeout(Updates.fetchUpdateAsync(), UPDATE_FETCH_TIMEOUT_MS);
-          await Updates.reloadAsync();
+          await requestReload('update available');
         }
       } catch (e) {
         console.log('Update check failed:', e);

@@ -8,10 +8,10 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { I18nManager } from "react-native";
-import * as Updates from "expo-updates";
 import { Language, TranslationKey, translations } from "./translations";
 import { AppSplash } from "../components/AppSplash";
 import { withTimeout } from "../utils/withTimeout";
+import { requestReload } from "../utils/appReload";
 
 const RELOAD_TIMEOUT_MS = 5000;
 
@@ -88,13 +88,7 @@ const reloadOnceForDirection = async (language: Language): Promise<boolean> => {
     return false;
   }
 
-  try {
-    await Updates.reloadAsync();
-    return true;
-  } catch (error) {
-    console.error("Failed to reload after language change:", error);
-    return false;
-  }
+  return requestReload("layout direction");
 };
 
 /** Direction is correct, so a future switch gets a fresh attempt. */
