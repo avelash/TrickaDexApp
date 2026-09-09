@@ -17,14 +17,26 @@ const RELOAD_TIMEOUT_MS = 5000;
 
 const STORAGE_KEY = "appLanguage";
 
+/**
+ * Records which direction we last spent a reload attempting. Survives the
+ * reload, which is the whole point: it is how the next boot tells "first
+ * attempt" from "this is not working".
+ */
+const DIRECTION_ATTEMPT_KEY = "appLanguageDirectionAttempt";
+
 const isRTLLanguage = (language: Language) => language === "he";
 
+const directionTarget = (language: Language) =>
+  isRTLLanguage(language) ? "rtl" : "ltr";
+
 /**
- * Aligns the native layout direction with the language. React Native only
- * picks up a direction change on a fresh JS bundle load, so this reports
- * whether a reload is needed rather than trying to apply it in place.
+ * Asks the native side for the layout direction a language needs, and reports
+ * whether a restart is still required for it to take effect.
+ *
+ * The flags set here persist natively, so they apply on the next real process
+ * start even if no reload happens now.
  */
-const applyLayoutDirection = (language: Language): boolean => {
+const requestLayoutDirection = (language: Language): boolean => {
   const shouldBeRTL = isRTLLanguage(language);
   let needsReload = false;
 
@@ -47,8 +59,35 @@ const applyLayoutDirection = (language: Language): boolean => {
   return needsReload;
 };
 
-/** Resolves false when the reload could not be performed. */
-const reload = async (): Promise<boolean> => {
+/**
+ * Reloads at most once per direction change, and only ever once.
+ *
+ * On Android, forceRTL and swapLeftAndRightInRTL only take effect on a full
+ * PROCESS restart. Updates.reloadAsync restarts just the JS bundle, so the
+ * flags read back unchanged, the same reload is requested again, and the app
+ * boot-loops forever without reaching a screen. That bricked Hebrew users, and
+ * English users on Hebrew-locale devices, who start out with isRTL already true.
+ *
+ * The attempt marker is stored before reloading and survives it, so the next
+ * boot can tell the reload did not work and render anyway. A layout direction
+ * that is merely wrong beats an app that never opens — and it self-corrects the
+ * next time the OS actually restarts the process, because the native flags were
+ * already set.
+ */
+const reloadOnceForDirection = async (language: Language): Promise<boolean> => {
+  const target = directionTarget(language);
+
+  try {
+    if ((await AsyncStorage.getItem(DIRECTION_ATTEMPT_KEY)) === target) {
+      // Already spent a reload on this direction and it did not stick.
+      return false;
+    }
+    await AsyncStorage.setItem(DIRECTION_ATTEMPT_KEY, target);
+  } catch (error) {
+    console.error("Failed to record direction attempt:", error);
+    return false;
+  }
+
   try {
     await Updates.reloadAsync();
     return true;
@@ -56,6 +95,13 @@ const reload = async (): Promise<boolean> => {
     console.error("Failed to reload after language change:", error);
     return false;
   }
+};
+
+/** Direction is correct, so a future switch gets a fresh attempt. */
+const clearDirectionAttempt = () => {
+  AsyncStorage.removeItem(DIRECTION_ATTEMPT_KEY).catch(error =>
+    console.error("Failed to clear direction attempt:", error)
+  );
 };
 
 interface LanguageContextValue {
@@ -93,19 +139,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
         const language = stored === "en" || stored === "he" ? stored : "en";
         setLanguageState(language);
 
-        // A mismatch here means the app relaunched before the layout direction
-        // took effect; reload once so the native side catches up.
-        //
-        // If the reload fails there is no second chance, so rendering must be
-        // released anyway — otherwise `loading` stays true and the app sits on a
-        // blank screen forever, with the layout direction merely mismatched.
-        if (applyLayoutDirection(language)) {
+        if (requestLayoutDirection(language)) {
           // A successful reload never resolves — the app restarts — so the
-          // timeout only matters when the reload silently hangs.
-          const reloaded = await withTimeout(reload(), RELOAD_TIMEOUT_MS).catch(
-            () => false
-          );
+          // timeout only matters when the reload silently hangs. Rendering is
+          // released in every other case, including when the attempt has
+          // already been spent, which is what stops the boot loop.
+          const reloaded = await withTimeout(
+            reloadOnceForDirection(language),
+            RELOAD_TIMEOUT_MS
+          ).catch(() => false);
           if (reloaded) return;
+        } else {
+          // Direction is already right, so a future switch gets its own attempt.
+          clearDirectionAttempt();
         }
       } catch (error) {
         console.error("Failed to load language:", error);
@@ -120,9 +166,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
     AsyncStorage.setItem(STORAGE_KEY, next)
       .catch((error) => console.error("Failed to save language:", error))
       .finally(() => {
-        // Switching between an LTR and an RTL language only takes effect on a
-        // fresh bundle load.
-        if (applyLayoutDirection(next)) reload();
+        // Spends the same single attempt as boot, so an explicit switch costs
+        // one restart rather than starting a loop of its own.
+        if (requestLayoutDirection(next)) {
+          reloadOnceForDirection(next);
+        } else {
+          clearDirectionAttempt();
+        }
       });
   }, []);
 
