@@ -1732,7 +1732,7 @@ const TRICKS_DATA_RAW: Trick[] = [
     icon: require("../../assets/fullHyperhook_icon.png"),
     types: ["flip", "twist", "kick"],
     prerequisites: ["full_twist", "full_hyper", "skip_hook"],
-    difficulty: 3,
+    difficulty: 4,
     description: "A Full Twist that finishes with a hook kick and lands on the kicking leg in hyper. Like a Backside 1080 done inverted.",
     tutorialUrl: "https://www.youtube.com/watch?v=xj-549k0rio",
     takeoff: "fake-backside",
