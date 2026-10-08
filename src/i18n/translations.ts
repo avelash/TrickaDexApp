@@ -45,6 +45,7 @@ const en = {
   "trickInfo.skillLevel": "Skill Level:",
   "trickInfo.prerequisites": "Prerequisites:",
   "trickInfo.watchTutorial": "Watch Tutorial",
+  "trickInfo.viewExample": "View Example",
   "trickInfo.excludeFromRandom": "Do not include in random combos",
 
   // Combo builder
@@ -308,6 +309,7 @@ const he: Record<TranslationKey, string> = {
   "trickInfo.skillLevel": "רמת קושי:",
   "trickInfo.prerequisites": "דרישות קדם:",
   "trickInfo.watchTutorial": "צפייה במדריך",
+  "trickInfo.viewExample": "צפייה בדוגמה",
   "trickInfo.excludeFromRandom": "אל תכלול בקומבו אקראי",
 
   // Combo builder

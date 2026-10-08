@@ -1,0 +1,1444 @@
+<title>TrickaDex Trick Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #EAF0F1;
+  --ink: #1F2D3A;
+  --muted: #5F7180;
+  --line: #DCE4E7;
+  --accent: #4ECDC4;
+  --accent-ink: #0E6A64;
+  --accent-soft: #E3F7F5;
+  --warn-ink: #8A5A00;
+  --warn-soft: #FFF3D6;
+  --bad-ink: #B42318;
+  --bad-soft: #FDE8E6;
+  --ok-ink: #1E7A4C;
+  --ok-soft: #E2F5EA;
+  --shadow: 0 1px 2px rgba(31,45,58,.06), 0 4px 16px rgba(31,45,58,.06);
+  --font: "Rubik", "Arial Hebrew", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0E171D; --surface: #15222A; --sunk: #1B2B34; --ink: #E4ECF0; --muted: #94A6B2;
+    --line: #263843; --accent: #4ECDC4; --accent-ink: #7FE0D9; --accent-soft: #153532;
+    --warn-ink: #F2C46B; --warn-soft: #3A2E12; --bad-ink: #FF8A80; --bad-soft: #3B1B19;
+    --ok-ink: #7CD9A6; --ok-soft: #16301F; --shadow: 0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0E171D; --surface: #15222A; --sunk: #1B2B34; --ink: #E4ECF0; --muted: #94A6B2;
+  --line: #263843; --accent: #4ECDC4; --accent-ink: #7FE0D9; --accent-soft: #153532;
+  --warn-ink: #F2C46B; --warn-soft: #3A2E12; --bad-ink: #FF8A80; --bad-soft: #3B1B19;
+  --ok-ink: #7CD9A6; --ok-soft: #16301F; --shadow: 0 1px 2px rgba(0,0,0,.3);
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 120px; }
+a { color: var(--accent-ink); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
+header.top h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+header.top h1 span { color: var(--accent-ink); }
+.save-state { font-size: 13px; color: var(--muted); min-height: 1.5em; }
+.save-state.err { color: var(--bad-ink); }
+
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.tab { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+.tab .n { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab[aria-selected="true"] .n { color: inherit; opacity: .75; }
+
+.layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+.layout > * { min-width: 0; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .layout.detail-open .list { display: none; }
+  .layout:not(.detail-open) .detail { display: none; }
+}
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.row { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; text-align: start; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; cursor: pointer; }
+.row:hover { border-color: var(--accent); }
+.row[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.thumb { width: 52px; height: 52px; border-radius: 10px; background: var(--sunk); display: grid; place-items: center; overflow: hidden; color: var(--muted); font-size: 11px; }
+.thumb img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.row .names b { display: block; font-weight: 600; }
+.row .names .he { color: var(--muted); font-size: 14px; }
+.row .meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 20px; color: var(--muted); }
+.empty code { font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--sunk); padding: 1px 6px; border-radius: 4px; }
+
+.lvl { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.lvl i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.flag { font-size: 12px; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.flag.warn { background: var(--warn-soft); color: var(--warn-ink); }
+.flag.bad { background: var(--bad-soft); color: var(--bad-ink); }
+.flag.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.flag.info { background: var(--accent-soft); color: var(--accent-ink); }
+.flag.long { white-space: normal; border-radius: 8px; padding: 4px 10px; align-self: flex-start; }
+
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+.detail .placeholder { padding: 40px 24px; color: var(--muted); text-align: center; }
+.back { display: none; border: 0; background: none; padding: 14px 20px 0; color: var(--accent-ink); cursor: pointer; font-weight: 500; }
+@media (max-width: 860px) { .back { display: block; } }
+
+.hero { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding: 20px; border-bottom: 1px solid var(--line); }
+@media (max-width: 480px) { .hero { grid-template-columns: 88px 1fr; gap: 12px; padding: 16px; } }
+.icon-box { aspect-ratio: 1; max-width: 100%; border-radius: 14px; background: var(--sunk); display: grid; place-items: center; overflow: hidden; border: 1px dashed var(--line); text-align: center; font-size: 12px; color: var(--muted); padding: 6px; }
+.icon-box img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.icon-box.has { padding: 0; border-style: solid; }
+.hero .names { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.big-input { font-size: 22px; font-weight: 700; border: 1px solid transparent; border-radius: 8px; padding: 2px 6px; margin-inline-start: -7px; background: transparent; width: 100%; }
+.big-input.he { font-size: 19px; font-weight: 600; }
+.big-input:hover { border-color: var(--line); }
+.big-input:focus { border-color: var(--accent); background: var(--bg); outline: none; }
+.id-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: var(--muted); }
+.id-line input { font-family: var(--mono); font-size: 13px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; background: var(--bg); width: 14em; max-width: 100%; }
+
+section.block { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 480px) { section.block { padding: 14px 16px; } }
+section.block > h2 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.claude-note { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.claude-note ul { margin: 0; padding-inline-start: 18px; }
+.claude-note .lbl { font-size: 12px; font-weight: 600; color: var(--accent-ink); }
+.your-note { background: var(--warn-soft); color: var(--warn-ink); border-radius: 10px; padding: 10px 14px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+label.field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 500; }
+label.field .hint { font-weight: 400; }
+.field input, .field select, .field textarea { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); color: var(--ink); font-size: 15px; width: 100%; }
+.field textarea { resize: vertical; min-height: 84px; line-height: 1.45; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+[dir="rtl"] { text-align: right; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 4px 12px; cursor: pointer; font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.chip.bad { background: var(--bad-soft); border-color: transparent; color: var(--bad-ink); }
+.chip .x { margin-inline-start: 6px; opacity: .6; }
+.chip small { color: var(--muted); margin-inline-start: 4px; }
+
+.levels { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.levels button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 6px 0 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.levels button i { width: 70%; height: 4px; border-radius: 2px; }
+.levels button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.level-name { font-size: 13px; color: var(--muted); }
+
+.picker { position: relative; }
+.picker-results { position: absolute; inset-inline: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); z-index: 5; max-height: 280px; overflow-y: auto; }
+.picker-results button { display: flex; justify-content: space-between; gap: 12px; width: 100%; border: 0; background: none; padding: 8px 12px; cursor: pointer; text-align: start; }
+.picker-results button:hover, .picker-results button:focus { background: var(--sunk); outline: none; }
+.picker-results .he { color: var(--muted); }
+.picker-results .q { font-size: 12px; color: var(--accent-ink); }
+
+.link-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 14px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 14px; cursor: pointer; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); }
+.btn:hover { border-color: var(--ink); }
+.btn.small { padding: 3px 10px; font-size: 13px; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn.good { background: var(--ok-ink); color: #fff; border-color: var(--ok-ink); }
+.btn.danger { color: var(--bad-ink); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.alts { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.alts li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+.steps { margin: 0; padding-inline-start: 20px; font-size: 14px; color: var(--muted); }
+.prompt { font-family: var(--mono); font-size: 13px; min-height: 150px; }
+.sources { margin: 0; padding-inline-start: 18px; font-size: 14px; }
+.warnings { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.actions { position: sticky; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; }
+.actions .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions .note-box { display: flex; flex-direction: column; gap: 8px; }
+.actions textarea { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); min-height: 64px; resize: vertical; }
+.status-line { font-size: 13px; color: var(--muted); }
+
+.howto { margin-top: 28px; font-size: 14px; color: var(--muted); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.howto div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.howto b { color: var(--ink); display: block; margin-bottom: 2px; }
+.howto code { font-family: var(--mono); font-size: 13px; color: var(--accent-ink); }
+
+.studio { display: flex; flex-direction: column; gap: 12px; }
+.step { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--bg); min-width: 0; }
+.step h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.step p { margin: 0; }
+.frames { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.frames:empty { display: none; }
+.frame { position: relative; border: 2px solid transparent; border-radius: 8px; padding: 0; overflow: hidden; background: var(--sunk); cursor: pointer; aspect-ratio: var(--ar, 3 / 4); }
+.frame:hover { border-color: var(--ink); }
+.frame canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.frame .t { position: absolute; inset-inline-start: 4px; bottom: 4px; font: 11px var(--mono); background: rgba(0,0,0,.6); color: #fff; border-radius: 4px; padding: 0 4px; }
+.frame .badge { position: absolute; top: 4px; inset-inline-end: 4px; font-size: 10px; font-weight: 600; background: var(--accent); color: #06302d; border-radius: 999px; padding: 0 6px; }
+.frame.center { border-color: var(--muted); }
+.frame.sharp { border-color: var(--accent); }
+.frames-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); scroll-margin-top: 12px; }
+.step { scroll-margin-top: 12px; }
+.crop-wrap { display: flex; justify-content: center; background: var(--sunk); border-radius: 10px; padding: 8px; }
+.crop-stage { position: relative; line-height: 0; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+.crop-canvas { display: block; }
+.crop-box { position: absolute; border: 2px solid var(--accent); box-shadow: 0 0 0 9999px rgba(0,0,0,.45); cursor: move; }
+.crop-box i { position: absolute; width: 24px; height: 24px; background: var(--accent); border: 2px solid #fff; border-radius: 50%; }
+.crop-box i[data-h="nw"] { left: -12px; top: -12px; cursor: nwse-resize; }
+.crop-box i[data-h="ne"] { right: -12px; top: -12px; cursor: nesw-resize; }
+.crop-box i[data-h="sw"] { left: -12px; bottom: -12px; cursor: nesw-resize; }
+.crop-box i[data-h="se"] { right: -12px; bottom: -12px; cursor: nwse-resize; }
+.handoff { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.frame-thumb { width: 120px; height: 120px; border-radius: 10px; overflow: hidden; background: var(--sunk); flex: none; }
+.frame-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.prompt-slot { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.prompt-slot summary { cursor: pointer; color: var(--muted); }
+.prompt-slot[open] summary { margin-bottom: 8px; }
+.prompt-slot textarea { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--surface); color: var(--ink); width: 100%; resize: vertical; margin-bottom: 8px; }
+.cut { display: flex; flex-direction: column; gap: 10px; }
+.cut-previews { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.checker { width: min(240px, 100%); aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: repeating-conic-gradient(#d5dbe0 0% 25%, #fff 0% 50%) 0 0 / 16px 16px; }
+.checker canvas { width: 100%; height: 100%; display: block; }
+.minis { display: flex; gap: 8px; }
+.mini { width: 72px; height: 72px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
+.mini canvas { width: 100%; height: 100%; display: block; }
+.mini.light { background: #fff; }
+.mini.dark { background: #15222A; }
+.range-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 500; }
+.range-field .hint { font-weight: 400; }
+.range-field input { width: 100%; accent-color: var(--accent); }
+label.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .row, .chip, .btn, .tab { transition: border-color .15s, background-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Trick<span>Queue</span></h1>
+    <div class="save-state" id="saveState" role="status" aria-live="polite"></div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Queue status"></nav>
+
+  <div class="layout" id="layout">
+    <div class="list" id="list"></div>
+    <article class="detail" id="detail"><div class="placeholder">Pick a trick to review it.</div></article>
+  </div>
+
+  <div class="howto">
+    <div><b>New tricks</b>Tell Claude <code>research 5 tricks</code>, or name the ones you want.</div>
+    <div><b>Fix and decide</b>Edit anything; changes save as you type. Approve, reject, or send back with a note.</div>
+    <div><b>Into the app</b>Tell Claude <code>apply approved</code>. It wires up tricks that have an icon, shows you the diff, and ships only when you say so.</div>
+  </div>
+</div>
+
+<script>
+const LEVELS = [
+  ["Novice", "#fde047"], ["Beginner", "#FB923C"], ["Intermediate", "#FF6B6B"], ["Advanced", "#F472B6"],
+  ["Elite", "#31c87f"], ["Ascendant", "#388DF8"], ["Transcendent", "#7C3AED"], ["Godlike", "#22A699"],
+];
+const TYPES = ["kick", "flip", "twist", "transition", "roll"];
+const TAKEOFFS = [
+  ["frontside", "frontflip"], ["pop", "pop 360"], ["front-vanish", "raiz, gumbi"], ["regular", "cartwheel, btwist"],
+  ["backside", "backflip"], ["fake-backside", "backside 720"], ["master-swing", "GMS"], ["swing", "cork"],
+  ["wrap", "wrap full"], ["back-vanish", "cheat 720"],
+];
+const LANDINGS = [
+  ["frontside", "frontflip"], ["semi", "aerial semi"], ["mega", "aerial mega"], ["backside", "backflip"],
+  ["hyper", "flash kick"], ["complete", "scoot"], ["fake-mega", "tornado"],
+];
+const TABS = [
+  { key: "review", label: "To review", match: c => c.status === "review" },
+  { key: "icon", label: "Needs icon", match: c => c.status === "approved" && !c.iconAsset },
+  { key: "ready", label: "Ready to add", match: c => c.status === "approved" && !!c.iconAsset },
+  { key: "rerun", label: "Re-research", match: c => c.status === "rerun" },
+  { key: "added", label: "Added", match: c => c.status === "added" },
+  { key: "rejected", label: "Rejected", match: c => c.status === "rejected" },
+];
+const DEFAULT_PROMPT = `Illustrate the person in the image
+The illustration should feature a clean, graphic aesthetic with all elements defined by a consistent, medium-weight black outline. Colors should be applied as flat, solid blocks within these outlines, with no gradients or blending.
+Keep little details like clothing patterns and logos, facial expressions (ONLY WHEN VISIBLE) and hair colour and shape.
+The anatomy should be simplified but proportional, with minimal facial features and suggested hair and clothing details. There should be no explicit light source or shadows, giving a clear, action-focused depiction. Maintain the exact body position and clothing as the original image.
+Clear white background.`;
+const ID_PATTERN = /^[a-z0-9]+(_[a-z0-9]+)*$/;
+const SAVE_DELAY_MS = 700;
+
+const state = {
+  db: null, assets: null, downloads: null, iconPrompt: null,
+  candidates: new Map(), // doc id -> data
+  catalog: [],
+  tab: "review",
+  openId: null,
+  noteMode: null, // "rerun" | "reject" while the note box is open
+};
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const el = (tag, attrs = {}, ...kids) => {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") node.className = v;
+    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) node.append(kid);
+  return node;
+};
+const iconUrl = id => "/_blob/" + id;
+
+try { state.tab = localStorage.getItem("tq.tab") || "review"; } catch {}
+
+/* ---------- saving: one write at a time per doc, coalesced ---------- */
+
+const pending = new Map(); // doc id -> { patch, timer, writing }
+const setSaveState = (text, isError = false) => {
+  const node = $("#saveState");
+  node.textContent = text;
+  node.classList.toggle("err", isError);
+};
+
+function queueSave(docId, patch, immediate = false) {
+  const entry = pending.get(docId) || { patch: {}, timer: null, writing: false };
+  Object.assign(entry.patch, patch);
+  pending.set(docId, entry);
+  const local = state.candidates.get(docId);
+  if (local) state.candidates.set(docId, { ...local, ...patch });
+  setSaveState("Saving…");
+  clearTimeout(entry.timer);
+  entry.timer = setTimeout(() => flush(docId), immediate ? 0 : SAVE_DELAY_MS);
+}
+
+async function flush(docId) {
+  const entry = pending.get(docId);
+  if (!entry || entry.writing || !Object.keys(entry.patch).length) return;
+  const patch = { ...entry.patch, updatedAt: new Date().toISOString() };
+  entry.patch = {};
+  entry.writing = true;
+  let failed = false;
+  try {
+    await state.db.collection("candidates").doc(docId).update(patch);
+    setSaveState("Saved");
+  } catch (e) {
+    failed = true;
+    entry.patch = { ...patch, ...entry.patch }; // edits made meanwhile win; retried on the next change
+    setSaveState(e?.code === "invalid_argument"
+      ? "You can view this queue but not edit it."
+      : "Couldn't save. Check your connection; your edits are kept and retried on your next change.", true);
+  } finally {
+    entry.writing = false;
+    if (failed) return;
+    if (Object.keys(entry.patch).length) entry.timer = setTimeout(() => flush(docId), SAVE_DELAY_MS);
+    else pending.delete(docId);
+  }
+}
+const hasPending = (docId, field) => field in (pending.get(docId)?.patch || {});
+
+/* ---------- derived ---------- */
+
+function warningsFor(c) {
+  const w = [];
+  const catalogIds = new Set(state.catalog.map(t => t.id));
+  const queued = new Map([...state.candidates.values()].filter(x => x.status !== "rejected").map(x => [x.id, x]));
+  if (!ID_PATTERN.test(c.id || "")) w.push(["bad", "id must be snake_case"]);
+  if (catalogIds.has(c.id) && c.status !== "added") w.push(["bad", "id already in the app"]);
+  const sameName = state.catalog.find(t => t.name.toLowerCase() === (c.name || "").trim().toLowerCase());
+  if (sameName && c.status !== "added") w.push(["bad", `name matches “${sameName.name}”`]);
+  for (const p of c.prerequisites || []) {
+    if (!catalogIds.has(p) && !queued.has(p)) w.push(["bad", `unknown prerequisite ${p}`]);
+  }
+  if (!c.nameHe) w.push(["warn", "no Hebrew name"]);
+  else if (c.heNameNote) w.push(["warn", "Hebrew name unconfirmed"]);
+  if (!c.descEn || !c.descHe) w.push(["warn", "description missing"]);
+  if (!c.tutorialUrl) w.push(["warn", "no tutorial"]);
+  if (!c.iconAsset) w.push(["info", "no icon yet"]);
+  return w;
+}
+
+const nameOf = id => {
+  const t = state.catalog.find(x => x.id === id);
+  if (t) return { name: t.name, he: t.nameHe, queued: false };
+  const q = [...state.candidates.values()].find(x => x.id === id);
+  if (q) return { name: q.name, he: q.nameHe, queued: true };
+  return null;
+};
+
+const levelTag = d => {
+  const [name, color] = LEVELS[d] || ["?", "transparent"];
+  return el("span", { class: "lvl" }, el("i", { style: `background:${color}` }), `${d ?? "?"} · ${name}`);
+};
+
+/* ---------- tabs & list ---------- */
+
+function renderTabs() {
+  const all = [...state.candidates.values()];
+  const nav = $("#tabs");
+  nav.replaceChildren(...TABS.map(t => el("button", {
+    class: "tab", role: "tab", "aria-selected": String(state.tab === t.key),
+    onclick: () => { state.tab = t.key; try { localStorage.setItem("tq.tab", t.key); } catch {} renderTabs(); renderList(); },
+  }, t.label, el("span", { class: "n" }, String(all.filter(t.match).length)))));
+}
+
+function renderList() {
+  const tab = TABS.find(t => t.key === state.tab) || TABS[0];
+  const items = [...state.candidates.entries()]
+    .filter(([, c]) => tab.match(c))
+    .sort(([, a], [, b]) => (a.difficulty ?? 9) - (b.difficulty ?? 9) || (a.name || "").localeCompare(b.name || ""));
+  const list = $("#list");
+  if (!items.length) {
+    const hint = {
+      review: ["Nothing waiting. Tell Claude ", el("code", {}, "research 5 tricks"), " to fill the queue."],
+      icon: ["Every approved trick has an icon."],
+      ready: ["Nothing ready yet. Approved tricks land here once they have an icon."],
+      rerun: ["Nothing sent back."],
+      added: ["Nothing added to the app yet."],
+      rejected: ["Nothing rejected."],
+    }[tab.key];
+    list.replaceChildren(el("div", { class: "empty" }, ...hint));
+    return;
+  }
+  list.replaceChildren(...items.map(([docId, c]) => {
+    const bad = warningsFor(c).filter(([k]) => k === "bad").length;
+    return el("button", {
+      class: "row", "aria-current": String(state.openId === docId),
+      onclick: () => openDetail(docId),
+    },
+      el("span", { class: "thumb" }, c.iconAsset ? el("img", { src: iconUrl(c.iconAsset), alt: "" }) : "no icon"),
+      el("span", { class: "names" }, el("b", {}, c.name || c.id), el("span", { class: "he", dir: "rtl", lang: "he" }, c.nameHe || "—")),
+      el("span", { class: "meta" }, levelTag(c.difficulty), bad ? el("span", { class: "flag bad" }, `${bad} to fix`) : null),
+    );
+  }));
+}
+
+/* ---------- detail ---------- */
+
+function openDetail(docId) {
+  state.openId = docId;
+  state.noteMode = null;
+  $("#layout").classList.add("detail-open");
+  renderList();
+  renderDetail();
+  if (matchMedia("(max-width: 860px)").matches) window.scrollTo({ top: 0 });
+}
+
+function closeDetail() {
+  state.openId = null;
+  $("#layout").classList.remove("detail-open");
+  renderList();
+  $("#detail").replaceChildren(el("div", { class: "placeholder" }, "Pick a trick to review it."));
+}
+
+function textField(docId, c, field, label, opts = {}) {
+  const attrs = {
+    id: `f-${field}`, "data-field": field, dir: opts.rtl ? "rtl" : null, lang: opts.rtl ? "he" : null,
+    disabled: opts.locked || null,
+    oninput: e => {
+      const patch = { [field]: e.target.value };
+      if (field === "nameHe" && state.candidates.get(docId)?.heNameNote) patch.heNameNote = "";
+      queueSave(docId, patch);
+      refreshWarnings();
+    },
+  };
+  const input = opts.multiline ? el("textarea", { ...attrs, class: opts.cls }) : el("input", { ...attrs, type: "text", class: opts.cls });
+  input.value = c[field] ?? "";
+  if (opts.bare) { if (label) input.setAttribute("aria-label", label); return input; }
+  return el("label", { class: "field", for: `f-${field}` }, el("span", {}, label, opts.hint ? el("span", { class: "hint" }, " · " + opts.hint) : null), input);
+}
+
+function selectField(docId, c, field, label, options) {
+  const select = el("select", { id: `f-${field}`, "data-field": field, onchange: e => queueSave(docId, { [field]: e.target.value }, true) },
+    ...options.map(([value, hint]) => el("option", { value }, `${value}  (${hint})`)));
+  select.value = c[field] ?? "";
+  return el("label", { class: "field", for: `f-${field}` }, label, select);
+}
+
+function renderDetail() {
+  const docId = state.openId;
+  const c = state.candidates.get(docId);
+  const detail = $("#detail");
+  if (!c) { closeDetail(); return; }
+  const locked = c.status === "added";
+
+  const iconBox = el("div", { class: "icon-box" + (c.iconAsset ? " has" : "") },
+    c.iconAsset ? el("img", { src: iconUrl(c.iconAsset), alt: `${c.name} icon` }) : "Icon goes here");
+
+  const hero = el("div", { class: "hero" },
+    iconBox,
+    el("div", { class: "names" },
+      textField(docId, c, "name", "English name", { bare: true, cls: "big-input", locked }),
+      textField(docId, c, "nameHe", "Hebrew name", { bare: true, cls: "big-input he", rtl: true, locked }),
+      c.heNameNote ? el("span", { class: "flag warn long" }, "⚠ " + c.heNameNote) : null,
+      el("div", { class: "id-line" },
+        el("label", { for: "f-id" }, "id"),
+        textField(docId, c, "id", "id", { bare: true, locked }),
+        locked ? el("span", {}, "locked: it keys users' saved progress") : el("span", {}, "permanent once added"),
+      ),
+      c.aka ? el("div", { class: "id-line" }, "Also called: ", c.aka) : null,
+    ),
+  );
+
+  const notes = el("section", { class: "block" },
+    el("h2", {}, "Notes"),
+    c.reviewNote ? el("div", { class: "your-note" }, el("b", {}, c.status === "rejected" ? "Why rejected: " : "Your note: "), c.reviewNote) : null,
+    (c.claudeNote || (c.questions || []).length) ? el("div", { class: "claude-note" },
+      c.claudeNote ? el("div", {}, el("div", { class: "lbl" }, "From Claude"), c.claudeNote) : null,
+      (c.questions || []).length ? el("div", {}, el("div", { class: "lbl" }, "Questions for you"), el("ul", {}, (c.questions || []).map(q => el("li", {}, q)))) : null,
+    ) : null,
+    el("div", { class: "warnings", id: "warnings" }),
+  );
+
+  const text = el("section", { class: "block" },
+    el("h2", {}, "Description"),
+    el("div", { class: "grid2" },
+      textField(docId, c, "descEn", "English", { multiline: true, locked }),
+      textField(docId, c, "descHe", "עברית", { multiline: true, rtl: true, locked }),
+    ),
+  );
+
+  const typeChips = el("div", { class: "chips", id: "typeChips" });
+  const drawTypes = () => {
+    const current = state.candidates.get(docId).types || [];
+    typeChips.replaceChildren(...TYPES.map(t => el("button", {
+      class: "chip", "aria-pressed": String(current.includes(t)), disabled: locked || null,
+      onclick: () => {
+        const now = state.candidates.get(docId).types || [];
+        queueSave(docId, { types: now.includes(t) ? now.filter(x => x !== t) : [...now, t] }, true);
+        drawTypes();
+      },
+    }, t)));
+  };
+  drawTypes();
+
+  const levelName = el("div", { class: "level-name" });
+  const levelRow = el("div", { class: "levels", role: "group", "aria-label": "Difficulty" });
+  const drawLevels = () => {
+    const d = state.candidates.get(docId).difficulty;
+    levelRow.replaceChildren(...LEVELS.map(([name, color], i) => el("button", {
+      "aria-pressed": String(d === i), title: name, disabled: locked || null,
+      onclick: () => { queueSave(docId, { difficulty: i }, true); drawLevels(); renderList(); },
+    }, String(i), el("i", { style: `background:${color}` }))));
+    levelName.textContent = LEVELS[d] ? `${LEVELS[d][0]}` : "Not set";
+  };
+  drawLevels();
+
+  const classify = el("section", { class: "block" },
+    el("h2", {}, "Classification"),
+    el("div", { class: "field" }, el("span", {}, "Type"), typeChips),
+    el("div", { class: "field" }, el("span", {}, "Difficulty"), levelRow, levelName),
+    textField(docId, c, "difficultyWhy", "Why this level", { locked }),
+    el("div", { class: "grid2" },
+      selectField(docId, c, "takeoff", "Takeoff", TAKEOFFS),
+      selectField(docId, c, "landingStance", "Landing stance", LANDINGS),
+    ),
+  );
+
+  const prereqChips = el("div", { class: "chips" });
+  const drawPrereqs = () => {
+    const list = state.candidates.get(docId).prerequisites || [];
+    prereqChips.replaceChildren(...(list.length ? list.map(p => {
+      const n = nameOf(p);
+      return el("button", {
+        class: "chip" + (n ? "" : " bad"), title: locked ? p : "Remove", disabled: locked || null,
+        onclick: () => {
+          queueSave(docId, { prerequisites: (state.candidates.get(docId).prerequisites || []).filter(x => x !== p) }, true);
+          drawPrereqs(); refreshWarnings();
+        },
+      }, n ? n.name : p, n?.queued ? el("small", {}, "in queue") : null, n ? null : el("small", {}, "not a trick"), locked ? null : el("span", { class: "x", "aria-hidden": "true" }, "×"));
+    }) : [el("span", { class: "level-name" }, "None: a starting trick.")]));
+  };
+  drawPrereqs();
+
+  const results = el("div", { class: "picker-results", hidden: true });
+  const search = el("input", {
+    type: "search", id: "prereqSearch", placeholder: "Add a prerequisite (English or עברית)", autocomplete: "off",
+    oninput: () => drawResults(), onfocus: () => drawResults(),
+    onkeydown: e => { if (e.key === "Escape") results.hidden = true; },
+  });
+  const drawResults = () => {
+    const q = search.value.trim().toLowerCase();
+    if (!q) { results.hidden = true; return; }
+    const have = new Set(state.candidates.get(docId).prerequisites || []);
+    const pool = [
+      ...state.catalog.map(t => ({ ...t, queued: false })),
+      ...[...state.candidates.values()].filter(x => x.status !== "rejected" && x.id !== c.id && !state.catalog.some(t => t.id === x.id))
+        .map(x => ({ id: x.id, name: x.name, nameHe: x.nameHe, queued: true })),
+    ];
+    const hits = pool.filter(t => !have.has(t.id) && t.id !== c.id &&
+      (t.name.toLowerCase().includes(q) || (t.nameHe || "").includes(q) || t.id.includes(q))).slice(0, 8);
+    results.replaceChildren(...(hits.length ? hits.map(t => el("button", {
+      onclick: () => {
+        queueSave(docId, { prerequisites: [...(state.candidates.get(docId).prerequisites || []), t.id] }, true);
+        search.value = ""; results.hidden = true; drawPrereqs(); refreshWarnings(); search.focus();
+      },
+    }, el("span", {}, t.name, t.queued ? el("span", { class: "q" }, "  in queue") : null), el("span", { class: "he", dir: "rtl" }, t.nameHe || ""))) : [el("div", { class: "level-name", style: "padding:8px 12px" }, "No trick matches.")]));
+    results.hidden = false;
+  };
+
+  const prereqs = el("section", { class: "block" },
+    el("h2", {}, "Prerequisites"),
+    prereqChips,
+    locked ? null : el("div", { class: "picker" }, el("label", { class: "field", for: "prereqSearch" }, search), results),
+  );
+
+  const tutorialLink = el("div", { class: "link-row", id: "tutorialLink" });
+  const drawTutorialLink = () => {
+    const cur = state.candidates.get(docId);
+    tutorialLink.replaceChildren(
+      cur.tutorialUrl ? el("a", { class: "btn small", href: cur.tutorialUrl, target: "_blank", rel: "noopener" }, "Watch ↗") : null,
+      cur.tutorialTitle ? el("span", {}, cur.tutorialTitle) : null,
+    );
+  };
+  drawTutorialLink();
+  const tutorial = el("section", { class: "block" },
+    el("h2", {}, "Tutorial"),
+    textField(docId, c, "tutorialUrl", "YouTube link", { locked }),
+    tutorialLink,
+    (c.altTutorials || []).length ? el("div", { class: "field" }, el("span", {}, "Alternatives"),
+      el("ul", { class: "alts" }, (c.altTutorials || []).map(a => el("li", {},
+        el("a", { href: a.url, target: "_blank", rel: "noopener" }, a.title || a.url),
+        locked ? null : el("button", {
+          class: "btn small",
+          onclick: () => {
+            const cur = state.candidates.get(docId);
+            const swapped = (cur.altTutorials || []).filter(x => x.url !== a.url);
+            if (cur.tutorialUrl) swapped.unshift({ url: cur.tutorialUrl, title: cur.tutorialTitle || "" });
+            queueSave(docId, { tutorialUrl: a.url, tutorialTitle: a.title || "", altTutorials: swapped }, true);
+            renderDetail();
+          },
+        }, "Use this"),
+      )))) : null,
+  );
+
+  const promptBox = textField(docId, c, "iconPrompt", "Prompt for your image tool", { multiline: true, cls: "prompt", locked });
+  const copyBtn = el("button", {
+    class: "btn small", onclick: async () => {
+      const area = $("#f-iconPrompt");
+      try { await navigator.clipboard.writeText(area.value); copyBtn.textContent = "Copied"; }
+      catch { area.focus(); area.select(); copyBtn.textContent = "Selected: copy it"; }
+      setTimeout(() => (copyBtn.textContent = "Copy prompt"), 1800);
+    },
+  }, "Copy prompt");
+
+  // The file input lives outside #detail so a live re-render can't detach it while the picker is open.
+  // A <label for> opens it natively, which is reliable on iOS Safari where input.click() on a hidden input is not.
+  const uploadBtn = el("label", {
+    class: "btn small", for: "iconUpload", role: "button", tabindex: "0",
+    onclick: () => { state.uploadFor = docId; },
+    onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.uploadFor = docId; iconInput().click(); } },
+    hidden: !state.assets || locked,
+  }, "Upload a finished icon");
+
+  let icon;
+  if (locked) {
+    icon = el("section", { class: "block" }, el("h2", {}, "Icon"), promptBox);
+  } else {
+    const S = getStudio(docId);
+    S.refSlot.replaceChildren(c.refVideo?.url
+      ? el("a", { class: "btn small", href: c.refVideo.url, target: "_blank", rel: "noopener", title: c.refVideo.note || c.refVideo.title || "" }, "Reference video ↗")
+      : "");
+    if (document.activeElement !== S.promptArea) S.promptArea.value = state.iconPrompt || DEFAULT_PROMPT;
+    S.uploadSlot.replaceChildren(uploadBtn);
+    S.useBtn.hidden = !state.assets;
+    renderHandoff(S);
+    icon = el("section", { class: "block" },
+      el("h2", {}, "Icon"),
+      S.root,
+      state.assets ? null : el("span", { class: "level-name" }, "Saving frames and icons is available to the queue's owner and editors."));
+    requestAnimationFrame(() => fitCrop(S));
+  }
+
+  const sources = (c.sources || []).length ? el("section", { class: "block" },
+    el("h2", {}, "Sources"),
+    el("ul", { class: "sources" }, c.sources.map(s => el("li", {}, el("a", { href: s.url, target: "_blank", rel: "noopener" }, s.label || s.url)))),
+  ) : null;
+
+  detail.replaceChildren(
+    el("button", { class: "back", onclick: closeDetail }, "← All tricks"),
+    hero, notes, text, classify, prereqs, tutorial, icon, sources, renderActions(docId, c),
+  );
+  refreshWarnings();
+}
+
+function renderActions(docId, c) {
+  const box = el("div", { class: "actions" });
+  const setStatus = (status, extra = {}) => {
+    queueSave(docId, { status, decidedAt: new Date().toISOString(), ...extra }, true);
+    state.noteMode = null;
+    renderTabs(); renderList(); renderDetail();
+  };
+
+  if (state.noteMode) {
+    const isRerun = state.noteMode === "rerun";
+    const area = el("textarea", { id: "decisionNote", placeholder: isRerun ? "What should Claude fix? e.g. wrong video, this is a variation of X" : "Why? (optional) Claude won't suggest it again" });
+    area.value = c.reviewNote || "";
+    const confirm = el("button", {
+      class: "btn " + (isRerun ? "primary" : "danger"),
+      onclick: () => {
+        const note = area.value.trim();
+        if (isRerun && !note) { area.focus(); area.placeholder = "Add a note so Claude knows what to change"; return; }
+        setStatus(isRerun ? "rerun" : "rejected", { reviewNote: note });
+      },
+    }, isRerun ? "Send back to Claude" : "Reject trick");
+    box.append(el("div", { class: "note-box" },
+      el("label", { for: "decisionNote", class: "status-line" }, isRerun ? "Note for Claude" : "Reason"),
+      area,
+      el("div", { class: "btns" }, confirm, el("button", { class: "btn", onclick: () => { state.noteMode = null; renderDetail(); } }, "Cancel")),
+    ));
+    setTimeout(() => area.focus(), 0);
+    return box;
+  }
+
+  const bad = warningsFor(c).filter(([k]) => k === "bad").length;
+  const btns = el("div", { class: "btns" });
+  if (c.status === "review") {
+    btns.append(
+      el("button", { class: "btn good", disabled: bad || null, title: bad ? "Fix the red items first" : null, onclick: () => setStatus("approved") }, "Approve"),
+      el("button", { class: "btn", onclick: () => { state.noteMode = "rerun"; renderDetail(); } }, "Re-research"),
+      el("button", { class: "btn danger", onclick: () => { state.noteMode = "reject"; renderDetail(); } }, "Reject"),
+    );
+  } else if (c.status === "added") {
+    box.append(el("div", { class: "status-line" }, "In the app. Edit it in the repo from here on."));
+    return box;
+  } else {
+    btns.append(el("button", { class: "btn", onclick: () => setStatus("review") }, "Move back to review"));
+    if (c.status === "approved" && !c.iconAsset) btns.prepend(el("span", { class: "status-line", style: "align-self:center" }, "Approved: waiting for an icon."));
+    if (c.status === "approved" && c.iconAsset) btns.prepend(el("span", { class: "status-line", style: "align-self:center" }, "Ready: tell Claude “apply approved”."));
+    if (c.status === "rerun") btns.prepend(el("span", { class: "status-line", style: "align-self:center" }, "Waiting for Claude to re-research."));
+  }
+  box.append(btns);
+  if (bad && c.status === "review") box.append(el("div", { class: "status-line" }, "Fix the red items to approve."));
+  return box;
+}
+
+function refreshWarnings() {
+  const c = state.candidates.get(state.openId);
+  const node = $("#warnings");
+  if (!c || !node) return;
+  const w = warningsFor(c);
+  node.replaceChildren(...(w.length ? w.map(([k, t]) => el("span", { class: `flag ${k}` }, t)) : [el("span", { class: "flag ok" }, "All checks pass")]));
+  const approve = $(".actions .btn.good");
+  if (approve) approve.disabled = w.some(([k]) => k === "bad");
+}
+
+function iconInput() {
+  let input = document.getElementById("iconUpload");
+  if (!input) {
+    input = el("input", { type: "file", id: "iconUpload", accept: "image/png,image/jpeg,image/webp", class: "visually-hidden", tabindex: "-1", "aria-hidden": "true",
+      onchange: e => {
+        const file = e.target.files[0];
+        const docId = state.uploadFor;
+        e.target.value = ""; // so picking the same file again still fires change
+        if (file && docId) uploadIcon(docId, file);
+      } });
+    document.body.append(input);
+  }
+  return input;
+}
+iconInput();
+
+async function uploadIcon(docId, file) {
+  if (!file) return;
+  if (!state.assets) { setSaveState("Icon upload isn't available in this view. Open the queue on claude.ai as its owner or an editor.", true); return; }
+  setSaveState("Uploading icon…");
+  const previous = state.candidates.get(docId)?.iconAsset;
+  try {
+    const res = await state.assets.upload(file);
+    queueSave(docId, { iconAsset: res.id }, true);
+    await flush(docId);
+    if (previous && previous !== res.id) state.assets.delete(previous).catch(() => {});
+    setSaveState("Icon uploaded");
+    renderTabs(); renderList(); renderDetail();
+  } catch (e) {
+    const msg = {
+      too_large: "That image is over 20 MB. Export a smaller one.",
+      unsupported_type: "Use a PNG, JPEG or WebP image.",
+      rate_limited: "Too many uploads at once. Wait a moment and try again.",
+      quota_or_state: "The queue's storage is full.",
+    }[e?.code] || "Upload failed. Try again.";
+    setSaveState(msg, true);
+  }
+}
+
+document.addEventListener("click", e => {
+  if (e.target.closest?.(".picker")) return;
+  document.querySelectorAll(".picker-results").forEach(r => (r.hidden = true));
+});
+
+/* ---------- icon studio: find the frame, crop it, clean up the generated icon ---------- */
+
+const FRAME_STEP = 1 / 30;     // one frame of a 30 fps clip
+const OVERVIEW_COUNT = 24;
+const BURST_HALF = 6;          // frames each side of the tapped moment
+const ICON_SIZE = 512;
+const MAX_WORK = 1600;         // longest side we process, for speed on phones
+let studio = null;             // one studio, for the trick that is open
+
+const clamp01 = v => Math.min(1, Math.max(0, v));
+const fmtT = t => t.toFixed(2) + "s";
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const canvasOf = (w, h) => { const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
+const toBlob = (c, type, q) => new Promise((res, rej) => c.toBlob(b => (b ? res(b) : rej(new Error("encode"))), type, q));
+const loadImg = url => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+
+// File pickers live outside #detail (live re-renders can't detach them) and open through <label for>, which iOS honours.
+function fileButton(id, accept, label, cls, onFile) {
+  let input = document.getElementById(id);
+  if (!input) {
+    input = el("input", { type: "file", id, accept, class: "visually-hidden", tabindex: "-1", "aria-hidden": "true",
+      onchange: e => { const f = e.target.files[0]; e.target.value = ""; if (f) input.handleFile?.(f); } });
+    document.body.append(input);
+  }
+  input.handleFile = onFile;
+  return el("label", { class: cls, for: id, role: "button", tabindex: "0",
+    onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } } }, label);
+}
+
+function getStudio(docId) {
+  if (studio?.docId === docId) return studio;
+  if (studio) { for (const u of [studio.videoUrl, studio.frameUrl]) if (u) URL.revokeObjectURL(u); studio.dead = true; }
+  const S = studio = { docId, lock: Promise.resolve(), burstBusy: 0, video: null, videoUrl: null, duration: 0,
+    frameT: null, crop: null, spacing: 1, burstT: null, frameBlob: null, frameUrl: null, cutSrc: null };
+
+  // 1 · find the frame
+  S.msg = el("div", { class: "status-line", role: "status" });
+  S.overview = el("div", { class: "frames" });
+  S.burstHead = el("div", { class: "frames-head", hidden: true });
+  S.burst = el("div", { class: "frames" });
+  S.refSlot = el("div");
+  const step1 = el("div", { class: "step" },
+    el("h3", {}, "1 · Find the frame"),
+    el("p", { class: "status-line" }, "Screen-record or download the reference clip and load it here. Tap the moment closest to the peak to see every frame around it. A screenshot works too."),
+    el("div", { class: "link-row" }, fileButton("studioMedia", "video/*,image/*", "Load video or screenshot", "btn small primary", f => loadMedia(S, f)), S.refSlot),
+    S.msg, S.overview, S.burstHead, S.burst);
+
+  // 2 · crop
+  S.cropCanvas = el("canvas", { class: "crop-canvas" });
+  S.cropBox = el("div", { class: "crop-box" }, ...["nw", "ne", "sw", "se"].map(h => el("i", { "data-h": h })));
+  S.stage = el("div", { class: "crop-stage" }, S.cropCanvas, S.cropBox);
+  S.cropWrap = el("div", { class: "crop-wrap" }, S.stage);
+  S.tLabel = el("span", { class: "status-line" });
+  S.nudge = el("div", { class: "link-row" },
+    el("button", { class: "btn small", onclick: () => nudge(S, -1) }, "◀ 1 frame"),
+    el("button", { class: "btn small", onclick: () => nudge(S, 1) }, "1 frame ▶"),
+    S.tLabel);
+  S.saveFrameBtn = el("button", { class: "btn small primary", onclick: () => saveFrame(S) }, "Use this frame");
+  S.step2 = el("div", { class: "step", hidden: true },
+    el("h3", {}, "2 · Crop"),
+    el("p", { class: "status-line" }, "Drag on the image to draw a box around the trickster. Drag the box or its corners to adjust."),
+    S.nudge, S.cropWrap,
+    el("div", { class: "link-row" },
+      el("button", { class: "btn small", onclick: () => { S.crop = { x: 0, y: 0, w: 1, h: 1 }; layoutCrop(S); } }, "Whole frame"),
+      el("button", { class: "btn small", onclick: () => squareCrop(S) }, "Make square"),
+      S.saveFrameBtn));
+  wireCrop(S);
+
+  // 3 · hand off to Gemini
+  S.handoffImg = el("img", { alt: "Chosen frame" });
+  S.copyImgBtn = el("button", { class: "btn small", onclick: () => copyFrame(S) }, "Copy image");
+  S.bothBtn = el("button", { class: "btn small primary", onclick: () => copyPromptAndSave(S) }, "Copy prompt + save image");
+  S.promptArea = el("textarea", { id: "f-sharedPrompt", class: "prompt", "aria-label": "Prompt",
+    oninput: e => savePrompt(e.target.value) });
+  S.copyPromptBtn = el("button", { class: "btn small", onclick: () => copyPrompt(S) }, "Copy prompt");
+  S.saveImgBtn = el("button", { class: "btn small", onclick: () => saveFrameToDevice(S) }, "Save to phone");
+  S.handoffEmpty = el("p", { class: "status-line" }, "The frame you pick shows up here.");
+  S.handoff = el("div", { class: "handoff", hidden: true },
+    el("div", { class: "frame-thumb" }, S.handoffImg),
+    el("div", { class: "link-row" }, S.bothBtn, S.copyPromptBtn, S.copyImgBtn, S.saveImgBtn,
+      el("a", { class: "btn small", href: "https://gemini.google.com/app", target: "_blank", rel: "noopener" }, "Open Gemini ↗")));
+  S.promptSlot = el("details", { class: "prompt-slot" },
+    el("summary", {}, "Prompt (the same for every trick)"),
+    S.promptArea,
+    el("div", { class: "link-row" }, el("button", { class: "btn small", onclick: () => { S.promptArea.value = DEFAULT_PROMPT; savePrompt(DEFAULT_PROMPT); } }, "Reset to default")));
+  S.step3 = el("div", { class: "step" }, el("h3", {}, "3 · Send to Gemini"),
+    el("p", { class: "status-line" }, "On your phone: tap “Copy prompt + save image”, open Gemini, attach the saved image and paste."),
+    S.handoffEmpty, S.handoff, S.promptSlot);
+
+  // 4 · clean up
+  S.tol = el("input", { type: "range", min: "8", max: "120", value: "40", "aria-label": "Background strictness", oninput: () => scheduleCut(S) });
+  S.pockets = el("input", { type: "checkbox", checked: true, onchange: () => scheduleCut(S) });
+  S.bits = el("input", { type: "checkbox", checked: true, onchange: () => scheduleCut(S) });
+  S.outCanvas = canvasOf(ICON_SIZE, ICON_SIZE);
+  S.minis = [canvasOf(144, 144), canvasOf(144, 144)];
+  S.useBtn = el("button", { class: "btn small primary", onclick: () => useCutout(S) }, "Use as icon");
+  S.cutMsg = el("div", { class: "status-line", role: "status" });
+  S.uploadSlot = el("span");
+  S.cutResult = el("div", { class: "cut", hidden: true },
+    el("div", { class: "cut-previews" },
+      el("div", { class: "checker" }, S.outCanvas),
+      el("div", { class: "minis" },
+        el("div", { class: "mini light" }, S.minis[0]),
+        el("div", { class: "mini dark" }, S.minis[1]))),
+    el("label", { class: "range-field" },
+      el("span", {}, "Background strictness", el("span", { class: "hint" }, " · raise it if a white halo is left, lower it if the figure gets eaten")),
+      S.tol),
+    el("label", { class: "check" }, S.pockets, "Also clear white gaps inside the figure"),
+    el("label", { class: "check" }, S.bits, "Remove stray bits (watermarks, specks)"),
+    el("div", { class: "link-row" }, S.useBtn));
+  S.step4 = el("div", { class: "step" },
+    el("h3", {}, "4 · Clean up Gemini's image"),
+    el("p", { class: "status-line" }, "Load the image Gemini made (or paste it on a computer). The white background comes off and it's cropped and centred at 512×512."),
+    el("div", { class: "link-row" }, fileButton("studioGemini", "image/*", "Load Gemini image", "btn small primary", f => loadCutSource(S, f)), S.uploadSlot),
+    S.cutMsg, S.cutResult);
+
+  S.root = el("div", { class: "studio" }, step1, S.step2, S.step3, S.step4);
+  return S;
+}
+
+/* step 1: frames */
+
+function seek(v, t) {
+  return new Promise(res => {
+    const done = () => { clearTimeout(timer); v.removeEventListener("seeked", done); res(); };
+    const timer = setTimeout(done, 4000);
+    v.addEventListener("seeked", done);
+    v.currentTime = t;
+  });
+}
+
+// Seeks are serialised: one video element can only be at one place at a time.
+function grab(S, t, maxW) {
+  const run = async () => {
+    const v = S.video;
+    const tt = Math.max(0, Math.min(t, S.duration - 0.001));
+    await seek(v, tt);
+    const s = maxW ? Math.min(1, maxW / v.videoWidth) : 1;
+    const c = canvasOf(v.videoWidth * s, v.videoHeight * s);
+    c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+    return { t: tt, c };
+  };
+  const p = S.lock.then(run, run);
+  S.lock = p.catch(() => {});
+  return p;
+}
+
+async function loadMedia(S, file) {
+  for (const box of [S.overview, S.burst]) { box._job = (box._job || 0) + 1; box.replaceChildren(); }
+  S.burstHead.hidden = true;
+  if (S.videoUrl) { URL.revokeObjectURL(S.videoUrl); S.videoUrl = null; }
+  S.video = null;
+  const url = URL.createObjectURL(file);
+
+  if (file.type.startsWith("image/")) {
+    try {
+      const img = await loadImg(url);
+      const c = canvasOf(img.naturalWidth, img.naturalHeight);
+      c.getContext("2d").drawImage(img, 0, 0);
+      S.frameT = null; S.msg.textContent = "";
+      showFrame(S, c, true);
+    } catch { S.msg.textContent = "Couldn't open that image."; }
+    finally { URL.revokeObjectURL(url); }
+    return;
+  }
+
+  S.videoUrl = url;
+  const v = document.createElement("video");
+  v.muted = true; v.playsInline = true; v.preload = "auto"; v.setAttribute("playsinline", "");
+  S.msg.textContent = "Opening video…";
+  const ok = await new Promise(res => {
+    v.addEventListener("loadedmetadata", () => res(true), { once: true });
+    v.addEventListener("error", () => res(false), { once: true });
+    setTimeout(() => res(false), 10000);
+    v.src = url;
+  });
+  if (!ok || !v.videoWidth) { S.msg.textContent = "This browser can't read that video. An MP4 screen recording works best."; return; }
+  try { await v.play(); v.pause(); } catch {}
+  let dur = v.duration;
+  if (!isFinite(dur)) { await seek(v, 1e7); dur = v.duration; }
+  if (!isFinite(dur) || dur <= 0) dur = v.currentTime || 1;
+  S.video = v; S.duration = dur;
+  const ar = v.videoWidth / v.videoHeight;
+  for (const box of [S.overview, S.burst]) box.style.setProperty("--ar", ar < 0.62 ? "3 / 4" : `${v.videoWidth} / ${v.videoHeight}`);
+  const n = Math.max(4, Math.min(OVERVIEW_COUNT, Math.round(dur / FRAME_STEP)));
+  const times = Array.from({ length: n }, (_, i) => (i + 0.5) * dur / n);
+  S.msg.textContent = `${fmtT(dur)} clip. Tap the moment closest to the peak.`;
+  fillFrames(S, S.overview, times, t => showBurst(S, t), {});
+}
+
+function sharpness(c) {
+  const w = c.width, h = c.height, d = c.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h).data;
+  const g = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) g[i] = d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114;
+  let sum = 0, sq = 0, n = 0;
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const i = y * w + x, l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - w] - g[i + w];
+    sum += l; sq += l * l; n++;
+  }
+  return n ? sq / n - (sum / n) ** 2 : 0;
+}
+
+async function fillFrames(S, box, times, onPick, opts) {
+  const job = (box._job = (box._job || 0) + 1);
+  box.replaceChildren();
+  const items = [];
+  for (let k = 0; k < times.length; k++) {
+    while (box === S.overview && S.burstBusy) await sleep(60); // the burst the person asked for goes first
+    if (job !== box._job || S.dead || !S.video) return;
+    let g;
+    try { g = await grab(S, times[k], 220); } catch { continue; }
+    if (job !== box._job) return;
+    const btn = el("button", { class: "frame" + (k === opts.centerIndex ? " center" : ""), title: fmtT(g.t), onclick: () => onPick(g.t) },
+      g.c, el("span", { class: "t" }, fmtT(g.t)));
+    box.append(btn);
+    if (opts.score) items.push({ btn, score: sharpness(g.c) });
+  }
+  if (opts.score && items.length > 2) {
+    const best = items.reduce((a, b) => (b.score > a.score ? b : a));
+    best.btn.classList.add("sharp");
+    best.btn.append(el("span", { class: "badge" }, "sharpest"));
+  }
+}
+
+async function showBurst(S, t) {
+  S.burstT = t;
+  const step = FRAME_STEP * S.spacing;
+  const times = [];
+  let centerIndex = -1;
+  for (let k = -BURST_HALF; k <= BURST_HALF; k++) {
+    const tt = t + k * step;
+    if (tt < 0 || tt > S.duration) continue;
+    if (k === 0) centerIndex = times.length;
+    times.push(tt);
+  }
+  S.burstHead.hidden = false;
+  S.burstHead.replaceChildren(
+    el("span", {}, `Around ${fmtT(t)}. Tap a frame to crop it.`),
+    el("span", { class: "chips" }, [1, 2, 4].map(n => el("button", {
+      class: "chip", "aria-pressed": String(S.spacing === n),
+      onclick: () => { S.spacing = n; showBurst(S, S.burstT); },
+    }, n === 1 ? "every frame" : `every ${n}`))));
+  S.burstHead.scrollIntoView({ behavior: "smooth", block: "start" });
+  S.burstBusy++;
+  try { await fillFrames(S, S.burst, times, tt => pickFrame(S, tt), { score: true, centerIndex }); }
+  finally { S.burstBusy--; }
+}
+
+async function pickFrame(S, t) {
+  try {
+    const g = await grab(S, t);
+    S.frameT = g.t;
+    showFrame(S, g.c, !S.crop);
+    S.step2.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch { S.msg.textContent = "Couldn't read that frame. Try another."; }
+}
+
+async function nudge(S, dir) {
+  if (!S.video || S.frameT == null) return;
+  const g = await grab(S, S.frameT + dir * FRAME_STEP);
+  S.frameT = g.t;
+  showFrame(S, g.c, false);
+}
+
+/* step 2: crop */
+
+function showFrame(S, src, resetCrop) {
+  const cv = S.cropCanvas;
+  cv.width = src.width; cv.height = src.height;
+  cv.getContext("2d").drawImage(src, 0, 0);
+  if (resetCrop || !S.crop) S.crop = { x: 0.15, y: 0.15, w: 0.7, h: 0.7 };
+  S.step2.hidden = false;
+  S.nudge.hidden = !S.video || S.frameT == null;
+  S.tLabel.textContent = S.frameT == null ? "" : fmtT(S.frameT);
+  fitCrop(S);
+  layoutCrop(S);
+}
+
+function fitCrop(S) {
+  const cv = S.cropCanvas;
+  if (!cv.width || S.step2.hidden) return;
+  const avail = Math.max(120, S.cropWrap.clientWidth - 16);
+  const s = Math.min(avail / cv.width, (window.innerHeight * 0.6) / cv.height, 1);
+  cv.style.width = Math.round(cv.width * s) + "px";
+  cv.style.height = Math.round(cv.height * s) + "px";
+}
+window.addEventListener("resize", () => studio && fitCrop(studio));
+
+function layoutCrop(S) {
+  const c = S.crop, b = S.cropBox.style;
+  b.left = c.x * 100 + "%"; b.top = c.y * 100 + "%"; b.width = c.w * 100 + "%"; b.height = c.h * 100 + "%";
+}
+
+function wireCrop(S) {
+  let drag = null;
+  const pt = e => {
+    const r = S.stage.getBoundingClientRect();
+    return { x: clamp01((e.clientX - r.left) / r.width), y: clamp01((e.clientY - r.top) / r.height) };
+  };
+  S.stage.addEventListener("pointerdown", e => {
+    if (e.button > 0 || !S.crop) return;
+    const p = pt(e), c = S.crop;
+    const inside = p.x >= c.x && p.x <= c.x + c.w && p.y >= c.y && p.y <= c.y + c.h;
+    drag = { mode: e.target.dataset?.h || (inside ? "move" : "draw"), p0: p, c0: { ...c } };
+    S.stage.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  S.stage.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const p = pt(e), dx = p.x - drag.p0.x, dy = p.y - drag.p0.y, c0 = drag.c0, m = drag.mode;
+    let l, t, r, b;
+    if (m === "move") {
+      l = Math.min(Math.max(c0.x + dx, 0), 1 - c0.w); t = Math.min(Math.max(c0.y + dy, 0), 1 - c0.h);
+      r = l + c0.w; b = t + c0.h;
+    } else if (m === "draw") {
+      l = Math.min(drag.p0.x, p.x); r = Math.max(drag.p0.x, p.x);
+      t = Math.min(drag.p0.y, p.y); b = Math.max(drag.p0.y, p.y);
+      if (r - l < 0.02 || b - t < 0.02) return; // a tap, not a drag
+    } else {
+      l = c0.x; t = c0.y; r = c0.x + c0.w; b = c0.y + c0.h;
+      if (m.includes("w")) l = clamp01(l + dx);
+      if (m.includes("e")) r = clamp01(r + dx);
+      if (m.includes("n")) t = clamp01(t + dy);
+      if (m.includes("s")) b = clamp01(b + dy);
+      [l, r] = [Math.min(l, r), Math.max(l, r)];
+      [t, b] = [Math.min(t, b), Math.max(t, b)];
+    }
+    const w = Math.max(r - l, 0.03), h = Math.max(b - t, 0.03);
+    S.crop = { x: Math.min(l, 1 - w), y: Math.min(t, 1 - h), w, h };
+    layoutCrop(S);
+  });
+  const end = () => { drag = null; };
+  S.stage.addEventListener("pointerup", end);
+  S.stage.addEventListener("pointercancel", end);
+}
+
+function squareCrop(S) {
+  const W = S.cropCanvas.width, H = S.cropCanvas.height, c = S.crop;
+  const side = Math.min(Math.max(c.w * W, c.h * H), W, H);
+  const cx = (c.x + c.w / 2) * W, cy = (c.y + c.h / 2) * H;
+  const x = Math.min(Math.max(cx - side / 2, 0), W - side), y = Math.min(Math.max(cy - side / 2, 0), H - side);
+  S.crop = { x: x / W, y: y / H, w: side / W, h: side / H };
+  layoutCrop(S);
+}
+
+function croppedFrame(S) {
+  const src = S.cropCanvas, W = src.width, H = src.height, c = S.crop;
+  const sx = Math.round(c.x * W), sy = Math.round(c.y * H), sw = Math.max(1, Math.round(c.w * W)), sh = Math.max(1, Math.round(c.h * H));
+  const s = Math.min(1, MAX_WORK / Math.max(sw, sh));
+  const out = canvasOf(sw * s, sh * s);
+  out.getContext("2d").drawImage(src, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  return out;
+}
+
+async function saveFrame(S) {
+  const blob = await toBlob(croppedFrame(S), "image/jpeg", 0.92);
+  if (S.frameUrl) URL.revokeObjectURL(S.frameUrl);
+  S.frameBlob = blob; S.frameUrl = URL.createObjectURL(blob);
+  renderHandoff(S);
+  S.step3.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!state.assets) return;
+  // Keep it on the trick so switching to Gemini and back (which can reload the page on a phone) loses nothing.
+  const c = state.candidates.get(S.docId), prev = c?.refFrameAsset;
+  S.saveFrameBtn.disabled = true;
+  setSaveState("Saving frame…");
+  try {
+    const res = await state.assets.upload(new File([blob], `${c?.id || "trick"}-frame.jpg`, { type: "image/jpeg" }));
+    queueSave(S.docId, { refFrameAsset: res.id }, true);
+    await flush(S.docId);
+    if (prev && prev !== res.id) state.assets.delete(prev).catch(() => {});
+    setSaveState("Frame saved");
+  } catch { setSaveState("Couldn't keep the frame on the trick; it's still here until you leave the page.", true); }
+  finally { S.saveFrameBtn.disabled = false; }
+}
+
+/* step 3: hand-off */
+
+function renderHandoff(S) {
+  const c = state.candidates.get(S.docId);
+  const src = S.frameUrl || (c?.refFrameAsset ? iconUrl(c.refFrameAsset) : null);
+  S.handoff.hidden = !src;
+  S.handoffEmpty.hidden = !!src;
+  if (src && S.handoffImg.getAttribute("src") !== src) S.handoffImg.src = src;
+  S.saveImgBtn.hidden = !state.downloads;
+  S.bothBtn.hidden = !state.downloads;
+}
+
+async function frameBlob(S) {
+  if (S.frameBlob) return S.frameBlob;
+  const r = await fetch(S.handoffImg.src);
+  if (!r.ok) throw new Error("fetch");
+  return (S.frameBlob = await r.blob());
+}
+
+async function copyFrame(S) {
+  try {
+    if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") throw new Error("no clipboard");
+    const png = frameBlob(S).then(async b => {
+      const bmp = await createImageBitmap(b);
+      const cv = canvasOf(bmp.width, bmp.height);
+      cv.getContext("2d").drawImage(bmp, 0, 0);
+      return toBlob(cv, "image/png");
+    });
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
+    S.copyImgBtn.textContent = "Copied";
+  } catch {
+    S.copyImgBtn.textContent = state.downloads ? "Can't copy here, use Save" : "Can't copy here, long-press the image";
+  }
+  setTimeout(() => (S.copyImgBtn.textContent = "Copy image"), 2400);
+}
+
+async function saveFrameToDevice(S) {
+  if (!state.downloads) return;
+  try {
+    const b = await frameBlob(S);
+    await state.downloads.save({ filename: `${state.candidates.get(S.docId)?.id || "trick"}-frame.jpg`, data: b });
+  } catch (e) {
+    if (e?.code === "declined") return;
+    setSaveState(e?.code === "rate_limited" ? "A save prompt is already open." : "Couldn't save the image.", true);
+  }
+}
+
+let promptTimer = null;
+function savePrompt(text) {
+  state.iconPrompt = text;
+  clearTimeout(promptTimer);
+  promptTimer = setTimeout(async () => {
+    if (!state.db) return;
+    try { await state.db.doc("settings/icon").set({ prompt: text, updatedAt: new Date().toISOString() }); setSaveState("Prompt saved"); }
+    catch { setSaveState("Couldn't save the prompt.", true); }
+  }, SAVE_DELAY_MS);
+}
+
+function copyPrompt(S) {
+  const text = S.promptArea.value || DEFAULT_PROMPT;
+  const p = navigator.clipboard?.writeText ? navigator.clipboard.writeText(text) : Promise.reject();
+  return p.then(() => { S.copyPromptBtn.textContent = "Copied"; return true; },
+    () => { S.promptSlot.open = true; S.promptArea.focus(); S.promptArea.select(); S.copyPromptBtn.textContent = "Selected: copy it"; return false; })
+    .finally(() => setTimeout(() => (S.copyPromptBtn.textContent = "Copy prompt"), 2000));
+}
+
+async function copyPromptAndSave(S) {
+  const copied = copyPrompt(S); // clipboard first, while the tap still counts
+  await saveFrameToDevice(S);
+  if (await copied) { S.bothBtn.textContent = "Prompt copied, image saved"; setTimeout(() => (S.bothBtn.textContent = "Copy prompt + save image"), 2400); }
+}
+
+/* step 4: background removal + crop */
+
+async function loadCutSource(S, file) {
+  const url = URL.createObjectURL(file);
+  try { S.cutSrc = await loadImg(url); }
+  catch { S.cutMsg.textContent = "Couldn't open that image."; return; }
+  finally { URL.revokeObjectURL(url); }
+  S.cutMsg.textContent = "";
+  S.cutResult.hidden = false;
+  runCut(S);
+}
+
+let cutTimer = null;
+function scheduleCut(S) { clearTimeout(cutTimer); cutTimer = setTimeout(() => runCut(S), 120); }
+
+function runCut(S) {
+  if (!S.cutSrc) return;
+  const res = cutout(S.cutSrc, { tol: +S.tol.value, pockets: S.pockets.checked, bits: S.bits.checked });
+  S.useBtn.disabled = !res;
+  if (!res) { S.cutMsg.textContent = "Nothing was left after removing the background. Lower the strictness."; return; }
+  S.cutMsg.textContent = "";
+  for (const cv of [S.outCanvas, ...S.minis]) {
+    const x = cv.getContext("2d");
+    x.clearRect(0, 0, cv.width, cv.height);
+    x.imageSmoothingQuality = "high";
+    x.drawImage(res, 0, 0, cv.width, cv.height);
+  }
+}
+
+async function useCutout(S) {
+  const c = state.candidates.get(S.docId);
+  S.useBtn.disabled = true;
+  try {
+    const blob = await toBlob(S.outCanvas, "image/png");
+    await uploadIcon(S.docId, new File([blob], `${c?.id || "trick"}.png`, { type: "image/png" }));
+  } finally { S.useBtn.disabled = false; }
+}
+
+function cutout(src, opt) {
+  const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
+  const sc = Math.min(1, MAX_WORK / Math.max(sw, sh));
+  const W = Math.round(sw * sc), H = Math.round(sh * sc), N = W * H;
+  const cv = canvasOf(W, H), ctx = cv.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(src, 0, 0, W, H);
+  const img = ctx.getImageData(0, 0, W, H), d = img.data;
+
+  // Background colour: the median of the border pixels.
+  const rs = [], gs = [], bs = [];
+  const sample = i => { if (d[i * 4 + 3] > 200) { rs.push(d[i * 4]); gs.push(d[i * 4 + 1]); bs.push(d[i * 4 + 2]); } };
+  for (let x = 0; x < W; x++) { sample(x); sample((H - 1) * W + x); }
+  for (let y = 0; y < H; y++) { sample(y * W); sample(y * W + W - 1); }
+  const med = a => (a.length ? a.sort((p, q) => p - q)[a.length >> 1] : 255);
+  const bg = [med(rs), med(gs), med(bs)];
+
+  const dist = new Float32Array(N);
+  for (let i = 0, j = 0; i < N; i++, j += 4) {
+    if (d[j + 3] < 16) continue; // already transparent counts as background
+    const dr = d[j] - bg[0], dg = d[j + 1] - bg[1], db = d[j + 2] - bg[2];
+    dist[i] = Math.sqrt(dr * dr + dg * dg + db * db);
+  }
+
+  // Flood the background in from the edges.
+  const tol = opt.tol;
+  const isBg = new Uint8Array(N), q = new Int32Array(N);
+  let head = 0, tail = 0;
+  const push = i => { if (!isBg[i] && dist[i] <= tol) { isBg[i] = 1; q[tail++] = i; } };
+  for (let x = 0; x < W; x++) { push(x); push((H - 1) * W + x); }
+  for (let y = 0; y < H; y++) { push(y * W); push(y * W + W - 1); }
+  while (head < tail) {
+    const i = q[head++], x = i % W;
+    if (x > 0) push(i - 1); if (x < W - 1) push(i + 1); if (i >= W) push(i - W); if (i < N - W) push(i + W);
+  }
+
+  // Enclosed background-coloured pockets (between arms and body, say), if they are big enough not to be an eye.
+  if (opt.pockets) {
+    const seen = new Uint8Array(N), minArea = Math.max(80, N * 0.0008);
+    for (let s0 = 0; s0 < N; s0++) {
+      if (isBg[s0] || seen[s0] || dist[s0] > tol) continue;
+      head = 0; tail = 0; q[tail++] = s0; seen[s0] = 1;
+      while (head < tail) {
+        const i = q[head++], x = i % W;
+        for (const k of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) {
+          if (k < 0 || k >= N || seen[k] || isBg[k] || dist[k] > tol) continue;
+          seen[k] = 1; q[tail++] = k;
+        }
+      }
+      if (tail >= minArea) for (let k = 0; k < tail; k++) isBg[q[k]] = 1;
+    }
+  }
+
+  // Alpha, with a soft 1px edge whose colour is un-mixed from the background (no white fringe).
+  const A = new Uint8ClampedArray(N), soft = Math.max(tol * 3, 60);
+  for (let i = 0; i < N; i++) {
+    if (isBg[i]) continue;
+    const x = i % W, j = i * 4;
+    const edge = (x > 0 && isBg[i - 1]) || (x < W - 1 && isBg[i + 1]) || (i >= W && isBg[i - W]) || (i < N - W && isBg[i + W]);
+    if (!edge) { A[i] = d[j + 3]; continue; }
+    const a = Math.min(1, dist[i] / soft);
+    A[i] = Math.round(a * d[j + 3]);
+    if (a > 0 && a < 1) for (let k = 0; k < 3; k++) d[j + k] = Math.max(0, Math.min(255, (d[j + k] - (1 - a) * bg[k]) / a));
+  }
+
+  // Keep the figure; drop pieces far from it (watermark badges, specks).
+  if (opt.bits) {
+    const lab = new Int32Array(N), comps = [];
+    for (let s0 = 0; s0 < N; s0++) {
+      if (A[s0] < 24 || lab[s0]) continue;
+      const id = comps.length + 1;
+      head = 0; tail = 0; q[tail++] = s0; lab[s0] = id;
+      let x0 = W, y0 = H, x1 = 0, y1 = 0;
+      while (head < tail) {
+        const i = q[head++], x = i % W, y = (i - x) / W;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+          const nx = x + ox, ny = y + oy;
+          if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+          const k = ny * W + nx;
+          if (!lab[k] && A[k] >= 24) { lab[k] = id; q[tail++] = k; }
+        }
+      }
+      comps.push({ area: tail, x0, y0, x1, y1 });
+    }
+    if (comps.length > 1) {
+      const m = comps.reduce((a, b) => (b.area > a.area ? b : a));
+      const pad = 0.12 * Math.max(m.x1 - m.x0, m.y1 - m.y0);
+      const keep = comps.map(c => c === m || (c.area >= 12 &&
+        c.x1 >= m.x0 - pad && c.x0 <= m.x1 + pad && c.y1 >= m.y0 - pad && c.y0 <= m.y1 + pad));
+      for (let i = 0; i < N; i++) if (lab[i] && !keep[lab[i] - 1]) A[i] = 0;
+      // faint edge pixels that belonged to a dropped piece
+      for (let i = 0; i < N; i++) if (A[i] > 0 && A[i] < 24) {
+        const x = i % W;
+        const near = (x > 0 && A[i - 1] >= 24) || (x < W - 1 && A[i + 1] >= 24) || (i >= W && A[i - W] >= 24) || (i < N - W && A[i + W] >= 24);
+        if (!near) A[i] = 0;
+      }
+    }
+  }
+
+  // Tight crop, square, centred, with a little breathing room.
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let i = 0; i < N; i++) {
+    d[i * 4 + 3] = A[i];
+    if (A[i] < 24) continue;
+    const x = i % W, y = (i - x) / W;
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return null;
+  ctx.putImageData(img, 0, 0);
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1, side = Math.ceil(Math.max(bw, bh) * 1.08);
+  let cur = canvasOf(side, side);
+  cur.getContext("2d").drawImage(cv, Math.round((side - bw) / 2 - x0), Math.round((side - bh) / 2 - y0));
+  // Halve step by step for a clean downscale.
+  while (cur.width / 2 >= ICON_SIZE) {
+    const next = canvasOf(cur.width / 2, cur.height / 2), x = next.getContext("2d");
+    x.imageSmoothingQuality = "high";
+    x.drawImage(cur, 0, 0, next.width, next.height);
+    cur = next;
+  }
+  const out = canvasOf(ICON_SIZE, ICON_SIZE), o = out.getContext("2d");
+  o.imageSmoothingQuality = "high";
+  o.drawImage(cur, 0, 0, ICON_SIZE, ICON_SIZE);
+  return out;
+}
+
+document.addEventListener("paste", e => {
+  if (!studio || !studio.root.isConnected) return;
+  const f = [...(e.clipboardData?.files || [])].find(x => x.type.startsWith("image/"));
+  if (!f) return;
+  e.preventDefault();
+  loadCutSource(studio, f);
+  studio.step4.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+
+/* ---------- live data ---------- */
+
+function applyRemote(docId) {
+  // Refresh inputs from the store without clobbering what is being typed.
+  const c = state.candidates.get(docId);
+  for (const input of document.querySelectorAll("#detail [data-field]")) {
+    const field = input.dataset.field;
+    if (input === document.activeElement || hasPending(docId, field)) continue;
+    const value = c[field] ?? "";
+    if (input.value !== String(value)) input.value = value;
+  }
+}
+
+async function start() {
+  renderTabs();
+  renderList();
+  const claude = window.claude;
+  const [db, assets, downloads] = await Promise.all([claude?.use?.("db") ?? null, claude?.use?.("assets") ?? null, claude?.use?.("downloads") ?? null]);
+  state.db = db; state.assets = assets; state.downloads = downloads;
+  if (!db) {
+    $("#list").replaceChildren(el("div", { class: "empty" }, "Open this page on claude.ai, signed in, to load the queue."));
+    return;
+  }
+
+  db.doc("settings/icon").onSnapshot(snap => {
+    state.iconPrompt = snap.exists ? (snap.data().prompt || null) : null;
+    if (studio && document.activeElement !== studio.promptArea) studio.promptArea.value = state.iconPrompt || DEFAULT_PROMPT;
+  }, () => {});
+
+  db.doc("catalog/tricks").onSnapshot(snap => {
+    state.catalog = snap.exists ? (snap.data().tricks || []) : [];
+    renderList(); refreshWarnings();
+  }, () => setSaveState("Lost the live connection. Reload the page.", true));
+
+  db.collection("candidates").onSnapshot(snap => {
+    const openBefore = state.openId && state.candidates.get(state.openId);
+    for (const doc of snap.docs) {
+      const remote = doc.data();
+      const mine = pending.get(doc.id)?.patch || {};
+      state.candidates.set(doc.id, { ...remote, ...mine });
+    }
+    for (const id of [...state.candidates.keys()]) if (!snap.docs.some(d => d.id === id)) state.candidates.delete(id);
+    renderTabs(); renderList();
+    if (state.openId) {
+      const now = state.candidates.get(state.openId);
+      if (!now) closeDetail();
+      else if (!openBefore || openBefore.status !== now.status || openBefore.iconAsset !== now.iconAsset || openBefore.claudeNote !== now.claudeNote) renderDetail();
+      else { applyRemote(state.openId); refreshWarnings(); }
+    }
+  }, () => setSaveState("Lost the live connection. Reload the page.", true));
+}
+
+start();
+</script>

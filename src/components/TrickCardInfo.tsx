@@ -295,7 +295,9 @@ export const TrickCardInfo: React.FC<TrickCardInfoProps> = ({
               style={styles.tutorialButton}
               onPress={() => Linking.openURL(trick.tutorialUrl!)}
             >
-              <Text style={styles.tutorialButtonText}>{t("trickInfo.watchTutorial")}</Text>
+              <Text style={styles.tutorialButtonText}>
+                {t(trick.tutorialKind === "example" ? "trickInfo.viewExample" : "trickInfo.watchTutorial")}
+              </Text>
             </TouchableOpacity>
           )}
 

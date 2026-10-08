@@ -9,6 +9,8 @@ export interface Trick {
   difficulty: number; // 0-10
   description: string;
   tutorialUrl: string;
+  /** What tutorialUrl leads to. Unset means a tutorial; "example" is a demo clip or trick page. */
+  tutorialKind?: "tutorial" | "example";
   takeoff: Takeoff;
   landingStance: LandingStance;
 }
