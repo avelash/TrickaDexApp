@@ -6,6 +6,24 @@ const BEST_POOL_MIN_SIZE = 10;
 const BEST_POOL_CHANCE = 0.65;
 const TRANSITION_BEFORE_FLIP_CHANCE = 0.8;
 
+/** The only tricks that can carry a hyper landing into a cart full. */
+const CART_FULL_ENTRIES = new Set(["cartwheel", "one_handed_cartwheel", "tricker_aerial"]);
+
+/** Cart fulls: "Full ..." tricks (Full Twist, Full Hyper, ...) and Double Full. */
+const isCartFull = (trick: Trick) => /^(Double )?Full\b/.test(trick.name);
+
+/**
+ * Rules that depend on the tricks themselves, not just their stances: out of a
+ * hyper landing a cart full needs a cartwheel-family entry, so Aerial → Full
+ * Twist is out but Aerial → Cartwheel → Full Twist is fine.
+ */
+const canPrecede = (candidate: Trick, next: Trick): boolean => {
+  if (isCartFull(next) && candidate.landingStance === "hyper") {
+    return CART_FULL_ENTRIES.has(candidate.id);
+  }
+  return true;
+};
+
 /**
  * The strongest tricks available: walk difficulty levels from the top until
  * there are enough, so the pool stays weighted to the rider's hardest tricks.
@@ -75,6 +93,7 @@ export const generateCombo = (
       source.filter(candidate => {
         if (reversed.some(trick => trick.id === candidate.id)) return false;
         if (transitionOnly && !candidate.types.includes("transition")) return false;
+        if (!canPrecede(candidate, current)) return false;
 
         // Be lenient where trick data is incomplete.
         if (!candidate.landingStance || !current.takeoff) return true;
@@ -85,13 +104,13 @@ export const generateCombo = (
         return transitions(candidate.landingStance, current.takeoff) !== "---";
       });
 
-    let candidates = validPredecessors(
-      useBestPool ? bestTricks : pool,
-      forceTransition
-    );
+    // Transitions come from the whole pool. The hardest levels hold only one or
+    // two, so drawing them from the best pool put that one trick in most combos.
+    const source = useBestPool && !forceTransition ? bestTricks : pool;
+    let candidates = validPredecessors(source, forceTransition);
 
     // Widen the search before giving up: full pool, then drop the transition rule.
-    if (candidates.length === 0 && useBestPool) {
+    if (candidates.length === 0 && source !== pool) {
       candidates = validPredecessors(pool, forceTransition);
     }
     if (candidates.length === 0 && forceTransition) {

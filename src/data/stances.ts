@@ -67,6 +67,8 @@ export const allowedAfterLandings = (Takeoff: Takeoff): LandingStance[] => {
             return ["hyper"];
         case "back-vanish":
             return ["complete","fake-mega","hyper"];
+        case "pop":
+            return ["frontside","hyper"];
         default:
             return [];
     }
@@ -79,6 +81,8 @@ export const transitions = (landingStance: LandingStance, takeoff: Takeoff): str
         return "punch";
      case "frontside-regular":
         return "step-out";
+     case "frontside-pop":
+        return "pop";
      case "semi-front-vanish":
         return "frontswing";
      case "semi-regular":
@@ -115,6 +119,8 @@ export const transitions = (landingStance: LandingStance, takeoff: Takeoff): str
         case "hyper-wrap":
             return "wrap";
         case "hyper-back-vanish":
+            return "re-direct";
+        case "hyper-pop":
             return "re-direct";
         case "hyper-boneless":
             return "boneless";
